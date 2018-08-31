@@ -1,0 +1,337 @@
+\documentclass[10pt]{article}
+\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage[top=1cm, right=4cm, left=4cm, bottom=1.5cm]{geometry}
+\usepackage{longtable}
+\usepackage{pdflscape}
+\usepackage{colortbl}
+\providecommand{\shadeRow}{\rowcolor[rgb]{0, 0.99, 0}}
+
+\date{}
+\begin{document}
+\begin{center}
+\Large {\Sexpr{startdate$sdate[startdate$practice==pracs[k]]}} $\sim$ {\Sexpr{startdate$edate[startdate$practice == pracs[k]]}}
+\end{center}
+\vspace{1cm}
+\begin{center}
+
+
+<<echo=FALSE, results=tex>>=
+cat("\\Large \\textbf{{", latexTranslate(pracs[k]), "}}\\\\\n")
+@ 
+\end{center}
+\vspace{1cm}
+\listoftables
+<<echo=FALSE, results=tex>>=
+## Switch list of figures on if running a Quarterly report
+
+cat("\\listoffigures\n\\clearpage\n")
+
+@
+
+
+<<echo=FALSE, results=hide>>=
+## fig 1 ##
+practice<-pracs[k]
+data1cfp <- subset(dfp, practice==pracs[k])
+data2cfp <- subset(dfp, practice==pracs[k])
+dfp_bar <- data.frame(Site= c(practice,"QOD Total",practice,"QOD Total"),
+                 time_point = c("3m","3m","12m","12m"),
+                 percent = c(data1cfp$fu3m,data1cfp$qod_fu3m,data1cfp$fu12m,data1cfp$qod_fu12m)*100)
+
+
+pl<-ggplot(data=dfp_bar, aes(x=time_point, y=percent, fill=Site)) +
+  scale_y_continuous(limits=c(0,100),breaks=seq(0,100,10),labels = function(x) paste0(x, "%"))+
+  geom_bar(stat="identity", position=position_dodge())+geom_hline(yintercept = 80,color="red")+
+  geom_text(aes(label=percent), vjust=1.6, color="white",hjust = 0,
+            position = position_dodge(0.9), size=5)+
+  labs(y="Follow up rate", x="Time after surgery")+
+  scale_fill_brewer(palette="Paired")+scale_x_discrete(limits=c("3m", "12m"))+
+  theme(panel.grid.major = element_line(color = "grey"),text = element_text(size=18))
+
+pdf(paste('figs/lumbar_fu_', practice, '.pdf', sep=''))
+pl
+dev.off()
+@
+
+<<echo=FALSE, results=tex>>=
+## Switch list of figures on if running a Quarterly report
+
+
+## follow up rate plot ##
+
+  cat("\\clearpage",
+    "\\begin{figure}[!htbp]",
+    "\\begin{center}",
+    "\\includegraphics[scale=0.5]{", paste('figs/lumbar_fu_', pracs[k],'.pdf', sep=''), "}",
+    "\\caption[Follow-up rate.]{Follow-up rate at 3m and 12m post surgery. The goal is 80$\\%$ and above.}",
+    "\\end{center}",
+    "\\end{figure}", sep='')
+
+
+@
+    
+<<echo=FALSE, results=hide>>=
+## extract the site's data ##
+data1c <- subset(data1, practice==pracs[k])
+data2c <- subset(data2, practice==pracs[k])
+data3c <- subset(data3, practice==pracs[k])
+data2co <- subset(data2o, practice==pracs[k])
+## table 1 ##
+
+tab1 <- matrix(NA, nrow=2, ncol=5)
+tab1[1,1] <- length(unique(data$surgeon))
+tab1[1,2] <- length(unique(data$surg_location))
+tab1[1,3] <- nrow(data3)
+tab1[1,4] <- nrow(data2)
+tab1[1,5] <- nrow(data1)
+tab1[2,1] <- length(unique(data1c$surgeon))
+tab1[2,2] <- length(unique(data1c$surg_location))
+tab1[2,3] <- nrow(data3c)
+tab1[2,4] <- nrow(data2c)
+tab1[2,5] <- nrow(data1c)
+colnames(tab1) <- c("$\\#$ Surgeons ", "$\\#$ Hospitals ", "$\\#$ 3-M Accrual ", "$\\#$ 12-M Accrual ","$\\#$ Follow-up
+Accrual ")
+rownames(tab1) <- c("QOD Total ",latexTranslate(pracs[k]))
+
+
+## other tables ##
+datas <- vector("list", 2)
+datas[[1]] <- data1c
+datas[[2]] <- data1
+tab2 <- tab2fun(datas=datas)
+rownames(tab2) <- c("Gender", "~~~~Female", "~~~~Male", "Age", "Race", "~~~Native American", "~~~Asian", "~~~African American", "~~~Pacific Islander", "~~~Caucasian", "~~~Other", "Hispanic", "Education", "~~~Less than High School", "~~~High School", "~~~Two-year College", "~~~Four-year College", "~~~Post-College", "Insurance Payer", "~~~Uninsured", "~~~Medicare", "~~~Medicaid", "~~~VA/Government", "~~~Private", "Liability", "~~~Workers Compensation", "~~~Disability Insurance", "Employed and Working", "~~~Full Time", "~~~Part Time", "Employed and Not Working", "~~~~~~Due to Spine Problem", "~~~~~~Due to Other Condition", "Unemployed", "~~~On disability", "~~~~~~Due to Spine Problem", "~~~~~~Due to Other Condition", "~~~Retired", "~~~Homemaker", "~~~None of the Above", "Attending School", "Intend to Work after Surgery", "Participate in Activities", "~~~Outside of Home", "~~~Inside Home")
+hl2 <- hltab2(data=data1, ipr=pracs[k])
+
+tab3 <- tab3fun(datas=datas)
+rownames(tab3) <- c("Comorbidity", "~~~Diabetes", "~~~Coronary Artery Disease", "~~~Osteoporosis", "~~~Anxiety", "~~~Depression", "Smoking", "~~~Current Every Day", "~~~Current Some Day", "~~~Not a Current Smoker", "Body Mass Index","Revision", "Principal Diagnosis","~~~Spondylolisthesis", "~~~Disc Herniation","~~~Stenosis","~~~Adjacent Segment Disease", "~~~Mechanical disc collapse", "~~~Pseudoarthrosis", "Predominant Symptom", "~~~Back Pain", "~~~Leg Pain", "~~~Both", "Motor Deficits", "Duration", "~~~Less Than 3 Months", "~~~Greater Than 3 Months","ASA Grade", "~~~1", "~~~2", "~~~3", "~~~4", "Surgical Approach", "~~~Posterior only","~~~Anterior only", "~~~Lateral only", "~~~Two stage","Arthrodesis Performed ", "Laminectomy Performed", "~~~Level 1", "~~~Level 2",  "~~~Level 3", "~~~Level 4", "~~~Level 5-7",  "~~~Level 8-11", "~~~Level >11")
+hl3 <- hltab3(data=data1, ipr=pracs[k])
+
+
+
+
+
+tab6b <- tab6bfun(datas=datas)
+rownames(tab6b) <- c("\\underline{Spondylolisthesis }", "~~~Decompression Alone", "~~~Arthrodesis", "~~~Interbody Graft", "~~~Laminectomy Performed", "~~~~~~Level 1", "~~~~~~Level 2",  "~~~~~~Level 3", "~~~~~~Level 4", "~~~~~~Level 5-7",  "~~~~~~Level 8-11", "~~~~~~Level >11",   "\\underline{Disc Herniation }", "~~~Decompression Alone", "~~~Arthrodesis", "~~~Interbody Graft", "~~~Laminectomy Performed", "~~~~~~Level 1", "~~~~~~Level 2",  "~~~~~~Level 3", "~~~~~~Level 4", "~~~~~~Level 5-7",  "~~~~~~Level 8-11", "~~~~~~Level >11",  "\\underline{Stenosis }", "~~~Decompression Alone", "~~~Arthrodesis", "~~~Interbody Graft", "~~~Laminectomy Performed", "~~~~~~Level 1", "~~~~~~Level 2",  "~~~~~~Level 3", "~~~~~~Level 4", "~~~~~~Level 5-7",  "~~~~~~Level 8-11", "~~~~~~Level >11", "\\underline{Adjacent Segment Disease }", "~~~Decompression Alone", "~~~Arthrodesis", "~~~Interbody Graft", "~~~Laminectomy Performed", "~~~~~~Level 1", "~~~~~~Level 2",  "~~~~~~Level 3", "~~~~~~Level 4", "~~~~~~Level 5-7",  "~~~~~~Level 8-11", "~~~~~~Level >11", "\\underline{Symptomatic Mechanical Disc Collapse }", "~~~Decompression Alone", "~~~Arthrodesis", "~~~Interbody Graft", "~~~Laminectomy Performed", "~~~~~~Level 1", "~~~~~~Level 2",  "~~~~~~Level 3", "~~~~~~Level 4", "~~~~~~Level 5-7",  "~~~~~~Level 8-11", "~~~~~~Level >11")
+
+
+tab7 <- tab7fun(datas=datas, datasb=datas)
+rownames(tab7) <- c("Mortality", "~~~Hospital Mortality", "~~~30-day Mortality", "~~~3-Month Mortality", "Major Adverse Events", "~~~Pulmonary Embolism", "~~~Stroke", "~~~Myocardial Infarction", "~~~Surgical Site Infection", "~~~Surgical Site Hematoma", "~~~New Neuro Deficit", "~~~Any Major AE", "Minor Adverse Event", "~~~Deep Venous Thrombosis", "~~~Urinary Tract Infection", "~~~Incidental Durotomy", "~~~Pneumonia", "~~~Any Minor AE", "Patient Satisfaction", "~~~1 Met", "~~~2 Not As Much As Hoped", "~~~3 Would Not Undergo", "~~~4 Same or Worse", "~~~Top 2 (1$\\&$2)", "Utilization", "~~~Estimated Blood Loss (cc)*", "~~~Duration of Surgery (min)*", "~~~Hospital Length of Stay (days)*", "~~~30-day Return to OR", "~~~30-day Hospital Readmission", "~~~3-month Revision Surgery", "~~~3-month Hospital Readmission")
+hl7 <- hltab7(data=data1, ipr=pracs[k])
+
+tab7b <- tab7bfun(datas=datas)
+rownames(tab7b) <- c("\\underline{Discectomy}", "~~~Estimated Blood Loss (cc)", "~~~Duration of Surgery (min)", "~~~Hospital Length of Stay (days)", "~~~30-day Return to OR", "~~~30-day Hospital Readmission", "~~~3-month Revision Surgery", "~~~3-month Hospital Readmission", "\\underline{Laminectomy only}", "~~~Estimated Blood Loss (cc)", "~~~Duration of Surgery (min)", "~~~Hospital Length of Stay (days)", "~~~30-day Return to OR", "~~~30-day Hospital Readmission", "~~~3-month Revision Surgery", "~~~3-month Hospital Readmission", "\\underline{PLF}", "~~~Estimated Blood Loss (cc)", "~~~Duration of Surgery (min)", "~~~Hospital Length of Stay (days)", "~~~30-day Return to OR", "~~~30-day Hospital Readmission", "~~~3-month Revision Surgery", "~~~3-month Hospital Readmission", "\\underline{PLIF/TLIF}", "~~~Estimated Blood Loss (cc)", "~~~Duration of Surgery (min)", "~~~Hospital Length of Stay (days)", "~~~30-day Return to OR", "~~~30-day Hospital Readmission", "~~~3-month Revision Surgery", "~~~3-month Hospital Readmission", "\\underline{ALIF}", "~~~Estimated Blood Loss (cc)", "~~~Duration of Surgery (min)", "~~~Hospital Length of Stay (days)", "~~~30-day Return to OR", "~~~30-day Hospital Readmission", "~~~3-month Revision Surgery", "~~~3-month Hospital Readmission", "\\underline{XLIF/DLIF}", "~~~Estimated Blood Loss (cc)", "~~~Duration of Surgery (min)", "~~~Hospital Length of Stay (days)", "~~~30-day Return to OR", "~~~30-day Hospital Readmission", "~~~3-month Revision Surgery", "~~~3-month Hospital Readmission")
+
+
+
+
+    data2o_1 <- subset(data2o, !is.na(newcat1))
+    data2o_2 <- subset(data2o, !is.na(newcat2))
+    data2o_3 <- subset(data2o, !is.na(newcat3))
+    data2o_4 <- subset(data2o, !is.na(newcat4))
+    data2o_5 <- subset(data2o, !is.na(newcat5))
+    data2o_6 <- subset(data2o, !is.na(newcat6))
+
+    data2co_1 <- subset(data2co, !is.na(newcat1))
+    data2co_2 <- subset(data2co, !is.na(newcat2))
+    data2co_3 <- subset(data2co, !is.na(newcat3))
+    data2co_4 <- subset(data2co, !is.na(newcat4))
+    data2co_5 <- subset(data2co, !is.na(newcat5))
+    data2co_6 <- subset(data2co, !is.na(newcat6))
+    
+    tab9a_0 <- tab9fun(ptab=cbind(tab9pfun(datas=data2co), tab9pfun(datas=data2o)), datas=list(data2co, data2o))
+    tab9_1 <- tab9fun(ptab=cbind(tab9pfun(datas=data2co_1), tab9pfun(datas=data2o_1)), datas=list(data2co_1, data2o_1))
+    tab9_2 <- tab9fun(ptab=cbind(tab9pfun(datas=data2co_2), tab9pfun(datas=data2o_2)), datas=list(data2co_2, data2o_2))
+    tab9_3 <- tab9fun(ptab=cbind(tab9pfun(datas=data2co_3), tab9pfun(datas=data2o_3)), datas=list(data2co_3, data2o_3))
+    tab9_4 <- tab9fun(ptab=cbind(tab9pfun(datas=data2co_4), tab9pfun(datas=data2o_4)), datas=list(data2co_4, data2o_4))
+    tab9_5 <- tab9fun(ptab=cbind(tab9pfun(datas=data2co_5), tab9pfun(datas=data2o_5)), datas=list(data2co_5, data2o_5))
+    tab9_6 <- tab9fun(ptab=cbind(tab9pfun(datas=data2co_6), tab9pfun(datas=data2o_6)), datas=list(data2co_6, data2o_6))
+
+    tab9 <- rbind(rep('',12), tab9_1, rep('',12), tab9_2, rep('',12), tab9_3, rep('',12), tab9_4, rep('',12), tab9_5, rep('',12), tab9_6)
+    tab9a <- rbind(rep('',12), tab9a_0)    
+ rownames(tab9a) <- c("\\underline{Overall}",  "Pain", "~~~Back Pain", "~~~Leg Pain", "ODI Score ($\\%$)", "EQ-5D Score", "Return to Activity", "Return to Work", "Patient Satisfaction (Expectation Met)")
+  
+
+
+    rownames(tab9) <- c("\\underline{Discectomy}", "~~~Pain", "~~~~~~Back Pain", "~~~~~~Leg Pain", "~~~ODI Score ($\\%$)", "~~~EQ-5D Score", "~~~Return to Activity", "~~~Return to Work", "~~~Patient Satisfaction (Expectation Met)", "\\underline{Laminectomy}", "~~~Pain", "~~~~~~Back Pain", "~~~~~~Leg Pain", "~~~ODI Score ($\\%$)", "~~~EQ-5D Score", "~~~Return to Activity", "~~~Return to Work", "~~~Patient Satisfaction (Expectation Met)", "\\underline{PLF}", "~~~Pain", "~~~~~~Back Pain", "~~~~~~Leg Pain", "~~~ODI Score ($\\%$)", "~~~EQ-5D Score", "~~~Return to Activity", "~~~Return to Work", "~~~Patient Satisfaction (Expectation Met)", "\\underline{PLIF/TLIF}", "~~~Pain", "~~~~~~Back Pain", "~~~~~~Leg Pain", "~~~ODI Score ($\\%$)", "~~~EQ-5D Score", "~~~Return to Activity", "~~~Return to Work", "~~~Patient Satisfaction (Expectation Met)", "\\underline{ALIF}", "~~~Pain", "~~~~~~Back Pain", "~~~~~~Leg Pain", "~~~ODI Score ($\\%$)", "~~~EQ-5D Score", "~~~Return to Activity", "~~~Return to Work", "~~~Patient Satisfaction (Expectation Met)", "\\underline{XLIF/DLIF}", "~~~Pain", "~~~~~~Back Pain", "~~~~~~Leg Pain", "~~~ODI Score ($\\%$)", "~~~EQ-5D Score", "~~~Return to Activity", "~~~Return to Work", "~~~Patient Satisfaction (Expectation Met)")
+
+    ## make scatter plot #
+    plotname1 <- paste("figs/lumbar_", pracs[k], "plot.pdf", sep="")
+    plotfun2(datas=data1c, pltnam=plotname1, ptab=cbind(tab9pfun(datas=data1c),tab9pfun(datas=data1)))
+    
+
+@
+\clearpage
+
+
+<<echo=FALSE, results=tex>>=
+latex(tab1, title="", caption="Frequency", where="!h", col.just=rep("c",5), size='footnotesize',  file="")
+@
+\noindent
+The number of patients with baseline and 3 month data at your site is \Sexpr{round(tab1[2,3])}. This is regardless of whether they have 12 month data.
+The number of patients with baseline and 12 month data at your site is \Sexpr{round(tab1[2,4])}. This is regardless of whether they have 3 month data.
+The total number of patients at your site included in this report (called "follow-up accrual") is \Sexpr{round(tab1[2,5])}. This includes: 1) patients with 3 and 12 month follow-up, 2) patients who have 12 month follow-up but missed 3 month follow-up, 3) patients with 3 month follow-up and are not yet eligible for 12 month follow-up.
+
+<<echo=FALSE, results=tex>>=  
+
+myrow <- rep('', nrow(tab2))
+myrow[hl2] <- 'shadeRow'
+latex(tab2, title="", caption="Baseline Characteristics for Patients with Follow-up", where="!h", size="footnotesize", col.just=rep("c",2), colheads=c(latexTranslate(pracs[k]), "QOD Total"), file="", lines.page=48, insert.bottom =mlCap("* ${\\tiny a}$ b ${\\tiny c}$ represents the lower quantile a, the median b, and the upper quartile c. \\\\ *$x\\pm s$ represents mean$\\pm 1$ Standard Deviation. \\\\ Denominator lower than 3-month accrual is because of the missing values. \\\\ Highlighted are variables with a meaningful difference between Site and other centers."), rownamesTexCmd=myrow)
+@
+
+
+\clearpage
+<<echo=FALSE, results=tex>>=
+myrow <- rep('', nrow(tab3))
+myrow[hl3] <- 'shadeRow'
+latex(tab3, title="", caption="Medical and Clinical History for Patients with Follow-up", where="!h", size="footnotesize", col.just=rep("c",2), colheads=c(latexTranslate(pracs[k]), "QOD Total"), file="", lines.page=57, insert.bottom =mlCap("* ${\\tiny a}$ b ${\\tiny c}$ represents the lower quantile a, the median b, and the upper quartile c. \\\\ *$x\\pm s$ represents mean$\\pm 1$ Standard Deviation. \\\\ Denominator lower than 3-month accrual is because of the missing values. \\\\ Highlighted are variables with a meaningful difference between Site and other centers."), rownamesTexCmd=myrow)
+@
+\clearpage
+
+
+<<echo=FALSE, results=tex>>=
+latex(tab6b, title="", caption="Surgical Procedures by Diagnosis Group for Patients with Follow-up", where="!h", size="footnotesize", col.just=rep("c",2), colheads=c(latexTranslate(pracs[k]), "QOD Total"), longtable=TRUE, lines.page=100, file="", insert.bottom =mlCap("$x\\pm s$ represents mean$\\pm 1$ Standard Deviation for Number of Levels. \\\\ N is the number of non-missing values. \\\\  Denominator lower than 3-month accrual is because of the missing values."))
+@
+\clearpage
+<<echo=FALSE, results=tex>>=
+myrow <- rep('', nrow(tab7))
+myrow[hl7] <- 'shadeRow'
+latex(tab7, title="", caption="Indicators of Safety and Quality of Care for Patients with Follow-up", where="!h", size="footnotesize", col.just=rep("c",2), colheads=c(latexTranslate(pracs[k]), "QOD Total"), file="", lines.page=55, long=TRUE, insert.bottom =mlCap("* ${\\tiny a}$ b ${\\tiny c}$ represent the lower quantile a, the median b, and the upper quartile c. \\\\  * $x\\pm s$ represents mean$\\pm 1$ Standard Deviation. \\\\ N is the number of non-missing values. \\\\  Denominator lower than 3-month accrual is because of the missing values."), rownamesTexCmd=myrow)
+@
+
+\clearpage
+
+<<echo=FALSE, results=hide>>=
+## fig 2##
+practice<-pracs[k]
+tab_figure <- figure_construct(datas=datas)
+
+dfp_satisfaction <- data.frame(Site= c(practice,"QOD Total",practice,"QOD Total",practice,"QOD Total",practice,"QOD Total",practice,"QOD Total"),satisfaction = c("1 Met","1 Met", "2 Not As Much As Hoped", "2 Not As Much As Hoped", "3 Would Not Undergo", "3 Would Not Undergo", "4 Same or Worse", "4 Same or Worse","Top 2 (1&2)","Top 2 (1&2)"),percent = c(round(tab_figure[1,1]),round(tab_figure[1,2]),round(tab_figure[2,1]),round(tab_figure[2,2]),round(tab_figure[3,1]),round(tab_figure[3,2]),round(tab_figure[4,1]),round(tab_figure[4,2]),round(tab_figure[5,1]),round(tab_figure[5,2])))
+
+
+pl<-ggplot(data=dfp_satisfaction, aes(x=satisfaction, y=percent, fill=Site)) +
+  scale_y_continuous(limits=c(0,100),breaks=seq(0,100,10),labels = function(x) paste0(x, "%"))+
+  geom_bar(stat="identity", position=position_dodge())+
+  geom_text(aes(label=percent), vjust=-0.2, color="black",hjust = 0,
+            position = position_dodge(0.9), size=4)+
+  labs(x="Satisfaction Rate",y="Satisfaction Level")+
+  scale_fill_brewer(palette="Paired")+scale_x_discrete(limits=c("1 Met", "2 Not As Much As Hoped","3 Would Not Undergo", "4 Same or Worse","Top 2 (1&2)"))+
+  theme(panel.grid.major = element_line(color = "grey"),text = element_text(size=12),axis.text.x=element_text(angle=30,hjust=0.5,vjust=0.6))
+
+pdf(paste('figs/lumbar_fu2_', practice, '.pdf', sep=''))
+pl
+dev.off()
+  
+
+############################
+
+dfp_readmission <- data.frame(Site= c(practice,"QOD Total",practice,"QOD Total",practice,"QOD Total"),readmit = c("30-day Hospital Readmission", "30-day Hospital Readmission", "3-month Hospital Readmission", "3-month Hospital Readmission", "3-month Revision Surgery", "3-month Revision Surgery"),percent = c(tab_figure[7,1],tab_figure[7,2],tab_figure[9,1],tab_figure[9,2],tab_figure[8,1],tab_figure[8,2]))
+
+
+pl<-ggplot(data=dfp_readmission, aes(x=readmit, y=percent, fill=Site)) +
+  scale_y_continuous(limits=c(0,10),breaks=seq(0,10,1),labels = function(x) paste0(x, "%"))+
+  geom_bar(stat="identity", position=position_dodge())+
+  geom_text(aes(label=percent), vjust=-0.2, color="black",hjust = 0,
+            position = position_dodge(0.9), size=4)+
+  labs(y="Readmission Percent",x="Readmission Category")+
+  scale_fill_brewer(palette="Paired")+scale_x_discrete(limits=c("30-day Hospital Readmission", "3-month Hospital Readmission", "3-month Revision Surgery"))+
+  theme(panel.grid.major = element_line(color = "grey"),text = element_text(size=12),axis.text.x=element_text(angle=30,hjust=0.5,vjust=0.6))
+
+pdf(paste('figs/lumbar_fu3_', practice, '.pdf', sep=''))
+pl
+dev.off()
+@
+
+<<echo=FALSE, results=tex>>=
+## Switch list of figures on if running a Quarterly report
+
+
+## follow up rate plot ##
+
+  cat("\\clearpage",
+    "\\begin{figure}[!htbp]",
+    "\\begin{center}",
+    "\\includegraphics[scale=1]{", paste('figs/lumbar_fu2_', pracs[k],'.pdf', sep=''), "}",
+    "\\caption[Satisfaction]{Satisfaction from surgery.}",
+    "\\end{center}",
+    "\\end{figure}", sep='')
+
+  cat("\\begin{figure}[!htbp]",
+    "\\begin{center}",
+    "\\includegraphics[scale=1]{", paste('figs/lumbar_fu3_', pracs[k],'.pdf', sep=''), "}",
+    "\\caption[Readmission]{Readmission.}",
+    "\\end{center}",
+    "\\end{figure}", sep='')
+
+
+@
+\clearpage
+
+
+<<echo=FALSE, results=tex>>=
+latex(tab7b, title="", caption="Utilization by Surgical Approach for Patients with 3-month Follow-up", where="!h", size="footnotesize", col.just=rep("c",2), colheads=c(latexTranslate(pracs[k]), "QOD Total"), file="", lines.page=100, long=TRUE, insert.bottom =mlCap("${\\tiny a}$ b ${\\tiny c}$ represent the lower quantile a, the median b, and the upper quartile c. \\\\ $x\\pm s$ represents mean$\\pm 1$ Standard Deviation. \\\\ N is the number of non-missing values. \\\\  Denominator lower than 3-month accrual is because of the missing values. \\\\ A patient could possibly fall into more than one category of Surgical Approach. \\\\ PLF: Posterolateral Lumbar Fusion \\\\ PLIF/TLIF: Transforaminal Lumbar Interbody Fusion/Posterior Lumbar Interbody Fusion \\\\ ALIF: Anterior Lumbar Interbody Fusion \\\\ XLIF/DLIF: Lateral Lumbar Interbody Fusion/Direct Lateral Interbody Fusion"))
+@
+
+\clearpage
+
+<<echo=FALSE, results=tex>>=
+
+    latex(tab9a, title="", caption="Outcomes at Baseline, 3 Month and 12 Month for Patients with 12-month Follow-up", where="!h", size="footnotesize", col.just=c("r", "c","r", "c","r","c", "r", "c","r", "c","r", "c"), colheads=rep(c("N-B", "Baseline","N-3", "3-Month","N-12", "12-Month"),2), cgroup=c(latexTranslate(pracs[k]), "QOD Total"), file='', lines.page=35, longtable=TRUE, landscape=TRUE, insert.bottom =mlCap("${\\tiny a}$ b ${\\tiny c}$ represent the lower quantile a, the median b, and the upper quartile c.  \\\\ $x\\pm s$ represents $\\bar{X}\\pm 1$ Standard Deviation. \\\\ N-B is the number of non-missing values at baseline. \\\\ N-3 is the number of non-missing values at 3 month. \\\\
+N-12 is the number of non-missing values at 12 month. \\\\Numbers after percents are frequencies."))
+
+@
+\clearpage
+
+<<echo=FALSE, results=tex>>=
+
+    cat("\\begin{figure}[!htbp]",
+        "\\begin{center}",
+        "\\includegraphics[width=15cm]{", plotname1, "}",
+        "\\caption[Patient Reported Outcomes]{The graph shows the means and standard deviations at the three time points.}",
+        "\\end{center}",
+        "\\end{figure}\n", sep='')
+
+@
+
+
+\clearpage
+
+<<echo=FALSE, results=tex>>=
+
+    latex(tab9, title="", caption="Outcomes at Baseline, 3 Month and 12 Month for Patients with 12-month Follow-up", where="!h", size="footnotesize", col.just=c("r", "c","r", "c","r","c", "r", "c","r", "c","r", "c"), colheads=rep(c("N-B", "Baseline","N-3", "3-Month","N-12", "12-Month"),2), cgroup=c(latexTranslate(pracs[k]), "QOD Total"), file='', lines.page=27, longtable=TRUE, landscape=TRUE, insert.bottom =mlCap("${\\tiny a}$ b ${\\tiny c}$ represent the lower quantile a, the median b, and the upper quartile c.  \\\\ $x\\pm s$ represents $\\bar{X}\\pm 1$ Standard Deviation. \\\\  N-B is the number of non-missing values at baseline. \\\\ N-3 is the number of non-missing values at 3 month. \\\\
+N-12 is the number of non-missing values at 12 month.  \\\\ Numbers after percents are frequencies. \\\\ PLF: Posterolateral Lumbar Fusion \\\\ PLIF/TLIF: Transforaminal Lumbar Interbody Fusion/Posterior Lumbar Interbody Fusion \\\\ ALIF: Anterior Lumbar Interbody Fusion \\\\ XLIF/DLIF: Lateral Lumbar Interbody Fusion/Direct Lateral Interbody Fusion"))
+
+@
+
+
+\clearpage
+
+\begin{landscape}
+<<echo=FALSE, results=tex>>=
+    tab <- modrst2[[pracs[k]]]
+    latex(tab, 
+          title='', 
+          caption=paste("Site", ': Self Benchmark Patient Reported Ouctomes and Utilization', sep=''), 
+          colheads=rep(c('N', 'Observed \n Mean ~~~~~~ (95$\\%$ CI)$^1$', 'Expected$^2$ \n Mean'),2), 
+          cgroup=c('3-Month Post-Surgery', '12-Month Post-Surgery'), 
+          rowname=c('$\\textbf{Back Pain}$', '$\\textbf{Leg Pain}$', '$\\textbf{ODI}$', '$\\textbf{EQ5D}$', '$\\textbf{Patient Satisfaction}^3$', '$\\textbf{Blood Loss (ml)}$', '$\\textbf{Length of Hospital Stay (day)}$'), 
+          where='!h', 
+          size='footnotesize', 
+          col.just=rep('c', 6), 
+          insert.bottom=c("The N represents the number with 3-month follow-up or 12-month follow-up. \\\\ The mean is your site's average response to these outcomes. \\\\ The expected mean for your site comes from a statistical model derived from all data. This model also uses several of the variables from tables 1-6 to predict these outcomes. \\\\ By comparing your mean to the expected mean, you can get a sense of how your site compares to QOD as a whole."), file='')
+@
+\end{landscape}
+\vspace{-0.1cm}
+\begin{landscape}
+<<echo=FALSE, results=tex>>=
+    cat("\\begin{figure}[!htbp]",
+        "\\begin{center}",
+        "\\includegraphics[width=25cm]{", paste('figs/lumbar_', pracs[k],'_model.pdf', sep=''), "}",
+        "\\caption[Self-benchmark: Observed vs Expected.]{", latexTranslate(pracs[k]), ": Self-benchmark: observed mean vs expected mean (as in the table above). Parenthesis denotes bootstrap 95$\\%$ CI of observed mean. Your site is statistically significantly different if triangle is outside parentheses and it is colored with red}",
+        "\\end{center}",
+        "\\end{figure}", sep='')
+@
+\end{landscape}
+\clearpage
+\end{document}
+
