@@ -204,9 +204,9 @@ latex(tab7, title="", caption="Indicators of Safety and Quality of Care for Pati
 <<echo=FALSE, results=hide>>=
 ## fig 2##
 practice<-pracs[k]
-tab_figure <- figure_construct(datas=datas)
+tab_figure <- figure_construct(data=datas)
 
-dfp_satisfaction <- data.frame(Site= c(practice,"QOD Total",practice,"QOD Total",practice,"QOD Total",practice,"QOD Total",practice,"QOD Total"),satisfaction = c("1 Met","1 Met", "2 Not As Much As Hoped", "2 Not As Much As Hoped", "3 Would Not Undergo", "3 Would Not Undergo", "4 Same or Worse", "4 Same or Worse","Top 2 (1&2)","Top 2 (1&2)"),percent = c(round(tab_figure[1,1]),round(tab_figure[1,2]),round(tab_figure[2,1]),round(tab_figure[2,2]),round(tab_figure[3,1]),round(tab_figure[3,2]),round(tab_figure[4,1]),round(tab_figure[4,2]),round(tab_figure[5,1]),round(tab_figure[5,2])))
+dfp_satisfaction <- data.frame(Site= c(practice,"QOD Total",practice,"QOD Total",practice,"QOD Total",practice,"QOD Total",practice,"QOD Total"),satisfaction = c("1-Met","1-Met", "2-Not As Much As \n Hoped", "2-Not As Much As \n Hoped", "3-Would Not \n Undergo", "3-Would Not \n Undergo", "4-Same or Worse", "4-Same or Worse","Combined \n (1&2)","Combined \n (1&2)"),percent = c(round(tab_figure[1,1]),round(tab_figure[1,2]),round(tab_figure[2,1]),round(tab_figure[2,2]),round(tab_figure[3,1]),round(tab_figure[3,2]),round(tab_figure[4,1]),round(tab_figure[4,2]),round(tab_figure[6,1]),round(tab_figure[6,2])))
 
 
 pl<-ggplot(data=dfp_satisfaction, aes(x=satisfaction, y=percent, fill=Site)) +
@@ -215,8 +215,9 @@ pl<-ggplot(data=dfp_satisfaction, aes(x=satisfaction, y=percent, fill=Site)) +
   geom_text(aes(label=percent), vjust=-0.2, color="black",hjust = 0,
             position = position_dodge(0.9), size=4)+
   labs(x="Satisfaction Rate",y="Satisfaction Level")+
-  scale_fill_brewer(palette="Paired")+scale_x_discrete(limits=c("1 Met", "2 Not As Much As Hoped","3 Would Not Undergo", "4 Same or Worse","Top 2 (1&2)"))+
-  theme(panel.grid.major = element_line(color = "grey"),text = element_text(size=12),axis.text.x=element_text(angle=30,hjust=0.5,vjust=0.6))
+  scale_fill_brewer(palette="Paired")+scale_x_discrete(limits=c("1-Met", "2-Not As Much As \n Hoped","3-Would Not \n Undergo", "4-Same or Worse",
+                                                                "Combined \n (1&2)"))+
+  theme(panel.grid.major = element_line(color = "grey"),text = element_text(size=12),axis.text.x=element_text(angle=30,hjust=0,vjust=0.6,size=10))
 
 pdf(paste('figs/lumbar_fu2_', practice, '.pdf', sep=''))
 pl

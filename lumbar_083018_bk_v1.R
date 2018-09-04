@@ -6,7 +6,7 @@
 rm(list=ls())
 
 ### set working directory###
-setwd("C:\\Users\\karacb1\\Desktop\\qod_outcomes_master")
+setwd("C:\\Users\\karacb1\\Desktop\\qod-project-codes")
 
 
 
@@ -68,8 +68,8 @@ data$practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\1", data$pt_study_id)
 data$sub_practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\3", data$pt_study_id)
 data$surgeon <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surgeon))
 data$surg_location <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surg_location))
-#liste=c("Cornell","Semmes")
-#data <- subset(data, practice %in% liste)
+liste=c("Cornell","Semmes")
+data <- subset(data, practice %in% liste)
 
 ## only include sites with at least 20 patients followed up at 3 month #
 tab <- with(subset(data, analysis3month), table(practice))
@@ -1279,7 +1279,7 @@ figure_construct <- function(datas) {
   M_f[3,] <- catfun1b(var1="pt_satisfaction_index.3m___3", var2="pt_satisfaction_index.3m___3", ilev="1", df=datas)
   M_f[4,] <- catfun1b(var1="pt_satisfaction_index.3m___4", var2="pt_satisfaction_index.3m___4", ilev="1", df=datas)
   M_f[5,] <- catfun1b(var1="pt_satisfaction_index2.3m", var2="pt_satisfaction_index2.3m", ilev="1", df=datas)
-  M_f[6,] <- catfun1b( var1="returned_to_or_with_30_day", var2="returned_to_or_with_30_day", ilev="1", df=datas)
+  M_f[6,] <- M_f[1,] + M_f[2,]
   M_f[7,] <- catfun1b(var1="readmit30day", var2="readmit30day", ilev="1", df=datas)
   M_f[8,] <- catfun1b(var1="revision_surg_3mths2", var2="revision_surg_3mths2", ilev="1", df=datas)
   M_f[9,] <- catfun1b(var1="readmit3m", var2="readmit3m", ilev="1", df=datas)
