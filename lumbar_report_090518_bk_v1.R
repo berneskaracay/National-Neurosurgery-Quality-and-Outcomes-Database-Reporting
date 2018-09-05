@@ -756,7 +756,7 @@ for (j in 1:np) {
     lines(tmp$time, 1-tmp$surv, type='s')
     lines(survs$time, 1-survs[[tprac]], type='s', col='blue')
     title(main=paste(tprac, ': Self Benchmark Return to Work \n (N=', nsample, ')', sep=''), line=4.3)
-    legend('bottomright', bty='n', lty=1:1, col=c('red', 'blue'), legend=c('tprac', 'QOD risk adjusted'))
+    legend('bottomright', bty='n', lty=1:1, col=c('black', 'blue'), legend=c(latexTranslate(tprac), 'QOD risk adjusted'))
     dev.off()
   } else {
     print(tprac)
