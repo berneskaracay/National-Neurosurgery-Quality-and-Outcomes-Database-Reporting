@@ -167,7 +167,7 @@ rownames(tab7b) <- c("\\underline{Discectomy}", "~~~Estimated Blood Loss (cc)", 
 <<echo=FALSE, results=tex>>=
 latex(tab1, title="", caption="Frequency", where="!h", col.just=rep("c",5), size='footnotesize',  file="")
 @
-\noindent
+
 The number of patients with baseline and 3 month data at your site is \Sexpr{round(tab1[2,3])}. This is regardless of whether they have 12 month data.
 The number of patients with baseline and 12 month data at your site is \Sexpr{round(tab1[2,4])}. This is regardless of whether they have 3 month data.
 The total number of patients at your site included in this report (called "follow-up accrual") is \Sexpr{round(tab1[2,5])}. This includes: 1) patients with 3 and 12 month follow-up, 2) patients who have 12 month follow-up but missed 3 month follow-up, 3) patients with 3 month follow-up and are not yet eligible for 12 month follow-up.
@@ -206,7 +206,7 @@ latex(tab7, title="", caption="Indicators of Safety and Quality of Care for Pati
 practice<-pracs[k]
 tab_figure <- figure_construct(data=datas)
 
-dfp_satisfaction <- data.frame(Site= c(practice,"QOD Total",practice,"QOD Total",practice,"QOD Total",practice,"QOD Total",practice,"QOD Total"),satisfaction = c("1-Met","1-Met", "2-Not As Much As \n Hoped", "2-Not As Much As \n Hoped", "3-Would Not \n Undergo", "3-Would Not \n Undergo", "4-Same or Worse", "4-Same or Worse","Combined \n (1&2)","Combined \n (1&2)"),percent = c(round(tab_figure[1,1]),round(tab_figure[1,2]),round(tab_figure[2,1]),round(tab_figure[2,2]),round(tab_figure[3,1]),round(tab_figure[3,2]),round(tab_figure[4,1]),round(tab_figure[4,2]),round(tab_figure[6,1]),round(tab_figure[6,2])))
+dfp_satisfaction <- data.frame(Site= c(practice,"QOD Total",practice,"QOD Total",practice,"QOD Total",practice,"QOD Total",practice,"QOD Total"),satisfaction = c("1-Met","1-Met", "2-Not As Much \n As Hoped", "2-Not As Much \n As Hoped", "3-Would Not \n Undergo", "3-Would Not \n Undergo", "4-Same or Worse", "4-Same or Worse","Satisfied \n (1+2)","Satisfied \n (1+2)"),percent = c(round(tab_figure[1,1]),round(tab_figure[1,2]),round(tab_figure[2,1]),round(tab_figure[2,2]),round(tab_figure[3,1]),round(tab_figure[3,2]),round(tab_figure[4,1]),round(tab_figure[4,2]),round(tab_figure[6,1]),round(tab_figure[6,2])))
 
 
 pl<-ggplot(data=dfp_satisfaction, aes(x=satisfaction, y=percent, fill=Site)) +
@@ -215,9 +215,8 @@ pl<-ggplot(data=dfp_satisfaction, aes(x=satisfaction, y=percent, fill=Site)) +
   geom_text(aes(label=percent), vjust=-0.2, color="black",hjust = 0,
             position = position_dodge(0.9), size=4)+
   labs(x="Satisfaction Rate",y="Satisfaction Level")+
-  scale_fill_brewer(palette="Paired")+scale_x_discrete(limits=c("1-Met", "2-Not As Much As \n Hoped","3-Would Not \n Undergo", "4-Same or Worse",
-                                                                "Combined \n (1&2)"))+
-  theme(panel.grid.major = element_line(color = "grey"),text = element_text(size=12),axis.text.x=element_text(angle=30,hjust=0,vjust=0.6,size=10))
+  scale_fill_brewer(palette="Paired")+scale_x_discrete(limits=c("1-Met", "2-Not As Much \n As Hoped","3-Would Not \n Undergo", "4-Same or Worse","Satisfied \n (1+2)"))+
+  theme(panel.grid.major = element_line(color = "grey"),text = element_text(size=12),axis.text.x=element_text(angle=30,hjust=1,vjust=1,size=10))
 
 pdf(paste('figs/lumbar_fu2_', practice, '.pdf', sep=''))
 pl
@@ -226,7 +225,7 @@ dev.off()
 
 ############################
 
-dfp_readmission <- data.frame(Site= c(practice,"QOD Total",practice,"QOD Total",practice,"QOD Total"),readmit = c("30-day Hospital Readmission", "30-day Hospital Readmission", "3-month Hospital Readmission", "3-month Hospital Readmission", "3-month Revision Surgery", "3-month Revision Surgery"),percent = c(tab_figure[7,1],tab_figure[7,2],tab_figure[9,1],tab_figure[9,2],tab_figure[8,1],tab_figure[8,2]))
+dfp_readmission <- data.frame(Site= c(practice,"QOD Total",practice,"QOD Total",practice,"QOD Total"),readmit = c("30-day Hospital \n Readmission", "30-day Hospital \n Readmission", "3-month Hospital \n Readmission", "3-month Hospital \n Readmission", "3-month Revision \n Surgery", "3-month Revision \n Surgery"),percent = c(tab_figure[7,1],tab_figure[7,2],tab_figure[9,1],tab_figure[9,2],tab_figure[8,1],tab_figure[8,2]))
 
 
 pl<-ggplot(data=dfp_readmission, aes(x=readmit, y=percent, fill=Site)) +
@@ -235,8 +234,8 @@ pl<-ggplot(data=dfp_readmission, aes(x=readmit, y=percent, fill=Site)) +
   geom_text(aes(label=percent), vjust=-0.2, color="black",hjust = 0,
             position = position_dodge(0.9), size=4)+
   labs(y="Readmission Percent",x="Readmission Category")+
-  scale_fill_brewer(palette="Paired")+scale_x_discrete(limits=c("30-day Hospital Readmission", "3-month Hospital Readmission", "3-month Revision Surgery"))+
-  theme(panel.grid.major = element_line(color = "grey"),text = element_text(size=12),axis.text.x=element_text(angle=30,hjust=0.5,vjust=0.6))
+  scale_fill_brewer(palette="Paired")+scale_x_discrete(limits=c("30-day Hospital \n Readmission", "3-month Hospital \n Readmission", "3-month Revision \n Surgery"))+
+  theme(panel.grid.major = element_line(color = "grey"),text = element_text(size=12),axis.text.x=element_text(angle=30,hjust=1,vjust=1))
 
 pdf(paste('figs/lumbar_fu3_', practice, '.pdf', sep=''))
 pl
@@ -334,5 +333,19 @@ N-12 is the number of non-missing values at 12 month.  \\\\ Numbers after percen
 @
 \end{landscape}
 \clearpage
+
+\clearpage
+<<echo=FALSE, results=tex>>=
+
+    cat("\\begin{figure}[!htbp]",
+        "\\begin{center}",
+        "\\includegraphics[width=10cm]{", paste('figs/lumbar_', pracs[k],'_model2.pdf', sep=''), "}",
+        "\\caption{", latexTranslate(pracs[k]), ": Kaplan-meier estimates of return to work vs. expected curve based on a multivariable Cox proportional hazards model. Shaded area indicates 95$\\%$ CI of Kaplan-meier estimates. Controlling for your patient characteristics, if the observed is above the expected, then your patients are returning to work sooner than expected based on QOD as a whole. If the observed is below the expected, then your patients are returning to work later than expected based on QOD as a whole.}",
+        "\\end{center}",
+        "\\end{figure}", sep='')
+
+@
+\clearpage
+
 \end{document}
 
