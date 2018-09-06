@@ -229,7 +229,7 @@ dfp_readmission <- data.frame(Site= c(practice,"QOD Total",practice,"QOD Total",
 
 
 pl<-ggplot(data=dfp_readmission, aes(x=readmit, y=percent, fill=Site)) +
-  scale_y_continuous(limits=c(0,max(10,max(dfp_readmission$percent))),breaks=seq(0,max(10,max(dfp_readmission$percent)),1),labels = function(x) paste0(x, "%"))+
+  scale_y_continuous(limits=c(0,max(10,max(dfp_readmission$percent))+1),breaks=seq(0,max(10,max(dfp_readmission$percent)+1),1),labels = function(x) paste0(x, "%"))+
   geom_bar(stat="identity", position=position_dodge())+
   geom_text(aes(label=percent), vjust=-0.2, color="black",hjust = 0,
             position = position_dodge(0.9), size=4)+

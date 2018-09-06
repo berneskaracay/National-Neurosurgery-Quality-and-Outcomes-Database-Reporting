@@ -1,0 +1,243 @@
+\documentclass[10pt]{article}
+\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{pdflscape}
+\usepackage[top=1.5cm, bottom=1.5cm, left=1cm, right=1cm]{geometry}
+\usepackage{colortbl}
+\providecommand{\shadeRow}{\rowcolor[rgb]{0, 0.99, 0}}
+<<echo=FALSE, results=tex>>=
+cat("\\title{STATISTICS and OUTCOMES ", if(reportType == "Annual") "ANNUAL ", "REPORT \\\\ CERVICAL}\n", sep='')
+@
+\date{}
+\begin{document}
+\maketitle
+\begin{center}
+\Large {\Sexpr{startdate$sdate[startdate$practice==pracs[k]]}} $\sim$ {\Sexpr{startdate$edate[startdate$practice == pracs[k]]}}
+\end{center}
+\vspace{1cm}
+\begin{center}
+<<echo=FALSE, results=tex>>=
+cat("\\Large \\textbf{", latexTranslate(pracs[k]), "}\\\\\n", sep='')
+@
+\end{center}
+\vspace{1cm}
+\listoftables
+<<echo=FALSE, results=tex>>=
+## Switch list of figures on if running a Quarterly report
+if (reportType %in% c("Quarter", "Fast Quarter")) {
+    cat("\\listoffigures\n")
+}
+
+## follow up rate plot ##
+if (pracs[k] %in% pracs2) {
+  cat("\\clearpage",
+    "\\begin{figure}[!htbp]",
+    "\\begin{center}",
+    "\\includegraphics[width=16cm]{", paste('figs/fu_', pracs[k],'.pdf', sep=''), "}",
+    "\\caption[Follow-up rate.]{Follow-up rate at 3m and 12m post surgery. The size of circle or triangle is proportional to the number of patients enrolled in each site. The goal is 0.80 and above.}",
+    "\\end{center}",
+    "\\end{figure}", sep='')
+}
+<<echo=FALSE, results=hide>>=
+data1c <- subset(data1, practice==pracs[k])
+data2c <- subset(data2, practice==pracs[k])
+
+## table 1 ##
+tab1 <- matrix(NA, nrow=2, ncol=5)
+tab1[1,1] <- length(unique(data$surgeon))
+tab1[1,2] <- length(unique(data$surg_location))
+tab1[1,3] <- nrow(data1)
+tab1[1,4] <- nrow(data1)
+tab1[1,5] <- nrow(data2)
+tab1[2,1] <- length(unique(data1c$surgeon))
+tab1[2,2] <- length(unique(data1c$surg_location))
+tab1[2,3] <- nrow(data1c)
+tab1[2,4] <- nrow(data1c)
+tab1[2,5] <- nrow(data2c)
+
+colnames(tab1) <- c("$\\#$ Surgeons", "$\\#$ Hospitals", "$\\#$ Baseline Accrual", "$\\#$ 3-Month Accrual", "$\\#$ 12-Month Accrual")
+rownames(tab1) <- c("QOD Total", latexTranslate(pracs[k]))
+if(reportType == "Annual") {
+    tab1 <- tab1[,-5, drop=FALSE]
+}
+
+## other tables ##
+datas <- vector("list", 2)
+datas[[1]] <- data1c
+datas[[2]] <- data1
+
+
+tab2 <- tab2fun(datas=datas)
+rownames(tab2) <- c("Gender", "~~~~Female", "~~~~Male", "Age", "Race", "~~~Native American", "~~~Asian", "~~~African American", "~~~Pacific Islander", "~~~Caucasian", "~~~Other", "Hispanic", "Education", "~~~Less than High School", "~~~High School", "~~~Two-year College", "~~~Four-year College", "~~~Post-College", "Insurance Payer", "~~~Uninsured", "~~~Medicare", "~~~Medicaid", "~~~VA/Government", "~~~Private", "Liability", "~~~Workers Compensation", "~~~Disability Insurance", "Employed and Working", "~~~Full Time", "~~~Part Time", "Employed and Not Working", "~~~~~~Due to Spine Problem", "~~~~~~Due to Other Condition", "Unemployed", "~~~On disability", "~~~~~~Due to Spine Problem", "~~~~~~Due to Other Condition", "~~~Retired", "~~~Homemaker", "~~~None of the Above", "Attending School", "Intend to Work after Surgery", "Participate in Activities", "~~~Outside of Home", "~~~Inside Home")
+hl2 <- hltab2(data=data1, ipr=pracs[k])
+
+tab3 <- tab3fun(datas=datas)
+rownames(tab3) <- c("Major Surgery in Past Year", "Comorbidity", "~~~Diabetes", "~~~Coronary Artery Disease", "~~~Osteoporosis", "~~~Anxiety", "~~~Depression", "Smoking", "~~~Current Every Day", "~~~Current Some Day", "~~~Not a Current Smoker", "Body Mass Index")
+hl3 <- hltab3(data=data1, ipr=pracs[k])
+
+tab4 <- tab4fun(datas=datas)
+rownames(tab4) <- c( "Revision", "Primary Indication for Surgery", "~~~Radiculopathy","~~~Myelopathy","~~~Neck Pain from Instability", "Underlying Pathology", "~~~Disc Herniation", "~~~Foraminal Stenosis", "~~~Central Stenosis", "~~~Cervical Instability", "~~~Pseudoarthrosis", "~~~Adjacent Segment Disease", "Duration", "~~~Less Than 3 Months", "~~~Greater Than 3 Months", "~~~Unknown")
+hl4 <- hltab4(data=data1, ipr=pracs[k])
+
+tab5 <- tab5fun(datas=datas)
+rownames(tab5) <- c('\\underline{Posterior laminectomy only}', '~~~~~Rating of Pain', '~~~~~~~~Neck Pain', '~~~~~~~~Arm Pain', '~~~~~NDI($\\%$)', '~~~~~EQ-5D', '\\underline{Posterior laminectomy and fusion}', '~~~~~Rating of Pain', '~~~~~~~~Neck Pain', '~~~~~~~~Arm Pain', '~~~~~NDI($\\%$)', '~~~~~mJOA', '~~~~~EQ-5D', '\\underline{Posterior foraminotomy only}', '~~~~~Rating of Pain', '~~~~~~~~Neck Pain', '~~~~~~~~Arm Pain', '~~~~~NDI($\\%$)', '~~~~~EQ-5D', '\\underline{ACDF only}', '~~~~~Rating of Pain', '~~~~~~~~Neck Pain', '~~~~~~~~Arm Pain', '~~~~~NDI($\\%$)', '~~~~~EQ-5D', '\\underline{Corpectomy only}', '~~~~~Rating of Pain', '~~~~~~~~Neck Pain', '~~~~~~~~Arm Pain', '~~~~~NDI($\\%$)', '~~~~~EQ-5D')
+
+tab6 <- tab6fun(datas=datas)
+tab6a <- tab6[1:11,]
+tab6b <- tab6[12:89,]
+rownames(tab6a) <- c("ASA Grade", "~~~1", "~~~2", "~~~3", "~~~4", "Arthrodesis Performed", "Surgical Approach", "~~~Anterior","~~~Posterior", "~~~Two-stage", 'Surgical Levels')
+rownames(tab6b) <- c('\\underline{Radiculopathy}', '~~~~Disc Herniation', '~~~~~~~~Anterior Approach', '~~~~~~~~Posterior Approach', '~~~~~~~~Two-stage Approach', '~~~~~~~~Levels', '~~~~Central/Foraminal Stenosis', '~~~~~~~~Anterior Approach', '~~~~~~~~Posterior Approach', '~~~~~~~~Two-stage Approach', '~~~~~~~~Levels', '~~~~Instability', '~~~~~~~~Anterior Approach', '~~~~~~~~Posterior Approach', '~~~~~~~~Two-stage Approach', '~~~~~~~~Levels', '~~~~Pseudoarthrosis', '~~~~~~~~Anterior Approach', '~~~~~~~~Posterior Approach', '~~~~~~~~Two-stage Approach', '~~~~~~~~Levels', '~~~~Adjacent Segment Disease', '~~~~~~~~Anterior Approach', '~~~~~~~~Posterior Approach', '~~~~~~~~Two-stage Approach', '~~~~~~~~Levels', '\\underline{Myelopathy}', '~~~~Disc Herniation', '~~~~~~~~Anterior Approach', '~~~~~~~~Posterior Approach', '~~~~~~~~Two-stage Approach', '~~~~~~~~Levels', '~~~~Central/Foraminal Stenosis', '~~~~~~~~Anterior Approach', '~~~~~~~~Posterior Approach', '~~~~~~~~Two-stage Approach', '~~~~~~~~Levels', '~~~~Instability', '~~~~~~~~Anterior Approach', '~~~~~~~~Posterior Approach', '~~~~~~~~Two-stage Approach', '~~~~~~~~Levels', '~~~~Pseudoarthrosis', '~~~~~~~~Anterior Approach', '~~~~~~~~Posterior Approach', '~~~~~~~~Two-stage Approach', '~~~~~~~~Levels', '~~~~Adjacent Segment Disease', '~~~~~~~~Anterior Approach', '~~~~~~~~Posterior Approach', '~~~~~~~~Two-stage Approach', '~~~~~~~~Levels', '\\underline{Instability}', '~~~~Disc Herniation', '~~~~~~~~Anterior Approach', '~~~~~~~~Posterior Approach', '~~~~~~~~Two-stage Approach', '~~~~~~~~Levels', '~~~~Central/Foraminal Stenosis', '~~~~~~~~Anterior Approach', '~~~~~~~~Posterior Approach', '~~~~~~~~Two-stage Approach', '~~~~~~~~Levels', '~~~~Instability', '~~~~~~~~Anterior Approach', '~~~~~~~~Posterior Approach', '~~~~~~~~Two-stage Approach', '~~~~~~~~Levels', '~~~~Pseudoarthrosis', '~~~~~~~~Anterior Approach', '~~~~~~~~Posterior Approach', '~~~~~~~~Two-stage Approach', '~~~~~~~~Levels', '~~~~Adjacent Segment Disease', '~~~~~~~~Anterior Approach', '~~~~~~~~Posterior Approach', '~~~~~~~~Two-stage Approach', '~~~~~~~~Levels')
+
+tab7 <- tab7fun(datas=datas, datasb=datas)
+rownames(tab7) <- c("Mortality", "~~~Hospital Mortality", "~~~30-day Mortality", "~~~3-Month Mortality", "Major Adverse Events", "~~~Pulmonary Embolism", "~~~Stroke", "~~~Myocardial Infarction", "~~~Surgical Site Infection", "~~~Surgical Site Hematoma", "~~~New Neuro Deficit", "~~~Any Major AE", "Minor Adverse Event", "~~~Deep Venous Thrombosis", "~~~Urinary Tract Infection", "~~~Dysphagia (requiring NPO or NG tube)", "~~~Dysphagia (not requiring NPO or NG tube)", "~~~Vocal cord paralysis", "~~~Cerebrospinal Fluid (CSF) leak", "~~~Wound dehiscence", "~~~Pneumonia", "~~~Any Minor AE", "Patient Satisfaction", "~~~1 Met", "~~~2 Not As Much As Hoped", "~~~3 Would Not Undergo", "~~~4 Same or Worse", "~~~Top 2 (1$\\&$2)", "Utilization", "~~~Estimated Blood Loss (cc)", "~~~Duration of Surgery (min)", "~~~Arthrodesis", "~~~Hospital Length of Stay (days)", "~~~30-day Return to OR", "~~~30-day Hospital Readmission", "~~~3-month Revision Surgery", "~~~3-month Hospital Readmission")
+
+tab7b <- tab7bfun(datas=datas)
+rownames(tab7b) <- c("\\underline{Posterior laminectomy only}", "~~~Estimated Blood Loss (cc)", "~~~Duration of Surgery (min)", "~~~Arthrodesis", "~~~Hospital Length of Stay (days)", "~~~30-day Return to OR", "~~~30-day Hospital Readmission", "~~~3-month Revision Surgery", "~~~3-month Hospital Readmission", "\\underline{Posterior laminectomy and fusion}", "~~~Estimated Blood Loss (cc)", "~~~Duration of Surgery (min)", "~~~Arthrodesis", "~~~Hospital Length of Stay (days)", "~~~30-day Return to OR", "~~~30-day Hospital Readmission", "~~~3-month Revision Surgery", "~~~3-month Hospital Readmission", "\\underline{Posterior foraminotomy only}", "~~~Estimated Blood Loss (cc)", "~~~Duration of Surgery (min)", "~~~Arthrodesis", "~~~Hospital Length of Stay (days)", "~~~30-day Return to OR", "~~~30-day Hospital Readmission", "~~~3-month Revision Surgery", "~~~3-month Hospital Readmission", "\\underline{ACDF only}", "~~~Estimated Blood Loss (cc)", "~~~Duration of Surgery (min)", "~~~Arthrodesis", "~~~Hospital Length of Stay (days)", "~~~30-day Return to OR", "~~~30-day Hospital Readmission", "~~~3-month Revision Surgery", "~~~3-month Hospital Readmission", "\\underline{Corpectomy only}", "~~~Estimated Blood Loss (cc)", "~~~Duration of Surgery (min)", "~~~Arthrodesis", "~~~Hospital Length of Stay (days)", "~~~30-day Return to OR", "~~~30-day Hospital Readmission", "~~~3-month Revision Surgery", "~~~3-month Hospital Readmission")
+
+tab8a <- tab8fun(ptab=cbind(tab8pfun(datas=data1c), tab8pfun(datas=data1)), datas=list(data1c, data1))
+tab8b <- tab8fun(ptab=cbind(tab8pfun(datas=subset(data1c, !is.na(newcat1))), tab8pfun(datas=subset(data1, !is.na(newcat1)))), datas=list(subset(data1c, !is.na(newcat1)), subset(data1, !is.na(newcat1))))
+tab8c <- tab8fun(ptab=cbind(tab8pfun(datas=subset(data1c, !is.na(newcat2))), tab8pfun(datas=subset(data1, !is.na(newcat2)))), datas=list(subset(data1c, !is.na(newcat2)), subset(data1, !is.na(newcat2))))
+tab8d <- tab8fun(ptab=cbind(tab8pfun(datas=subset(data1c, !is.na(newcat3))), tab8pfun(datas=subset(data1, !is.na(newcat3)))), datas=list(subset(data1c, !is.na(newcat3)), subset(data1, !is.na(newcat3))))
+tab8e <- tab8fun(ptab=cbind(tab8pfun(datas=subset(data1c, !is.na(newcat4))), tab8pfun(datas=subset(data1, !is.na(newcat4)))), datas=list(subset(data1c, !is.na(newcat4)), subset(data1, !is.na(newcat4))))
+tab8f <- tab8fun(ptab=cbind(tab8pfun(datas=subset(data1c, !is.na(newcat5))), tab8pfun(datas=subset(data1, !is.na(newcat5)))), datas=list(subset(data1c, !is.na(newcat5)), subset(data1, !is.na(newcat5))))
+
+tab8 <- rbind(rep('',6), tab8b[-6,], rep('',6), tab8c, rep('',6),tab8d[-6,], rep('',6),tab8e[-6,], rep('',6),tab8f[-6,])
+rownames(tab8) <- c('\\underline{Posterior laminectomy only}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)', '\\underline{Posterior laminectomy and fusion}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~mJOA', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)', '\\underline{Posterior foraminotomy only}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)', '\\underline{ACDF only}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)', '\\underline{Corpectomy only}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)')
+
+
+tab9a <- tab9fun(ptab=cbind(tab9pfun(datas=data2c), tab9pfun(datas=data2)), datas=list(data2c, data2))
+tab9b <- tab9fun(ptab=cbind(tab9pfun(datas=subset(data2c, !is.na(newcat1))), tab9pfun(datas=subset(data2, !is.na(newcat1)))), datas=list(subset(data2c, !is.na(newcat1)), subset(data2, !is.na(newcat1))))
+tab9c <- tab9fun(ptab=cbind(tab9pfun(datas=subset(data2c, !is.na(newcat2))), tab9pfun(datas=subset(data2, !is.na(newcat2)))), datas=list(subset(data2c, !is.na(newcat2)), subset(data2, !is.na(newcat2))))
+tab9d <- tab9fun(ptab=cbind(tab9pfun(datas=subset(data2c, !is.na(newcat3))), tab9pfun(datas=subset(data2, !is.na(newcat3)))), datas=list(subset(data2c, !is.na(newcat3)), subset(data2, !is.na(newcat3))))
+tab9e <- tab9fun(ptab=cbind(tab9pfun(datas=subset(data2c, !is.na(newcat4))), tab9pfun(datas=subset(data2, !is.na(newcat4)))), datas=list(subset(data2c, !is.na(newcat4)), subset(data2, !is.na(newcat4))))
+tab9f <- tab9fun(ptab=cbind(tab9pfun(datas=subset(data2c, !is.na(newcat5))), tab9pfun(datas=subset(data2, !is.na(newcat5)))), datas=list(subset(data2c, !is.na(newcat5)), subset(data2, !is.na(newcat5))))
+
+tab9 <- rbind(rep('',8), tab9b[-6,], rep('',8), tab9c, rep('',8),tab9d[-6,], rep('',8),tab9e[-6,], rep('',8),tab9f[-6,])
+rownames(tab9) <- c('\\underline{Posterior laminectomy only}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)', '\\underline{Posterior laminectomy and fusion}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~mJOA', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)', '\\underline{Posterior forminotomy only}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)', '\\underline{ACDF only}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)', '\\underline{Corpectomy only}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)')
+
+plotname1 <- paste('figs/', pracs[k], "plot.pdf", sep="")
+plot12mfun2(datas=data1c, pltnam=plotname1, ptab=cbind(tab8pfun(datas=data1c), tab9pfun(datas=data1c)))
+@
+\clearpage
+<<echo=FALSE, results=tex>>=
+latex(tab1[,-3], title="", caption="Frequency", where="!h", col.just=rep("c",4), size='footnotesize', file="")
+
+myrow <- rep('', nrow(tab2))
+myrow[hl2] <- 'shadeRow'
+latex(tab2, title="", caption="Baseline Characteristics for Patients with 3-Month Follow-up", where="!h", size="small", col.just=rep("c",2), colheads=c(latexTranslate(pracs[k]), "QOD Total"), file="", lines.page=48, insert.bottom =mlCap("* ${\\tiny a}$ b ${\\tiny c}$ represents the lower quantile a, the median b, and the upper quartile c. \\\\ *$x\\pm s$ represents mean$\\pm 1$ Standard Deviation. \\\\ Denominator lower than 3-month accrual is because of the missing values. \\\\ Highlighted are variables with a meaningful difference between Site and other centers."), rownamesTexCmd=myrow)
+@
+\clearpage
+<<echo=FALSE, results=tex>>=
+myrow <- rep('', nrow(tab3))
+myrow[hl3] <- 'shadeRow'
+latex(tab3[-1,], title="", caption="Medical History for Patients with 3-Month Follow-up", where="!h", size="small", col.just=rep("c",2), colheads=c(latexTranslate(pracs[k]), "QOD Total"), file="", insert.bottom =mlCap("* ${\\tiny a}$ b ${\\tiny c}$ represents the lower quantile a, the median b, and the upper quartile c. \\\\ *$x\\pm s$ represents mean$\\pm 1$ Standard Deviation. \\\\ Denominator lower than 3-month accrual is because of the missing values. \\\\ Highlighted are variables with a meaningful difference between Site and other centers."), rownamesTexCmd=myrow[-1])
+
+myrow <- rep('', nrow(tab4))
+myrow[hl4] <- 'shadeRow'
+latex(tab4, title="", caption="Clinical Characteristics for Patients with 3-Month Follow-up", where="!h", size="small", col.just=rep("c",2), colheads=c(latexTranslate(pracs[k]), "QOD Total"), file="", rownamesTexCmd=myrow, insert.bottom =mlCap('Denominator lower than 3-month accrual is because of the missing values. \\\\ Highlighted are variables with a meaningful difference between Site and other centers.'))
+@
+\clearpage
+<<echo=FALSE, results=tex>>=
+latex(tab5, title="", caption="Baseline Patient Reported Outcomes", where="!h", size="small", col.just=rep("c",2), colheads=c(latexTranslate(pracs[k]), "QOD Total"), file="", insert.bottom =mlCap("${\\tiny a}$ b ${\\tiny c}$ represents the lower quantile a, the median b, and the upper quartile c.\\\\ $x\\pm s$ represents mean$\\pm 1$ Standard Deviation. \\\\ N is the number of non-missing values. "))
+
+latex(tab6a, title="", caption="Surgical Procedures for Patients with 3-Month Follow-up", where="!h", size="small", col.just=rep("c",2), colheads=c(latexTranslate(pracs[k]), "QOD Total"), longtable=TRUE, lines.page=100, file="", insert.bottom =mlCap("$x\\pm s$ represents mean$\\pm 1$ Standard Deviation for Number of Levels. \\\\ N is the number of non-missing values. \\\\  Denominator lower than 3-month accrual is because of the missing values."))
+@
+\clearpage
+<<echo=FALSE, results=tex>>=
+latex(tab6b, title="", caption="Surgical Procedures by Primary Indication for Patients with 3-Month Follow-up", where="!h", size="small", col.just=rep("c",2), colheads=c(latexTranslate(pracs[k]), "QOD Total"), longtable=TRUE, lines.page=200, file="", insert.bottom =mlCap("$x\\pm s$ represents mean$\\pm 1$ Standard Deviation for Number of Levels. \\\\ N is the number of non-missing values. \\\\  Denominator lower than 3-month accrual is because of the missing values."))
+@
+\clearpage
+<<echo=FALSE, results=tex>>=
+latex(tab7, title="", caption="Indicators of Safety and Quality of Care for Patients with 3-Month Follow-up", where="!h", size="small", col.just=rep("c",2), colheads=c(latexTranslate(pracs[k]), "QOD Total"), file="", lines.page=55, long=TRUE, insert.bottom =mlCap("* ${\\tiny a}$ b ${\\tiny c}$ represent the lower quantile a, the median b, and the upper quartile c. \\\\  * $x\\pm s$ represents mean$\\pm 1$ Standard Deviation. \\\\ N is the number of non-missing values. \\\\  Denominator lower than 3-month accrual is because of the missing values."))
+@
+\clearpage
+<<echo=FALSE, results=tex>>=
+latex(tab7b, title="", caption="Utilization by Surgical Approach for Patients with 3-Month Follow-up", where="!h", size="small", col.just=rep("c",2), colheads=c(latexTranslate(pracs[k]), "QOD Total"), file="", lines.page=100, long=TRUE, insert.bottom =mlCap("* ${\\tiny a}$ b ${\\tiny c}$ represent the lower quantile a, the median b, and the upper quartile c. \\\\  * $x\\pm s$ represents mean$\\pm 1$ Standard Deviation. \\\\ N is the number of non-missing values. \\\\  Denominator lower than 3-month accrual is because of the missing values."))
+@
+\clearpage
+<<echo=FALSE, results=tex>>=
+latex(tab8, title="", caption="Outcomes at Baseline and 3 Month", where="!h", size="small", col.just=c("r", "c", "c","r", "c", "c"), colheads=rep(c("N", "Baseline", "3-Month"),2), file="", cgroup=c(latexTranslate(pracs[k]), "QOD Total"), n.cgroup=c(3,3), insert.bottom =mlCap("${\\tiny a}$ b ${\\tiny c}$ represent the lower quantile a, the median b, and the upper quartile c.  \\\\ $x\\pm s$ represents $\\bar{X}\\pm 1$ Standard Deviation. \\\\ N is the number of non-missing values. \\\\ Numbers after percents are frequencies."))
+@
+\clearpage
+\begin{landscape}
+<<echo=FALSE, results=tex>>=
+if(reportType %in% c("Quarter", "Fast Quarter")) {
+    latex(tab9, title="", caption="Outcomes at Baseline, 3 Month and 12 Month for Patients with 12-Month Follow-up", where="!h", size="footnotesize", col.just=c("r", "c", "c", "c", "r", "c", "c", "c"), colheads=rep(c("N", "Baseline", "3-Month", "12-Month"),2), longtable=TRUE, file="", cgroup=c(latexTranslate(pracs[k]), "QOD Total"), n.cgroup=c(4,4), insert.bottom =mlCap("${\\tiny a}$ b ${\\tiny c}$ represent the lower quantile a, the median b, and the upper quartile c.  \\\\ $x\\pm s$ represents $\\bar{X}\\pm 1$ Standard Deviation. \\\\ N is the number of non-missing values. \\\\ Numbers after percents are frequencies."), lines.page=100)
+}
+@
+\end{landscape}
+\clearpage
+<<echo=FALSE, results=tex>>=
+if(reportType %in% c("Quarter", "Fast Quarter")) {
+    cat("\\begin{figure}[!htbp]",
+        "\\begin{center}",
+        "\\includegraphics[width=14cm]{", plotname1, "}",
+        "\\caption[Patient Reported Outcomes]{The left panel shows the means and standard deviations at the three time points. The baseline and 3-month N is the number of patients with 3-month follow-up. The N for 12-month is the number of patients with 12-month follow-up.  The middle panel shows scatter-plots of the 3-month scores versus baseline scores. The N is the number of patients with 3-month follow-up.  The right panel shows the scatter-plots of the 12-month scores versus 3-month scores. The N is the number of patients with 3 and 12-month follow-up. For the middle and right panels, the dotted lines on the figures shows where the patient had scores that were the same at both time points. For the pain scores and the NDI, points below the line indicate that the scores improved over time. For the EQ-5D and mJOA, points above the line indicate that the scores improved over time.}",
+        "\\end{center}",
+        "\\end{figure}\n", sep='')
+}
+@
+\clearpage
+\begin{landscape}
+<<echo=FALSE, results=tex>>=
+if(reportType %in% c("Quarter", "Fast Quarter")) {
+    tab <- modrst2[[pracs[k]]]
+    latex(tab, 
+          title='', 
+          caption=paste(latexTranslate(pracs[k]), ': Self Benchmark', sep=''), 
+          colheads=rep(c('N', 'Observed \n Mean ~~~~~~ (95$\\%$ CI)$^1$', 'Expected$^2$ \n Mean'),2), 
+          cgroup=c('3-Month Post-Surgery', '12-Month Post-Surgery'), 
+          rowname=c('$\\textbf{Neck Pain}$', '$\\textbf{Arm Pain}$', '$\\textbf{NDI}$', '$\\textbf{EQ5D}$', '$\\textbf{mJOA}$', '$\\textbf{Patient Satisfaction}^3$', '$\\textbf{Blood Loss (ml)}$', '$\\textbf{Length of Hospital Stay (day)}$'), where='!h', size='footnotesize', 
+          col.just=rep('c', 6), 
+          insert.bottom=c("The N represents the number with 3-month follow-up or 12-month follow-up. \\\\ The mean is your site's average response to these outcomes. \\\\ The expected mean for your site comes from a statistical model derived from all data. This model also uses several of the variables from tables 1-6 to predict these outcomes. \\\\ By comparing your mean to the expected mean, you can get a sense of how your site compares to QOD as a whole."), 
+          file='')
+}
+@
+\vspace{-0.1cm}
+<<echo=FALSE, results=tex>>=
+if(reportType %in% c("Quarter", "Fast Quarter")) {
+    cat("\\begin{figure}[!htbp]",
+        "\\begin{center}",
+        "\\includegraphics[width=22cm]{", paste('figs/', pracs[k],'_model.pdf', sep=''), "}",
+        "\\caption[Self-benchmark: Observed vs Expected.]{", latexTranslate(pracs[k]), ": Self-benchmark: observed mean vs expected mean (as in the table above). Parenthesis denotes bootstrap 95$\\%$ CI of observed mean.}",
+        "\\end{center}",
+        "\\end{figure}", sep='')
+}
+@
+\end{landscape}
+\clearpage
+<<echo=FALSE, results=tex>>=
+if(reportType %in% c("Quarter", "Fast Quarter")) {
+    cat("\\begin{figure}[!htbp]",
+        "\\begin{center}",
+        "\\includegraphics[width=9cm]{", paste('figs/', pracs[k],'_model2.pdf', sep=''), "}",
+        "\\caption{", latexTranslate(pracs[k]), ": Kaplan-meier estimates of return to work vs. expected curve based on a multivariable Cox proportional hazards model. Shaded area indicates 95$\\%$ CI of Kaplan-meier estimates. Controlling for your patient characteristics, if the observed is above the expected, then your patients are returning to work sooner than expected based on QOD as a whole. If the observed is below the expected, then your patients are returning to work later than expected based on QOD as a whole.}",
+        "\\end{center}",
+        "\\end{figure}", sep='')
+}
+@
+\clearpage
+<<echo=FALSE, results=tex>>=
+if(reportType == "Quarter") {
+    cat("\\begin{figure}[!htbp]",
+        "\\begin{center}",
+        "\\includegraphics[width=14cm]{", paste('figs/rank_',  pracs[k],'.pdf', sep=''), "}",
+        "\\caption[Ranks of ",  latexTranslate(pracs[k]), " Regarding Outcome Performance]{Risk-adjusted relative performance of ",  latexTranslate(pracs[k]), " Multivariable proportional odds models were fitted for each of the outcomes on patients characteristics, with center included as random intercept. Center effects (random intercepts) were ranked, and the median, 80$\\%$, 90$\\%$ and 95$\\%$ intervals of the ranks are presented.}",
+        "\\end{center}",
+        "\\end{figure}", sep='')
+}
+@
+\clearpage
+<<echo=FALSE, results=tex>>=
+if(reportType == "Quarter") {
+    cat("\\begin{figure}[!htbp]",
+        "\\begin{center}",
+        "\\includegraphics[width=16cm]{", paste('figs/OR_',  pracs[k],'.pdf', sep=''), "}",
+        "\\caption[Risk-adjusted relative performance of ",  latexTranslate(pracs[k]), ", better or worse than the median]{Risk-adjusted relative performance of ",  latexTranslate(pracs[k]), ", better or worse than the median. Multivarible ordinal logistic models were fitted for each of the outcomes on patients characteristics, with center included as random intercept. The performance of Site is evaluated by comparing its intercept with the median intercept. 80$\\%$, 90$\\%$ and 95$\\%$ credible intervals are presented. The numbers listed on the right represent the probabilities that this center is more than 25$\\%$ worse than the median outcomes.}",
+        "\\end{center}",
+        "\\end{figure}", sep='')
+}
+@
+\end{document}
+

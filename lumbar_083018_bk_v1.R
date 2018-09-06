@@ -65,11 +65,14 @@ data <- merge(data, d[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', '
 # extract practice/center name, patient id, surgeon id, hospital/surg_location #
 n <- nrow(data)
 data$practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\1", data$pt_study_id)
+data$practice[data$practice=="CSNA"]="A"
 data$sub_practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\3", data$pt_study_id)
 data$surgeon <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surgeon))
 data$surg_location <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surg_location))
-liste=c("Cornell","Semmes")
+liste=c("Cornell","Semmes","Vanderbilt", "A")
 data <- subset(data, practice %in% liste)
+
+
 
 ## only include sites with at least 20 patients followed up at 3 month #
 tab <- with(subset(data, analysis3month), table(practice))
@@ -507,43 +510,15 @@ data$insurance1___4 <- ifelse(data$insurance1 %in% 4, 1, 0)
 data$insurance1___5 <- ifelse(data$insurance1 %in% 5, 1, 0)
 
 
-#######################################################################################
-#######################################################################################
+################################I add this part subset dataset#######################################################
+#####################################Subsetting data sets  ##################################################
 ds <- data
-ds <- subset(ds, select=c(pgender, ptage2, race, ptethnicity,pt_education_level, workers_comp, liability_claim1, any_major_surgery_in_the_p, diabetes, cad, osteoporosis, anxiety, depression, bmi, diagnosis, dominant_symptom1, motor_def2, symptom_duration2, asa_grade, arthrodesis_performed, interbody_graft, surgical_approach, occupation, work, smoker, odiscore, eq5dscore, back_pain_vas, leg_pain_vas1, odiscore.3m, odiscore.12m, eq5dscore.3m, eq5dscore.12m, back_pain_vas.3m, back_pain_vas.12m, leg_pain_vas1.3m, leg_pain_vas1.12m, pt_satisfaction_index.3m, pt_satisfaction_index.12m, los3, estimated_blood_loss_cc3, rtw.3m, day, practice, pt_study_id, analysis3month, select12m))
-rtwdata <- subset(ds, !is.na(rtw.3m))
+ds <- subset(ds, select=c(pt_study_id,practice,ruptured_aneurysm, surg_manage_aneur1, surg_manage_aneur2, surg_manage_aneur3,surg_manage_aneur4, surg_manage_aneur5, surg_manage_aneur6, ruptured_aneurysm1, ruptured_aneurysm2, ruptured_aneurysm3, ruptured_aneurysm4, ruptured_aneurysm5, ruptured_aneurysm6, intracranial_hemorrhage, new_stroke, died_within30days, treatment_avm, procedure_performed_cs, procedure_abstraction))
 
-## single impute missing covariates ##
-tmp <- transcan(~ pgender + ptage2 + race + ptethnicity + pt_education_level + workers_comp + liability_claim1 + any_major_surgery_in_the_p + diabetes + cad + osteoporosis + anxiety + depression + bmi + diagnosis + dominant_symptom1 + motor_def2 + symptom_duration2 + asa_grade + arthrodesis_performed + interbody_graft + surgical_approach + work + smoker + odiscore + eq5dscore + back_pain_vas + leg_pain_vas1, data=ds, imputed=TRUE, transformed=TRUE, pl=FALSE, pr=FALSE)
-imp <- impute(tmp, data=ds, list.out=TRUE)
 
-## get complete data set ##
-for (i in names(tmp$imputed)) {
-  x <- ds[[i]]
-  if (sum(is.na(x))>0) {
-    if (is.numeric(x)) {
-      ds[[i]][is.na(x)] <- tmp$imputed[[i]]
-    } else {
-      ds[[i]][is.na(x)] <- levels(ds[[i]])[tmp$imputed[[i]]]
-    }
-  }
-}
 
-# to get bootstrap CI #
-btfun <- function(x, B=2000) {
-  set.seed(123)
-  n <- length(x)
-  if (n > 0) {
-    m <- mean(x, na.rm=TRUE)
-    v <- numeric(B)
-    for (i in seq(B)) {
-      v[i] <- mean(x[sample(1:n, size=n, replace=TRUE)], na.rm=TRUE)
-    }
-    ci <- quantile(v, probs=c(0.025,0.975))
-    return(c(n,m,ci))
-  }
-  return(c(0,NA,NA,NA))
-}
+
+
 
 ## fit models and get observed and expected mean for each site #
 #######PRACS1 HOSPITAL HAS MORE THAN 20 PATIENTS
@@ -738,7 +713,7 @@ for (j in 1:np) {
     lines(tmp$time, 1-tmp$surv, type='s')
     lines(survs$time, 1-survs[[tprac]], type='s', col='blue')
     title(main=paste(tprac, ': Self Benchmark Return to Work \n (N=', nsample, ')', sep=''), line=4.3)
-    legend('bottomright', bty='n', lty=1:1, col=c('red', 'blue'), legend=c('tprac', 'QOD risk adjusted'))
+    legend('bottomright', bty='n', lty=1:1, col=c('black', 'blue'), legend=c(latexTranslate(tprac), 'Expected'))
     dev.off()
   } else {
     print(tprac)
@@ -1588,6 +1563,7 @@ if(length(pracs1) > 0L) {
   load('patient_lumbar_index.rda')
   n <- nrow(d)
   d$practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\1", d$pt_study_id)
+  d$practice[d$practice=="CSNA"]="A"
   d$sub_practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\3", d$pt_study_id)
   d <- subset(d, practice %in% pracs1)
   dfp <- aggregate(cbind(usefull3month, usefull12month, analysis3month, analysis12month) ~ practice, FUN=sum, data=d)
@@ -1637,6 +1613,7 @@ if(length(pracs2) > 0L) {
   load('patient_lumbar_index.rda')
   n <- nrow(d)
   d$practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\1", d$pt_study_id)
+  d$practice[d$practice=="CSNA"]="A"
   d$sub_practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\3", d$pt_study_id)
   d <- subset(d, practice %in% pracs2)
   df <- aggregate(cbind(usefull3month, usefull12month, analysis3month, analysis12month) ~ practice, FUN=sum, data=d)
