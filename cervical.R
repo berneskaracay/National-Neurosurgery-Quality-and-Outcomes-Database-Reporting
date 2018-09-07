@@ -16,15 +16,16 @@
 
 ## Possible values for reportType are 'Quarter', 'Fast Quarter'
 ## and 'Annual'
-reportType <- commandArgs(TRUE)
+
+rm(list=ls())
+
+### set working directory###
+setwd("C:\\Users\\karacb1\\Desktop\\qod-project-codes")
 
 library(Hmisc)
 library(rms)
 library(MASS)
 library(survival)
-if(reportType == "Quarter"){
-    library(rstan)
-}
 
 #################################################
 #### organize data set and prepare variables ####
@@ -52,7 +53,7 @@ dat3 <- subset(data, redcap_event_name=="12month_arm_1")
 dat3 <- dat3[!duplicated(dat3$pt_study_id),]
 # change 3month ODI and EQ5D colnames #
 vid <- which(names(data) %in% c('patient_baseline_interview_complete', 'thirty_day_morbidity_complete', 'patient_interview_complete', 'questionnaires_complete', 'date_surgery_performed'))
-names(dat2)[(vid[3]+1):vid[4]] <- paste(names(dat1)[(vid[3]+1):vid[4]], ".3m", sep="")
+names(dat2)[(vid[2]+1):vid[4]] <- paste(names(dat1)[(vid[2]+1):vid[4]], ".3m", sep="")
 names(dat3)[(vid[2]+1):vid[4]] <- paste(names(dat1)[(vid[2]+1):vid[4]], ".12m", sep="")
 # merge the data sets #
 dat1b <- dat1[c(1:vid[1], (vid[3]+1):vid[5])]
@@ -68,29 +69,24 @@ data$sub_practice <- sub("^([^*]+)(\\*(.+))?_CP[0-9]{4}$", "\\3", data$pt_study_
 data$pt_id <- sub(".*_", "", as.character(data$pt_study_id))
 data$surgeon <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surgeon))
 data$surg_location <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surg_location))
-
+liste=c("Cornell","Semmes","Cornell","Vanderbilt","Duke","U_Utah","UVA")
+data <- subset(data, practice %in% liste)
 # merge the data with index #
 data <- merge(data, d[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month')], by='pt_study_id', all.y=TRUE)
 
-if(reportType == "Annual") {
-    ## Select only the annual range
-    data$surgery_date <- as.Date(data$date_surgery_performed)
-    data$surgery_date[is.na(data$surgery_date)] <- as.Date(data$surgerydte1[is.na(data$surgery_date)])
+data$surgery_date <- as.Date(data$date_surgery_performed)
+data$surgery_date[is.na(data$surgery_date)] <- as.Date(data$surgerydte1[is.na(data$surgery_date)])
 
-    data <- subset(data, surgery_date >= as.Date("2017-01-01") & surgery_date <= as.Date("2017-12-31"))
-}
 
 ## only include sites with at least 20 patients followed up at 3 month #
 tab <- with(subset(data, analysis3month), table(practice))
 pracs1 <- names(tab)[tab>=20]
 data <- subset(data, practice %in% pracs1)
 ## create 12m analysis data indicator #
-if(reportType == "Annual") {
-    pracs2 <- character(0)
-} else {
-    tab <- with(subset(data, analysis12month), table(practice))
-    pracs2 <- names(tab)[tab>=20]
-}
+
+tab <- with(subset(data, analysis12month), table(practice))
+pracs2 <- names(tab)[tab>=20]
+
 data$select12m <- data$practice %in% pracs2 & data$analysis12month
 
 ## prepare variables ##
@@ -177,10 +173,10 @@ data$wound_dehiscence = factor(data$wound_dehiscence,levels=c("1","0"))
 data$pneumonia = factor(data$pneumonia,levels=c("1","0"))
 
 
-data$pt_satisfaction_index2 <- ifelse(data$pt_satisfaction_index%in%c(1,2), 1,2)
-data$pt_satisfaction_index2[is.na(data$pt_satisfaction_index)] <- NA
-data$pt_satisfaction_index2 <- factor(data$pt_satisfaction_index2, levels=c("1", "2"))
-data$pt_satisfaction_index = factor(data$pt_satisfaction_index,levels=c("1","2","3","4"))
+data$pt_satisfaction_index2.3m <- ifelse(data$pt_satisfaction_index.3m%in%c(1,2), 1,2)
+data$pt_satisfaction_index2.3m[is.na(data$pt_satisfaction_index.3m)] <- NA
+data$pt_satisfaction_index2.3m <- factor(data$pt_satisfaction_index2.3m, levels=c("1", "2"))
+data$pt_satisfaction_index.3m = factor(data$pt_satisfaction_index.3m,levels=c("1","2","3","4"))
 data$pt_satisfaction_index2.12m <- ifelse(data$pt_satisfaction_index.12m%in%c(1,2), 1,2)
 data$pt_satisfaction_index2.12m[is.na(data$pt_satisfaction_index.12m)] <- NA
 data$pt_satisfaction_index2.12m <- factor(data$pt_satisfaction_index2.12m, levels=c("1", "2"))
@@ -193,9 +189,9 @@ data$returned_to_or_with_30_day = factor(data$returned_to_or_with_30_day,levels=
 
 data$date_surgery <- as.Date(data$date_surgery_performed, format='%Y-%m-%d')
 data$readmission_date <- as.Date(data$readmission_date, format='%Y-%m-%d')
-data$date_readmission <- as.Date(data$date_readmission, format='%Y-%m-%d')
+data$date_readmission.3m <- as.Date(data$date_readmission.3m, format='%Y-%m-%d')
 data$days1 <- as.numeric(data$readmission_date - data$date_surgery)
-data$days2 <- as.numeric(data$date_readmission - data$date_surgery)
+data$days2 <- as.numeric(data$date_readmission.3m - data$date_surgery)
 data$days.readmit <- ifelse(is.na(data$days1), data$days2, data$days1)
 data$readmit30day <- data$re_admitted_within_30_days
 data$readmit30day[!is.na(data$days.readmit)] <- 0
@@ -203,22 +199,22 @@ data$readmit30day[!is.na(data$days.readmit) & data$days.readmit<31] <- 1
 ## FIX ME -- HACKY QUICK FIX
 data$readmit30day[is.na(data$readmit30day)] <- 0
 data$readmit30day <- factor(data$readmit30day, levels=0:1)
-data$readmit3m <- ifelse(data$readmit_3months%in%c(1) | data$readmit_3mth_surg%in%c(1) | data$readmit_3mth_surg.12m%in%c(1), 1, 0)
+data$readmit3m <- ifelse(data$readmit_3months%in%c(1) | data$readmit_3mth_surg.3m%in%c(1) | data$readmit_3mth_surg.12m%in%c(1), 1, 0)
 data$readmit3m <- factor(data$readmit3m, levels=c("1", "0"))
 
-data$return_to_work[!data$plan_return_work %in% 1] <- NA
-data$return_to_work <- factor(data$return_to_work, levels=c('1','0','2'))
+data$return_to_work.3m[!data$plan_return_work.3m %in% 1] <- NA
+data$return_to_work.3m <- factor(data$return_to_work.3m, levels=c('1','0','2'))
 data$return_to_work.12m[!data$plan_return_work.12m %in% 1] <- NA
 data$return_to_work.12m <- factor(data$return_to_work.12m, levels=c('1','0','2'))
-data$return_to_work.12m[data$return_to_work %in% '1'] <- '1'
+data$return_to_work.12m[data$return_to_work.3m %in% '1'] <- '1'
 data$mort30d <- ifelse(data$place_discharged_to %in% c('6') | data$patient_died_within_30_day %in% c('1'), 1, 0)
 data$mort30d[is.na(data$place_discharged_to) & is.na(data$patient_died_within_30_day)] <- NA
 data$mort30d <- factor(data$mort30d, level=0:1)
-data$mort3m <- ifelse(data$mort30d %in% c('1') | data$patient_interview_status %in% c('9'), 1, 0)
-data$mort3m[is.na(data$mort30d) & is.na(data$patient_interview_status)] <- NA
+data$mort3m <- ifelse(data$mort30d %in% c('1') | data$patient_interview_status.3m %in% c('9'), 1, 0)
+data$mort3m[is.na(data$mort30d) & is.na(data$patient_interview_status.3m)] <- NA
 data$mort3m <- factor(data$mort3m, level=0:1)
-data$revision_surg_3mths2 <- ifelse(data$revision_surg_3mths %in% 1 | data$revision_surg_3mths.12m %in% 1, 1, 0)
-data$revision_surg_3mths2[is.na(data$revision_surg_3mths) & is.na(data$revision_surg_3mths.12m)] <- NA
+data$revision_surg_3mths2 <- ifelse(data$revision_surg_3mths.3m %in% 1 | data$revision_surg_3mths.12m %in% 1, 1, 0)
+data$revision_surg_3mths2[is.na(data$revision_surg_3mths.3m) & is.na(data$revision_surg_3mths.12m)] <- NA
 data$revision_surg_3mths2 <- factor(data$revision_surg_3mths2, levels=c("1", "0"))
 
 data$arthrodesis <- ifelse(data$arthrodesis_performed %in% 1 | data$acdf_performed1 %in% 1, 1, 0)
@@ -284,24 +280,24 @@ data$newcat4 <- ifelse(data$acdf_performed1 %in% 1 & data$corpectomy_performed1 
 data$newcat5 <- ifelse(data$corpectomy_performed1 %in% 1, 1, NA)
 
 ## return to work ##
-data$date_of_contact <- as.Date(data$date_of_contact, format='%Y-%m-%d')
-data$date_return_work <- as.Date(data$date_return_work, format='%Y-%m-%d')
+data$date_of_contact.3m <- as.Date(data$date_of_contact.3m, format='%Y-%m-%d')
+data$date_return_work.3m <- as.Date(data$date_return_work.3m, format='%Y-%m-%d')
 data$date_surgery <- as.Date(data$date_surgery_performed, format='%Y-%m-%d')
-data$day1 <- as.numeric(data$date_of_contact - data$date_surgery)
-data$day2 <- as.numeric(data$date_return_work - data$date_surgery)
+data$day1 <- as.numeric(data$date_of_contact.3m - data$date_surgery)
+data$day2 <- as.numeric(data$date_return_work.3m- data$date_surgery)
 data$day1[data$day1<0 | data$day1>200] <- NA
 data$day2[data$day2<0 | data$day2>200] <- NA
-data$rtw <- as.numeric(ifelse(as.character(data$return_to_work) %in% 2, NA, as.character(data$return_to_work)))
+data$rtw.3m <- as.numeric(ifelse(as.character(data$return_to_work.3m) %in% 2, NA, as.character(data$return_to_work.3m)))
 data$day <- data$day1
-ind <- data$return_to_work %in% 1
+ind <- data$return_to_work.3m %in% 1
 data$day[ind] <- ifelse(is.na(data$day2[ind]), data$day1[ind], data$day2[ind])
-data$rtw[is.na(data$day)] <- NA
+data$rtw.3m[is.na(data$day)] <- NA
 
 
 ##################################################################
 #### model fitting to get plots and tables of expected values ####
 ##################################################################
-if(reportType %in% c("Quarter", "Fast Quarter")) {
+
     ds <- data
     ds$race <- ifelse(ds$prace___5==1, 'white', 'other')
     ds$race[ds$prace___3==1] <- 'black'
@@ -321,10 +317,10 @@ if(reportType %in% c("Quarter", "Fast Quarter")) {
     ds$work[ds$unemployed %in% 1] <- 5
     ds$work[ds$unemployed %in% 2] <- 6
     ds$work <- factor(ds$work, levels=c(1,2,3,4,5,6,7))
-    ds$pt_satisfaction_index <- as.numeric(ds$pt_satisfaction_index)
+    ds$pt_satisfaction_index.3m <- as.numeric(ds$pt_satisfaction_index.3m)
     ds$pt_satisfaction_index.12m <- as.numeric(ds$pt_satisfaction_index.12m)
-    ds <- subset(ds, select=c(pgender, ptage2, race, ptethnicity,pt_education_level, workers_comp, liability_claim1, any_major_surgery_in_the_p, diabetes, cad, osteoporosis, anxiety, depression, smoker, bmi, predominat_symptom_durg, underlying_pathology, symptom_duration2, asa_grade, arthrodesis, surgical_approach, occupation, work, ndiscore, eq5dscore, neck_pain_vas, arm_pain_vas1, joa, ndiscore.3m, ndiscore.12m, eq5dscore.3m, eq5dscore.12m, neck_pain_vas.3m, neck_pain_vas.12m, arm_pain_vas1.3m, arm_pain_vas1.12m, pt_satisfaction_index, pt_satisfaction_index.12m, los3, estimated_blood_loss_cc3, joa.3m, joa.12m, rtw, day, practice, pt_study_id, analysis3month, select12m))
-    rtwdata <- subset(ds, !is.na(rtw))
+    ds <- subset(ds, select=c(pgender, ptage2, race, ptethnicity,pt_education_level, workers_comp, liability_claim1, any_major_surgery_in_the_p, diabetes, cad, osteoporosis, anxiety, depression, smoker, bmi, predominat_symptom_durg, underlying_pathology, symptom_duration2, asa_grade, arthrodesis, surgical_approach, occupation, work, ndiscore, eq5dscore, neck_pain_vas, arm_pain_vas1, joa, ndiscore.3m, ndiscore.12m, eq5dscore.3m, eq5dscore.12m, neck_pain_vas.3m, neck_pain_vas.12m, arm_pain_vas1.3m, arm_pain_vas1.12m, pt_satisfaction_index.3m, pt_satisfaction_index.12m, los3, estimated_blood_loss_cc3, joa.3m, joa.12m, rtw.3m, day, practice, pt_study_id, analysis3month, select12m))
+    rtwdata <- subset(ds, !is.na(rtw.3m))
 
     ## single impute missing covariates ##
     tmp <- transcan(~ pgender + ptage2 + race + ptethnicity + pt_education_level + workers_comp + liability_claim1 + any_major_surgery_in_the_p + diabetes + cad + osteoporosis + anxiety + depression + smoker + bmi + predominat_symptom_durg + underlying_pathology + symptom_duration2 + asa_grade + arthrodesis + surgical_approach + work + ndiscore + eq5dscore + neck_pain_vas + arm_pain_vas1 + joa, data=ds, imputed=TRUE, transformed=TRUE, pl=FALSE, pr=FALSE)
@@ -409,12 +405,12 @@ if(reportType %in% c("Quarter", "Fast Quarter")) {
     fmla0 <- "pgender + ptage2 + race + ptethnicity + pt_education_level + workers_comp + liability_claim1 + any_major_surgery_in_the_p + diabetes + cad + osteoporosis + anxiety + depression + smoker + rcs(bmi,4) + predominat_symptom_durg + underlying_pathology + symptom_duration2 + asa_grade + arthrodesis + surgical_approach + work + rcs(ndiscore,3) + rcs(eq5dscore,3) + rcs(neck_pain_vas,3) + rcs(arm_pain_vas1,3)"
     fmla1 <- "pgender + ptage2 + race + ptethnicity + pt_education_level + workers_comp + liability_claim1 + any_major_surgery_in_the_p + diabetes + cad + osteoporosis + anxiety + depression + smoker + rcs(bmi,4) + predominat_symptom_durg + underlying_pathology + symptom_duration2 + asa_grade + arthrodesis + surgical_approach + work + rcs(ndiscore,3) + rcs(eq5dscore,3) + rcs(neck_pain_vas,3) + rcs(arm_pain_vas1,3) + rcs(joa,3)"
 
-                                        # the following models may take a few minutes to run #
+                                   # the following models may take a few minutes to run #
     ndi <- modfun(dt=ds, fmla=fmla0, resp1="ndiscore.3m", resp2="ndiscore.12m", prs=data.frame(prac=pracs1))
     eq5d <- modfun(dt=ds, fmla=fmla0, resp1="eq5dscore.3m", resp2="eq5dscore.12m", prs=data.frame(prac=pracs1))
     neck <- modfun(dt=ds, fmla=fmla0, resp1="neck_pain_vas.3m", resp2="neck_pain_vas.12m", prs=data.frame(prac=pracs1))
     arm <- modfun(dt=ds, fmla=fmla0, resp1="arm_pain_vas1.3m", resp2="arm_pain_vas1.12m", prs=data.frame(prac=pracs1))
-    satisfy <- modfun(dt=ds, fmla=fmla0, resp1="pt_satisfaction_index", resp2="pt_satisfaction_index.12m", prs=data.frame(prac=pracs1))
+    satisfy <- modfun(dt=ds, fmla=fmla0, resp1="pt_satisfaction_index.3m", resp2="pt_satisfaction_index.12m", prs=data.frame(prac=pracs1))
     los <- modfun(dt=ds, fmla=fmla0, resp1="los3", resp2="", prs=data.frame(prac=pracs1))
     blood <- modfun(dt=ds, fmla=fmla0, resp1="estimated_blood_loss_cc3", resp2="", prs=data.frame(prac=pracs1))
     joa <- modfun(dt=ds, fmla=fmla1, resp1="joa.3m", resp2="joa.12m", prs=data.frame(prac=pracs1))
@@ -437,7 +433,7 @@ if(reportType %in% c("Quarter", "Fast Quarter")) {
     names(modrst) <- names(table(ds$practice))
 
                                         # model of return to work #
-    fit <- coxph(Surv(day, rtw) ~ pgender + ptage2 + race + ptethnicity + pt_education_level + workers_comp + liability_claim1 + any_major_surgery_in_the_p + diabetes + cad + osteoporosis + anxiety + depression + smoker + rcs(bmi,4) + predominat_symptom_durg + underlying_pathology + symptom_duration2 + asa_grade + arthrodesis + surgical_approach + occupation + rcs(ndiscore,3) + rcs(eq5dscore,3) + rcs(neck_pain_vas,3) + rcs(arm_pain_vas1,3), data=rtwdata)
+    fit <- coxph(Surv(day, rtw.3m) ~ pgender + ptage2 + race + ptethnicity + pt_education_level + workers_comp + liability_claim1 + any_major_surgery_in_the_p + diabetes + cad + osteoporosis + anxiety + depression + smoker + rcs(bmi,4) + predominat_symptom_durg + underlying_pathology + symptom_duration2 + asa_grade + arthrodesis + surgical_approach + occupation + rcs(ndiscore,3) + rcs(eq5dscore,3) + rcs(neck_pain_vas,3) + rcs(arm_pain_vas1,3), data=rtwdata)
     pred <- survfit(fit, newdata=rtwdata, se.fit=FALSE)
     tmp <- apply(pred$surv, MARGIN=1, FUN=function(x) {
         zxcv <- aggregate(x, by=list(rtwdata$practice), FUN=mean)
@@ -531,7 +527,7 @@ if(reportType %in% c("Quarter", "Fast Quarter")) {
         par(mar=c(5,4,4,2))
         nsample <- sum(rtwdata$practice==tprac)
         dt <- subset(rtwdata, practice==tprac)
-        tmp <- summary(survfit(Surv(day, rtw) ~ 1, data=dt))
+        tmp <- summary(survfit(Surv(day, rtw.3m) ~ 1, data=dt))
         tmp2 <- tmp
         tmp2$time <- tmp$time[!is.na(tmp$lower) & !is.na(tmp$upper)]
         tmp2$surv <- tmp$surv[!is.na(tmp$lower) & !is.na(tmp$upper)]
@@ -583,358 +579,8 @@ if(reportType %in% c("Quarter", "Fast Quarter")) {
         }
     }
     save(modrst2, file='cervical_modrst2.RData')
-}
-if(reportType == "Quarter") {
-    ## prepare variables for bayesian modeling #
-    ds$ndiscore.3m <- round(data$ndiscore.3m/4,0)*4
-    ds$ndiscore.12m <- round(data$ndiscore.12m/4,0)*4
-
-    ds$eq5dscore.3m <- round(round(data$eq5dscore.3m,2)/4,2)*4
-    ds$eq5dscore.12m <- round(round(data$eq5dscore.12m,2)/4,2)*4
-
-    ds$blood <- as.numeric(cut(ds$estimated_blood_loss_cc3, breaks=c(0,10,15,20,25,30,50,75,100,150,175,200,250,300,450,650,1000, 1500, 2000,5000), include.lowest=TRUE))
-    ds$los <- as.numeric(cut(ds$los3, breaks=c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,29,90), include.lowest = TRUE))
-
-    ## standardize continuous variables #
-    stdfun <- function(x) {
-        return((x-mean(x))/sd(x))
-    }
-    for (i in 1:28) {
-        x <- ds[[i]]
-        if (is.numeric(x)) {
-            ds[[i]] <- stdfun(x)
-        }
-    }
-    save(ds, file='bayes/cervcial_bayes_data.RData')
-
-#############################
-    ## bayesian models fitting ##
-#############################
-
-    ## parallel R files generated #
-    ## saved in "bayes" directory #
-
-    script <- "load(file='cervical_bayes_data.RData')
-library(rms)
-library(rstan)
-library(ordinal)
-
-rstan_options(auto_write = TRUE)
-
-stanmod <- '
-data {
-  int<lower=1> N;                    // number of records
-  int<lower=1> K;                    // number of columns in X
-  int<lower=1> M;                    // number of practices
-  int<lower=1> Ncut;                 // number of distinct values in y
-  int<lower=1, upper=Ncut> y[N];                 // response
-  matrix[N,K] X;                     // design matrix
-  int<lower=1, upper=M> practice[N]; // practice associated with record 
-} 
-parameters {
-  vector[K] beta;
-  real<lower=0> sigma;
-  ordered[Ncut] a;
-  vector[M] b;
-}
-model {
-  for (i in 1:N) {
-    y[i] ~ ordered_logistic(X[i] * beta + b[practice[i]], a); 
-  }                                                             
-  b ~ normal(0, sigma); 
-  beta ~ normal(0, 1000);
-  sigma ~ cauchy(0,50); 
-}
-'
-
-## derive design matrix #
-X0a <- model.matrix(~ pgender + ptage2 + race + ptethnicity +
-                    pt_education_level + workers_comp +
-                    liability_claim1 + any_major_surgery_in_the_p + diabetes +
-                    cad + osteoporosis + anxiety + depression + smoker +
-                    rcs(bmi,4) + predominat_symptom_durg + underlying_pathology +
-                    symptom_duration2 + asa_grade + arthrodesis +
-                    surgical_approach + work + rcs(ndiscore,3) +
-                    rcs(eq5dscore,3) + rcs(neck_pain_vas,3) +
-                    rcs(arm_pain_vas1,3),
-                    data=ds)[, -1L]
-
-X0b <- model.matrix(~ pgender + ptage2 + race + ptethnicity +
-                    pt_education_level + workers_comp + liability_claim1 +
-                    any_major_surgery_in_the_p + diabetes + cad + osteoporosis +
-                    anxiety + depression + smoker + rcs(bmi,4) +
-                    predominat_symptom_durg + underlying_pathology +
-                    symptom_duration2 + asa_grade + arthrodesis +
-                    surgical_approach + work + rcs(ndiscore,3) +
-                    rcs(eq5dscore,3) + rcs(neck_pain_vas,3) +
-                    rcs(arm_pain_vas1,3) + rcs(joa,3),
-                    data=ds)[, -1L]
 
 
-## run bayesian model in R #
-bayesmod <- function(dat=ds, otcm='back_pain_vas.12m', X0s) {
-  if (grepl('12m', otcm)) {
-    ind <- dat$select12m & !is.na(dat[[otcm]])
-  } else {
-    ind <- dat$analysis3month & !is.na(dat[[otcm]])
-  }
-  df <- dat[ind,]
-
-  ## Store the sorted unique values of otcm column for later use
-  otcm.uniq <- sort(unique(df[[otcm]]))
-
-  ## transform the outcome variable to rank #
-  df$y.freq <- factor(df[[otcm]], levels=otcm.uniq, labels=seq_along(otcm.uniq))
-  df$y <- as.numeric(df$y.freq)
-
-  ## obtain estimates from frequentist model #
-  cat(\"Fitting Frequentist model ... \")
-  if (grepl('joa', otcm)) {
-    X0 <- X0s[[2]]
-    fit.freq <- clmm(y.freq ~ pgender + ptage2 + race + ptethnicity +
-                     pt_education_level + workers_comp + liability_claim1 +
-                     any_major_surgery_in_the_p + diabetes + cad + osteoporosis +
-                     anxiety + depression + smoker + rcs(bmi,4) +
-                     predominat_symptom_durg + underlying_pathology +
-                     symptom_duration2 + asa_grade + arthrodesis +
-                     surgical_approach + work + rcs(ndiscore,3) +
-                     rcs(eq5dscore,3) + rcs(neck_pain_vas,3) +
-                     rcs(arm_pain_vas1,3) + rcs(joa,3) + (1|practice),
-                     link='logit', data=df)
-  } else {
-    X0 <- X0s[[1]]
-    fit.freq <- clmm(y.freq ~ pgender + ptage2 + race + ptethnicity +
-                     pt_education_level + workers_comp + liability_claim1 +
-                     any_major_surgery_in_the_p + diabetes + cad + osteoporosis +
-                     anxiety + depression + smoker + rcs(bmi,4) +
-                     predominat_symptom_durg + underlying_pathology +
-                     symptom_duration2 + asa_grade + arthrodesis +
-                     surgical_approach + work + rcs(ndiscore,3) +
-                     rcs(eq5dscore,3) + rcs(neck_pain_vas,3) +
-                     rcs(arm_pain_vas1,3) + (1|practice),
-                     link='logit', data=df)
-  }
-  cat(\"Done\n\")
-
-  est.int <- fit.freq$alpha
-  est.beta <- fit.freq$beta
-  est.ranef <- fit.freq$ranef
-
-  ## run stan model #
-  ## set initial values, using frequentist estimate for the first chain #
-  init.values <- list(list(beta=est.beta, a=est.int, b=est.ranef))
-
-  ## data to feed #
-  dt <- list(y=df$y, X=X0[ind,], K=ncol(X0), M=length(est.ranef), N=nrow(df),
-             Ncut=length(est.int), practice=as.numeric(factor(df$practice)))
-
-  cat(\"Running Bayes model\n\")
-  timing <- system.time(fit <- stan(model_code=stanmod, data=dt, iter=20000, chains=1, init=init.values, seed=123))
-  cat(\"Done running Bayes model\n\")
-  print(timing)
-  return(fit)
-}
-
-outcomes1 <- c('blood', 'los', 'neck_pain_vas.3m', 'arm_pain_vas1.3m',
-               'ndiscore.3m', 'eq5dscore.3m', 'joa.3m', 'pt_satisfaction_index',
-               'neck_pain_vas.12m', 'arm_pain_vas1.12m', 'ndiscore.12m',
-               'eq5dscore.12m', 'joa.12m', 'pt_satisfaction_index.12m')
-outcomes2 <- c('blood', 'los', 'neck3m', 'arm3m', 'ndi3m', 'eq5d3m', 'joa3m',
-               'satisfy3m', 'neck12m', 'arm12m', 'ndi12m', 'eq5d12m', 'joa12m',
-               'satisfy12m')
-
-fit <- bayesmod(dat=ds, otcm=outcomes1[qind], X0=list(X0a, X0b))
-save(fit, file=paste('cervical_fit_', outcomes2[qind], '.RData', sep=''))
-"
-    for (u in 1:14) {
-        write(paste("qind=", u, " \n", script, sep=""), sprintf("bayes/cervical_bayesmod_%s.R", u))
-    }
-
-    ##  to run batch job on the server # 
-
-    script <- "R CMD BATCH --vanilla bayesmod"
-    for(u in 1:14) {
-        write(sprintf("%s_%d.R", script, u), sprintf("bayes/cervical_bayesmod_%d.sh", u))
-    }
-
-
-
-##################################################
-    ## create ranking figures based on Bayes models ##
-##################################################
-    intcp <- vector('list', 14)
-    outcomes <- c('neck3m', 'arm3m', 'ndi3m', 'eq5d3m', 'joa3m', 'satisfy3m', 'blood', 'los', 'neck12m', 'arm12m', 'ndi12m', 'eq5d12m', 'joa12m', 'satisfy12m')
-    for (i in 1:14) {
-        load(file=paste('bayes/cervical_fit_', outcomes[i], '.RData', sep=''))
-        intcp[[i]] <- extract(fit)$b
-    }
-
-    ## plot of ranks ##
-    ## get quantiles of ranks #
-    mats <- vector('list', 14)
-    for (i in 1:14) {
-        M <- apply(intcp[[i]], MARGIN=1, FUN=rank)
-        M2 <- apply(M, MARGIN=1, FUN=quantile, probs=c(0.025, 0.05, 0.1, 0.5, 0.9, 0.95, 0.975))
-        if (i %in% grep('eq5d|joa', outcomes)) {
-            M3 <- as.data.frame(ncol(M2)+1-t(M2))
-        } else {
-            M3 <- as.data.frame(t(M2))
-        }
-        if (i %in% grep('12m', outcomes)) {
-            M3$center <- pracs2
-        } else {
-            M3$center <- pracs1
-        }
-        mats[[i]] <- M3
-    }
-
-
-    for (k in pracs1) {
-        if (k %in% pracs2) {
-            pdf(paste('figs/rank_', k, '.pdf', sep=''), width=9, height=14)
-            par(mfrow=c(2,1), mar=c(2,11,6,2))
-            tab <- as.data.frame(matrix(NA, nrow=14, ncol=7))
-            for (i in 1:14) {
-                tmp <- mats[[i]]
-                tab[i,] <- tmp[tmp$center==k,1:7]
-            }
-            plot(1:8,  1:8, type='n', axes=FALSE, xlab='', ylab='', xlim=c(1,length(pracs1)), ylim=c(0.5,8.5))
-            points(tab[1:8,4], 8:1, pch=19)
-            segments(tab[1:8,1], 8:1, tab[1:8,7], 8:1, lwd=3, col='grey80')
-            segments(tab[1:8,2], 8:1, tab[1:8,6], 8:1, lwd=3, col='grey50')
-            segments(tab[1:8,3], 8:1, tab[1:8,5], 8:1, lwd=3, col='grey10')
-            axis(side=2, at=8:1, labels=c('Neck Pain', 'Arm Pain', 'NDI', 'EQ5D', 'mJOA', 'Patient Satisfaction', 'Blood Loss', 'Length of Hospital Stay'), las=2, col='white')
-            axis(side=3)
-            abline(v=(length(pracs1)+1)/2, lty=2)
-            text(length(pracs1)/4, 0, 'Better', xpd=NA, font=3)
-            title('Ranks of Site for 3-month Outcomes')
-            
-            plot(1:6,  1:6, type='n', axes=FALSE, xlab='', ylab='', xlim=c(1,length(pracs2)), ylim=c(0.5,6.5))
-            points(tab[9:14,4], 6:1, pch=19)
-            segments(tab[9:14,1], 6:1, tab[9:14,7], 6:1, lwd=3, col='grey80')
-            segments(tab[9:14,2], 6:1, tab[9:14,6], 6:1, lwd=3, col='grey50')
-            segments(tab[9:14,3], 6:1, tab[9:14,5], 6:1, lwd=3, col='grey10')
-            axis(side=2, at=6:1, labels=c('Neck Pain', 'Arm Pain', 'NDI', 'EQ5D', 'mJOA', 'Patient Satisfaction'), las=2, col='white')
-            axis(side=3)
-            abline(v=(length(pracs2)+1)/2, lty=2)
-            text(length(pracs2)/4, 0, 'Better', xpd=NA, font=3)
-            title('Ranks of Site for 12-month Outcomes')
-            dev.off()
-        } else {
-            pdf(paste('figs/rank_', k, '.pdf', sep=''), width=9, height=7)
-            par(mfrow=c(1,1), mar=c(2,11,6,2))
-            tab <- as.data.frame(matrix(NA, nrow=8, ncol=7))
-            for (i in 1:7) {
-                tmp <- mats[[i]]
-                tab[i,] <- tmp[tmp$center==k,1:7]
-            }
-            plot(1:8,  1:8, type='n', axes=FALSE, xlab='', ylab='', xlim=c(1,length(pracs1)), ylim=c(0.5,8.5))
-            points(tab[1:8,4], 8:1, pch=19)
-            segments(tab[1:8,1], 8:1, tab[1:8,7], 8:1, lwd=3, col='grey80')
-            segments(tab[1:8,2], 8:1, tab[1:8,6], 8:1, lwd=3, col='grey50')
-            segments(tab[1:8,3], 8:1, tab[1:8,5], 8:1, lwd=3, col='grey10')
-            axis(side=2, at=8:1, labels=c('Neck Pain', 'Arm Pain', 'NDI', 'EQ5D', 'mJOA', 'Patient Satisfaction', 'Blood Loss', 'Length of Hospital Stay'), las=2, col='white')
-            axis(side=3)
-            abline(v=(length(pracs1)+1)/2, lty=2)
-            text(length(pracs1)/4, 0, 'Better', xpd=NA, font=3)
-            title('Ranks of Site for 3-month Outcomes')
-            dev.off()
-        }
-    }
-
-
-    ## plot of odds ratio ##
-    mats <- intcp
-    for (i in grep('eq5d|joa', outcomes)) {
-        mats[[i]] <- 0 - mats[[i]]
-    }
-    for (i in 1:8) {
-        colnames(mats[[i]]) <- pracs1
-    }
-    for (i in 9:14) {
-        colnames(mats[[i]]) <- pracs2
-    }
-                                        # find median intercept #
-    mdn <- vector('list', 14)
-    for (i in 1:14) {
-        mdn[[i]] <- apply(mats[[i]], MARGIN=1, FUN=median)
-    }
-                                        # to get statistics for plots #
-    statfun <- function(x, m) {
-        y <- x - m
-        q <- quantile(y, probs=c(0.025, 0.05, 0.1, 0.5, 0.9, 0.95, 0.975))
-        pr <- mean(exp(y)>1.25)
-        return(c(q, pr))
-    }
-
-    for (k in pracs1) {
-        if (k %in% pracs2) {
-            mat <- matrix(NA, nrow=14, ncol=8)
-            for (i in 1:14) {
-                mat[i,] <- statfun(x=mats[[i]][,k], m=mdn[[i]])
-            }
-            pdf(file=paste('figs/OR_', k, '.pdf', sep=''), width=11, height=10)
-            par(mfrow=c(1,1),mar=c(5,10,3,7), lend=1, xpd=NA)
-            plot(exp(c(mat[,1], mat[,7])), 1:28, type='n', ylim=c(0.7,15.8), xlab='', ylab='', main='', axes=FALSE, log='x')
-            xmin <- 10^(par('usr')[1])
-            xmax <- 10^(par('usr')[2])
-            xmin <- ifelse(xmin>0.51, 0.51, xmin)
-            xmax <- ifelse(xmax<1.5, 1.5, xmax)
-            par(new=TRUE)
-            plot(exp(c(mat[,1], mat[,7])), 1:28, type='n', ylim=c(0.7,15.8), xlab='Odds Ratio', ylab='', main='', axes=FALSE, log='x', xlim=c(xmin, xmax))
-            xmin <- 10^(par('usr')[1])
-            xmax <- 10^(par('usr')[2])
-            ymin <- par('usr')[3]
-            polygon(x=c(xmin, 1, 1, xmin), y=c(ymin,ymin,14.7,14.7), border=NA, col=rgb(red=0.1, green=0.8, blue=0.1, alpha=0.1))
-            polygon(x=c(xmax, 1, 1, xmax), y=c(ymin,ymin,14.7,14.7), border=NA, col=rgb(red=0.8, green=0.1, blue=0.1, alpha=0.1))
-            segments(exp(mat[,1]), 14:1, exp(mat[,7]), 14:1, lwd=4, col='grey80')
-            segments(exp(mat[,2]), 14:1, exp(mat[,6]), 14:1, lwd=4, col='grey50')
-            segments(exp(mat[,3]), 14:1, exp(mat[,5]), 14:1, lwd=4, col='grey20')
-            points(exp(mat[,4]), 14:1, pch=20, col='white')
-            axis(side=1)
-            text(xmin, 14:1, labels=c('3m Neck Pain', '3m Arm Pain', '3m NDI', '3m EQ5D', '3m mJOA', '3m Patient Satisfaction', 'Blood Loss', 'Length of Hospital Stay', '12m Neck Pain', '12m Arm Pain', '12m NDI', '12m EQ5D', '12m mJOA', '12m Patient Satisfaction'), pos=2)
-            text(xmax, 14:1, format(round(mat[,8],4), nsmall=4), pos=4)
-            text(xmax,15.2, labels='Pr(OR>1.25)', pos=4)
-            segments(1.25,0.3,1.25,14.7, lty=3)
-            text(1, 15.3, 'Worse', pos=4, col=rgb(red=0.8, green=0.1, blue=0.1, alpha=0.9))
-            text(1, 15.3, 'Better', pos=2, col=rgb(red=0.1, green=0.8, blue=0.1, alpha=0.9))
-            title(paste('Comparison of ', k, ' to Risk-Adjusted Median Outcomes', sep=''))
-            dev.off()  
-        } else {
-            mat <- matrix(NA, nrow=8, ncol=8)
-            for (i in 1:8) {
-                mat[i,] <- statfun(x=mats[[i]][,k], m=mdn[[i]])
-            }
-            pdf(file=paste('figs/OR_', k, '.pdf', sep=''), width=11, height=6)
-            par(mfrow=c(1,1),mar=c(5,10,3,7), lend=1, xpd=NA)
-            plot(exp(c(mat[,1], mat[,7])), 1:16, type='n', ylim=c(0.7,9.8), xlab='', ylab='', main='', axes=FALSE, log='x')
-            xmin <- 10^(par('usr')[1])
-            xmax <- 10^(par('usr')[2])
-            xmin <- ifelse(xmin>0.51, 0.51, xmin)
-            xmax <- ifelse(xmax<1.5, 1.5, xmax)
-            par(new=TRUE)
-            plot(exp(c(mat[,1], mat[,7])), 1:16, type='n', ylim=c(0.7,9.8), xlab='Odds Ratio', ylab='', main='', axes=FALSE, log='x', xlim=c(xmin, xmax))
-            xmin <- 10^(par('usr')[1])
-            xmax <- 10^(par('usr')[2])
-            ymin <- par('usr')[3]
-            polygon(x=c(xmin, 1, 1, xmin), y=c(ymin,ymin,8.7,8.7), border=NA, col=rgb(red=0.1, green=0.8, blue=0.1, alpha=0.1))
-            polygon(x=c(xmax, 1, 1, xmax), y=c(ymin,ymin,8.7,8.7), border=NA, col=rgb(red=0.8, green=0.1, blue=0.1, alpha=0.1))
-            segments(exp(mat[,1]), 8:1, exp(mat[,7]), 8:1, lwd=4, col='grey80')
-            segments(exp(mat[,2]), 8:1, exp(mat[,6]), 8:1, lwd=4, col='grey50')
-            segments(exp(mat[,3]), 8:1, exp(mat[,5]), 8:1, lwd=4, col='grey20')
-            points(exp(mat[,4]), 8:1, pch=20, col='white')
-            axis(side=1)
-            text(xmin, 8:1, labels=c('3m Neck Pain', '3m Arm Pain', '3m NDI', '3m EQ5D', '3m mJOA', '3m Patient Satisfaction', 'Blood Loss', 'Length of Hospital Stay'), pos=2)
-            text(xmax, 8:1, format(round(mat[,8],4), nsmall=4), pos=4)
-            text(xmax,9.2, labels='Pr(OR>1.25)', pos=4)
-            segments(1.25,0.3,1.25,7.7, lty=3)
-            text(1, 9.3, 'Worse', pos=4, col=rgb(red=0.8, green=0.1, blue=0.1, alpha=0.9))
-            text(1, 9.3, 'Better', pos=2, col=rgb(red=0.1, green=0.8, blue=0.1, alpha=0.9))
-            title(paste('Comparison of ', k, ' to Risk-Adjusted Median Outcomes', sep=''))
-            dev.off()  
-        }
-    }
-}
 #################################
 ## generate descriptive tables ##
 #################################
@@ -942,13 +588,10 @@ save(fit, file=paste('cervical_fit_', outcomes2[qind], '.RData', sep=''))
 ## get the start date of each center #
 startdate <- aggregate(data$date_surgery, by=list(data$practice), FUN=min, na.rm=TRUE)
 colnames(startdate) <- c('practice', 'sdate')
-if(reportType == "Annual") {
-    startdate$sdate <- "2017-01-01"
-    startdate$edate <- "2017-12-31"
-} else {
-    startdate$sdate <- as.character(startdate$sdate)
-    startdate$edate <- dldate
-}
+
+startdate$sdate <- as.character(startdate$sdate)
+startdate$edate <- dldate
+
 
 #### functions of generating descriptive statistics ####
 
@@ -956,8 +599,8 @@ if(reportType == "Annual") {
 catfun1 <- function(var1, var2, ilev, dfs, var3="pt_study_id") {
   nlist <- length(dfs)
   dats <- vector("list", nlist)
-  for (i in seq_len(nlist)) {
-    dats[[i]] <- dfs[[i]][!is.na(dfs[[i]][[var2]]) & !is.na(dfs[[i]][[var3]]), ]
+  for (i in 1:nlist) {
+    dats[[i]] <- dfs[[i]][!is.na(dfs[[i]][[var2]])&!is.na(dfs[[i]][[var3]]), ]
   }
   pcts <- character(nlist)
   fracs <- character(nlist)
@@ -976,6 +619,7 @@ catfun1 <- function(var1, var2, ilev, dfs, var3="pt_study_id") {
   ret <- paste(pcts, fracs, sep="~~")
   return(ret)
 }
+
 
 catfun2 <- function(ds, vars) {
   n <- length(vars)
@@ -1011,6 +655,7 @@ catfun2 <- function(ds, vars) {
 }
 
 
+
 # continuous variable #
 confun1 <- function(var1, dig=1, dfs, var2, var3="pt_study_id") {
   nlist <- length(dfs)
@@ -1038,6 +683,24 @@ confun1 <- function(var1, dig=1, dfs, var2, var3="pt_study_id") {
   return(ret)
 }
 
+# for categorical variables for figures#
+catfun1b <- function(var1, var2, ilev, dfs, var3="pt_study_id") {
+  nlist <- length(dfs)
+  dats <- vector("list", nlist)
+  for (i in 1:nlist) {
+    dats[[i]] <- dfs[[i]][!is.na(dfs[[i]][[var2]])&!is.na(dfs[[i]][[var3]]), ]
+  }
+  pcts <- integer(nlist)
+  for (i in 1:nlist) {
+    n <- nrow(dats[[i]])
+    num <- sum(dats[[i]][[var1]]%in%ilev)
+    pct <- round(100*num/n,1)
+    pcts[i] <-  pct
+  }
+  return(pcts)
+}
+
+# continuous variable #
 confun2 <- function(var1, dig=1, dfs, dig2=0) {
   nlist <- length(dfs)
   vecs <- vector("list", nlist)
@@ -1454,11 +1117,11 @@ tab7fun <- function(datas, datasb) {
   M[21,] <- catfun1(var1="pneumonia", var2="pneumonia", ilev="1", df=datas)
   M[22,] <- catfun1(var1="minorade", var2="minorade", ilev="1", df=datas)
   
-  M[24,] <- catfun1(var1="pt_satisfaction_index", var2="pt_satisfaction_index", ilev="1", df=datas)
-  M[19+6,] <- catfun1(var1="pt_satisfaction_index", var2="pt_satisfaction_index", ilev="2", df=datas)
-  M[20+6,] <- catfun1(var1="pt_satisfaction_index", var2="pt_satisfaction_index", ilev="3", df=datas)
-  M[21+6,] <- catfun1(var1="pt_satisfaction_index", var2="pt_satisfaction_index", ilev="4", df=datas)
-  M[22+6,] <- catfun1(var1="pt_satisfaction_index2", var2="pt_satisfaction_index2", ilev="1", df=datas)
+  M[24,] <- catfun1(var1="pt_satisfaction_index.3m", var2="pt_satisfaction_index.3m", ilev="1", df=datas)
+  M[19+6,] <- catfun1(var1="pt_satisfaction_index.3m", var2="pt_satisfaction_index.3m", ilev="2", df=datas)
+  M[20+6,] <- catfun1(var1="pt_satisfaction_index.3m", var2="pt_satisfaction_index.3m", ilev="3", df=datas)
+  M[21+6,] <- catfun1(var1="pt_satisfaction_index.3m", var2="pt_satisfaction_index.3m", ilev="4", df=datas)
+  M[22+6,] <- catfun1(var1="pt_satisfaction_index2.3m", var2="pt_satisfaction_index2.3m", ilev="1", df=datas)
   
   M[24+6,] <- confun2(var1="estimated_blood_loss_cc3", dfs=datas, dig=0)
   M[25+6,] <- confun2(var1="length_of_surgery", dfs=datas, dig=0)
@@ -1555,10 +1218,10 @@ tab8fun <- function(ptab, datas) {
     M[(i+1), 6] <- paste(format(round(ptab[i,9], digs[i]), nsmall=digs[i]), "$\\pm$", format(round(ptab[i,10], digs[i]), nsmall=digs[i]), sep="")
   }
   
-  M[7,1:3] <- catfun2(ds=datas[[1]], vars='return_to_work')
-  M[7,4:6] <- catfun2(ds=datas[[2]], vars='return_to_work')
-  M[8,1:3] <- catfun2(ds=datas[[1]], vars='pt_satisfaction_index')
-  M[8,4:6] <- catfun2(ds=datas[[2]], vars='pt_satisfaction_index')
+  M[7,1:3] <- catfun2(ds=datas[[1]], vars='return_to_work.3m')
+  M[7,4:6] <- catfun2(ds=datas[[2]], vars='return_to_work.3m')
+  M[8,1:3] <- catfun2(ds=datas[[1]], vars='pt_satisfaction_index.3m')
+  M[8,4:6] <- catfun2(ds=datas[[2]], vars='pt_satisfaction_index.3m')
   return(M)
 }
   
@@ -1599,10 +1262,10 @@ tab9fun <- function(ptab, datas) {
     M[(i+1), 8] <- paste(format(round(ptab[i,13], digs[i]), nsmall=digs[i]), "$\\pm$", format(round(ptab[i,14], digs[i]), nsmall=digs[i]), sep="")
   }
   
-  M[7,1:4] <- catfun2(ds=datas[[1]], vars=c('return_to_work','return_to_work.12m'))
-  M[7,5:8] <- catfun2(ds=datas[[2]], vars=c('return_to_work','return_to_work.12m'))
-  M[8,1:4] <- catfun2(ds=datas[[1]], vars=c('pt_satisfaction_index','pt_satisfaction_index.12m'))
-  M[8,5:8] <- catfun2(ds=datas[[2]], vars=c('pt_satisfaction_index','pt_satisfaction_index.12m'))
+  M[7,1:4] <- catfun2(ds=datas[[1]], vars=c('return_to_work.3m','return_to_work.12m'))
+  M[7,5:8] <- catfun2(ds=datas[[2]], vars=c('return_to_work.3m','return_to_work.12m'))
+  M[8,1:4] <- catfun2(ds=datas[[1]], vars=c('pt_satisfaction_index.3m','pt_satisfaction_index.12m'))
+  M[8,5:8] <- catfun2(ds=datas[[2]], vars=c('pt_satisfaction_index.3m','pt_satisfaction_index.12m'))
   return(M)
 }
 
@@ -1766,7 +1429,12 @@ if(length(pracs2) > 0L) {
 #### run .rnw file to generate pdf report ####
 ##############################################
 data1 <- data
+data2o <- subset(data, analyzed_3month | analyzed_12month)
 data2 <- subset(data, analyzed_12month)
+data3 <- subset(data, analyzed_3month)
+
+
+
 load(file='cervical_modrst2.RData')
 mlCap <- function(x) {
   sprintf("\\begin{tabular}{l}%s \\end{tabular}", x)
