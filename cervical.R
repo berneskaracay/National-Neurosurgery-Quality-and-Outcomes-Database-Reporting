@@ -294,6 +294,51 @@ data$day[ind] <- ifelse(is.na(data$day2[ind]), data$day1[ind], data$day2[ind])
 data$rtw.3m[is.na(data$day)] <- NA
 
 
+######New Employment Variable##########################################################
+
+data$pt_education_level___1 <- ifelse(data$pt_education_level %in% 1, 1, 0)
+data$pt_education_level___2 <- ifelse(data$pt_education_level %in% 2, 1, 0)
+data$pt_education_level___3 <- ifelse(data$pt_education_level %in% 3, 1, 0)
+data$pt_education_level___4 <- ifelse(data$pt_education_level %in% 4, 1, 0)
+data$pt_education_level___5 <- ifelse(data$pt_education_level %in% 5, 1, 0)
+data$pt_education_level___6 <- ifelse(data$pt_education_level %in% NA, 1, 0)
+
+
+
+data$smoker___1 <- ifelse(data$smoker %in% 1, 1, 0)
+data$smoker___2 <- ifelse(data$smoker %in% 2, 1, 0)
+data$smoker___3 <- ifelse(data$smoker %in% 3, 1, 0)
+
+
+
+data$asa_grade___1 <- ifelse(data$asa_grade %in% 1, 1, 0)
+data$asa_grade___2 <- ifelse(data$asa_grade %in% 2, 1, 0)
+data$asa_grade___3 <- ifelse(data$asa_grade %in% 3, 1, 0)
+data$asa_grade___4 <- ifelse(data$asa_grade %in% 4, 1, 0)
+
+data$surgical_approach___1 <- ifelse(data$surgical_approach %in% 1, 1, 0)
+data$surgical_approach___2 <- ifelse(data$surgical_approach %in% 2, 1, 0)
+data$surgical_approach___3 <- ifelse(data$surgical_approach %in% 3, 1, 0)
+data$surgical_approach___4 <- ifelse(data$surgical_approach %in% 4, 1, 0)
+
+data$pt_satisfaction_index.3m___1 <- ifelse(data$pt_satisfaction_index.3m %in% 1, 1, 0)
+data$pt_satisfaction_index.3m___2 <- ifelse(data$pt_satisfaction_index.3m %in% 2, 1, 0)
+data$pt_satisfaction_index.3m___3 <- ifelse(data$pt_satisfaction_index.3m %in% 3, 1, 0)
+data$pt_satisfaction_index.3m___4 <- ifelse(data$pt_satisfaction_index.3m %in% 4, 1, 0)
+
+
+data$place_discharged_to___6 <- ifelse(data$place_discharged_to %in% 6, 1, 0)
+
+######New Employment Variable##########################################################
+
+data$insurance1___1 <- ifelse(data$insurance1 %in% 1, 1, 0)
+data$insurance1___2 <- ifelse(data$insurance1 %in% 2, 1, 0)
+data$insurance1___3 <- ifelse(data$insurance1 %in% 3, 1, 0)
+data$insurance1___4 <- ifelse(data$insurance1 %in% 4, 1, 0)
+data$insurance1___5 <- ifelse(data$insurance1 %in% 5, 1, 0)
+
+
+
 ##################################################################
 #### model fitting to get plots and tables of expected values ####
 ##################################################################
@@ -1134,6 +1179,24 @@ tab7fun <- function(datas, datasb) {
   return(M)
 }
 
+
+figure_construct <- function(datas) {
+  M_f <- matrix(NA,nrow=9, ncol=2)
+  M_f[1,] <- catfun1b(var1="pt_satisfaction_index.3m___1", var2="pt_satisfaction_index.3m___1", ilev="1", df=datas)
+  M_f[2,] <- catfun1b(var1="pt_satisfaction_index.3m___2", var2="pt_satisfaction_index.3m___2", ilev="1", df=datas)
+  M_f[3,] <- catfun1b(var1="pt_satisfaction_index.3m___3", var2="pt_satisfaction_index.3m___3", ilev="1", df=datas)
+  M_f[4,] <- catfun1b(var1="pt_satisfaction_index.3m___4", var2="pt_satisfaction_index.3m___4", ilev="1", df=datas)
+  M_f[5,] <- catfun1b(var1="pt_satisfaction_index2.3m", var2="pt_satisfaction_index2.3m", ilev="1", df=datas)
+  M_f[6,] <- M_f[1,] + M_f[2,]
+  M_f[7,] <- catfun1b(var1="readmit30day", var2="readmit30day", ilev="1", df=datas)
+  M_f[8,] <- catfun1b(var1="revision_surg_3mths2", var2="revision_surg_3mths2", ilev="1", df=datas)
+  M_f[9,] <- catfun1b(var1="readmit3m", var2="readmit3m", ilev="1", df=datas)
+  return(M_f)
+}
+
+
+
+
 # table of utilization #
 tab7bfun <- function(datas) { 
   M <- matrix("", nrow=45, ncol=2)
@@ -1384,43 +1447,73 @@ plot12mfun2 <- function(datas, pltnam, ptab) {
 
 ## only for site with >20 12m followup ##
 
+
+if(length(pracs1) > 0L) {
+  load('patient_cervical_index.rda')
+  n <- nrow(d)
+  d$practice <- sub("^([^*]+)(\\*(.+))?_CP[0-9]{4}$", "\\1", d$pt_study_id)
+  d$sub_practice <- sub("^([^*]+)(\\*(.+))?_CP[0-9]{4}$", "\\3", d$pt_study_id)
+  d <- subset(d, practice %in% pracs1)
+  dfp <- aggregate(cbind(usefull3month, usefull12month, analysis3month, analysis12month) ~ practice, FUN=sum, data=d)
+  colnames(dfp) <- c('practice', 'x3m', 'x12m', 'y3m', 'y12m')
+  ##########Ben ekledim#################
+  dfp$QOD_3base<-sum(dfp$x3m,na.rm = FALSE)
+  dfp$QOD_12base<-sum(dfp$x12m,na.rm = FALSE)
+  dfp$QOD_3m<-sum(dfp$y3m,na.rm = FALSE)
+  dfp$QOD_12m<-sum(dfp$y12m,na.rm = FALSE)
+  dfp$qod_fu3m <- round(dfp$QOD_3m/dfp$QOD_3base,2)
+  dfp$qod_fu12m <-round(dfp$QOD_12m/dfp$QOD_12base,2)
+  ################
+  dfp$fu3m <-0
+  dfp$fu12m <-0
+  dfp$fu3m <- round(dfp$y3m/dfp$x3m,2)
+  dfp$fu12m <- round(dfp$y12m/dfp$x12m,2)
+  dfp$fu <- round(dfp$fu3m + dfp$fu12m,2)
+  dfp <- dfp[order(dfp$fu),]
+  nm <- nrow(dfp)
+  dfp$center <- nm:1
+  num.min <- min(dfp$x12m)
+  num.max <- max(dfp$x3m)
+}
+
+
+## only for site with >20 12m followup ##
+
+
 if(length(pracs2) > 0L) {
-    load('patient_cervical_index.rda')
-    n <- nrow(d)
-    d$practice <- sub("^([^*]+)(\\*(.+))?_CP[0-9]{4}$", "\\1", d$pt_study_id)
-    d$sub_practice <- sub("^([^*]+)(\\*(.+))?_CP[0-9]{4}$", "\\3", d$pt_study_id)
-
-    d <- subset(d, practice %in% pracs2)
-    df <- aggregate(cbind(usefull3month, usefull12month, analysis3month, analysis12month) ~ practice, FUN=sum, data=d)
-    colnames(df) <- c('practice', 'x3m', 'x12m', 'y3m', 'y12m')
-    df$fu3m <- df$y3m/df$x3m
-    df$fu12m <- df$y12m/df$x12m
-    df <- subset(df, y12m>19)
-    df$fu <- df$fu3m + df$fu12m
-    df <- df[order(df$fu),]
-    nm <- nrow(df)
+  load('patient_cervical_index.rda')
+  n <- nrow(d)
+  d$practice <- sub("^([^*]+)(\\*(.+))?_CP[0-9]{4}$", "\\1", d$pt_study_id)
+  d$sub_practice <- sub("^([^*]+)(\\*(.+))?_CP[0-9]{4}$", "\\3", d$pt_study_id)
+  d <- subset(d, practice %in% pracs2)
+  df <- aggregate(cbind(usefull3month, usefull12month, analysis3month, analysis12month) ~ practice, FUN=sum, data=d)
+  colnames(df) <- c('practice', 'x3m', 'x12m', 'y3m', 'y12m')
+  ##########Ben ekledim#################
+  df$QOD_3base<-sum(df$x3m,na.rm = FALSE)
+  df$QOD_12base<-sum(df$x12m,na.rm = FALSE)
+  df$QOD_3m<-sum(df$y3m,na.rm = FALSE)
+  df$QOD_12m<-sum(df$y12m,na.rm = FALSE)
+  df$qod_fu3m <- round(df$QOD_3m/df$QOD_3base,2)
+  df$qod_fu12m <-round(df$QOD_12m/df$QOD_12base,2)
+  ################
+  df$fu3m <-0
+  df$fu12m <-0
+  df$fu3m <- round(df$y3m/df$x3m,2)
+  df$fu12m <- round(df$y12m/df$x12m,2)
+  df$fu <- round(df$fu3m + df$fu12m,2)
+  df <- df[order(df$fu),]
+  nm <- nrow(df)
+  df$center <- nm:1
+  num.min <- min(df$x12m)
+  num.max <- max(df$x3m)
+  
+  
+  for (k in 1:nm) {
+    ip <- pracs2[k]
     df$center <- nm:1
-    num.min <- min(df$x12m)
-    num.max <- max(df$x3m)
-
-    for (k in 1:nm) {
-        ip <- pracs2[k]
-        df$center <- nm:1
-        df$center[df$practice==ip] <- ip
-        pdf(paste('figs/fu_', ip, '.pdf', sep=''), width=9, height=12)
-        par(mar=c(5,7,2,2), mfrow=c(1,1))
-        plot(df$fu3m, 1:nm, xlim=c(0,1), ylim=c(0,nm+1), cex=0.5+(2*df$x3m-num.min)/num.max, axes=FALSE, xlab='Follow-up Rate', ylab='', main=' ')
-        axis(side=1)
-        axis(side=2, col='white', at=1:nm, labels=df$center, las=2)
-        for (i in 1:nm) {
-            abline(h=i, lty=3, col='grey')
-        }
-        points(df$fu12m, 1:nm, cex=0.5+(2*df$x3m-num.min)/num.max, pch=2, col='grey30')
-        legend('top', pch=1:2, legend=c('3-Month', '12-Month'), bty='n', ncol=2)
-        segments(0.8,-1,0.8,nm+0.5, lty=2, col='grey30')
-        segments(0.7,-1,0.7,nm+0.5, lty=2, col='grey70')
-        dev.off()
-    }
+    df$center[df$practice==ip] <- ip
+    
+  }
 }
 
 

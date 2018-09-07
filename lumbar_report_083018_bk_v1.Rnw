@@ -334,7 +334,7 @@ N-12 is the number of non-missing values at 12 month.  \\\\ Numbers after percen
 \end{landscape}
 \clearpage
 
-\clearpage
+
 <<echo=FALSE, results=tex>>=
 
     cat("\\begin{figure}[!htbp]",

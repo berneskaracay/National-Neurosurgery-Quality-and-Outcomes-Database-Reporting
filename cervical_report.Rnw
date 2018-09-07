@@ -31,8 +31,55 @@ cat("\\listoffigures\n\\clearpage\n")
 
 
 
+
 <<echo=FALSE, results=hide>>=
+## fig 1 ##
+practice<-pracs[k]
+data1cfp <- subset(dfp, practice==pracs[k])
+data2cfp <- subset(dfp, practice==pracs[k])
+dfp_bar <- data.frame(Site= c(practice,"QOD Total",practice,"QOD Total"),
+                 time_point = c("3m","3m","12m","12m"),
+                 percent = c(data1cfp$fu3m,data1cfp$qod_fu3m,data1cfp$fu12m,data1cfp$qod_fu12m)*100)
+
+
+pl<-ggplot(data=dfp_bar, aes(x=time_point, y=percent, fill=Site)) +
+  scale_y_continuous(limits=c(0,100),breaks=seq(0,100,10),labels = function(x) paste0(x, "%"))+
+  geom_bar(stat="identity", position=position_dodge())+geom_hline(yintercept = 80,color="red")+
+  geom_text(aes(label=percent), vjust=1.6, color="white",hjust = 0,
+            position = position_dodge(0.9), size=5)+
+  labs(y="Follow up rate", x="Time after surgery")+
+  scale_fill_brewer(palette="Paired")+scale_x_discrete(limits=c("3m", "12m"))+
+  theme(panel.grid.major = element_line(color = "grey"),text = element_text(size=18))
+
+pdf(paste('figs/cervical_fu_', practice, '.pdf', sep=''))
+pl
+dev.off()
+
+@
+
+<<echo=FALSE, results=tex>>=
+## Switch list of figures on if running a Quarterly report
+
+
+## follow up rate plot ##
+
+  cat("\\clearpage",
+    "\\begin{figure}[!htbp]",
+    "\\begin{center}",
+    "\\includegraphics[scale=0.5]{", paste('figs/cervical_fu_', pracs[k],'.pdf', sep=''), "}",
+    "\\caption[Follow-up rate.]{Follow-up rate at 3m and 12m post surgery. The goal is 80$\\%$ and above.}",
+    "\\end{center}",
+    "\\end{figure}", sep='')
+
+
+@
+    
+
+
+
+
 <<echo=FALSE, results=hide>>=
+
 ## extract the site's data ##
 data1c <- subset(data1, practice==pracs[k])
 data2c <- subset(data2, practice==pracs[k])
@@ -184,6 +231,78 @@ latex(tab6b, title="", caption="Surgical Procedures by Primary Indication for Pa
 latex(tab7, title="", caption="Indicators of Safety and Quality of Care for Patients with 3-Month Follow-up", where="!h", size="small", col.just=rep("c",2), colheads=c(latexTranslate(pracs[k]), "QOD Total"), file="", lines.page=55, long=TRUE, insert.bottom =mlCap("* ${\\tiny a}$ b ${\\tiny c}$ represent the lower quantile a, the median b, and the upper quartile c. \\\\  * $x\\pm s$ represents mean$\\pm 1$ Standard Deviation. \\\\ N is the number of non-missing values. \\\\  Denominator lower than 3-month accrual is because of the missing values."))
 @
 \clearpage
+
+
+
+<<echo=FALSE, results=hide>>=
+## fig 2##
+practice<-pracs[k]
+tab_figure <- figure_construct(data=datas)
+
+dfp_satisfaction <- data.frame(Site= c(practice,"QOD Total",practice,"QOD Total",practice,"QOD Total",practice,"QOD Total",practice,"QOD Total"),satisfaction = c("1-Met","1-Met", "2-Not As Much \n As Hoped", "2-Not As Much \n As Hoped", "3-Would Not \n Undergo", "3-Would Not \n Undergo", "4-Same or Worse", "4-Same or Worse","Satisfied \n (1+2)","Satisfied \n (1+2)"),percent = c(round(tab_figure[1,1]),round(tab_figure[1,2]),round(tab_figure[2,1]),round(tab_figure[2,2]),round(tab_figure[3,1]),round(tab_figure[3,2]),round(tab_figure[4,1]),round(tab_figure[4,2]),round(tab_figure[6,1]),round(tab_figure[6,2])))
+
+
+pl<-ggplot(data=dfp_satisfaction, aes(x=satisfaction, y=percent, fill=Site)) +
+  scale_y_continuous(limits=c(0,100),breaks=seq(0,100,10),labels = function(x) paste0(x, "%"))+
+  geom_bar(stat="identity", position=position_dodge())+
+  geom_text(aes(label=percent), vjust=-0.2, color="black",hjust = 0,
+            position = position_dodge(0.9), size=4)+
+  labs(x="Satisfaction Rate",y="Satisfaction Level")+
+  scale_fill_brewer(palette="Paired")+scale_x_discrete(limits=c("1-Met", "2-Not As Much \n As Hoped","3-Would Not \n Undergo", "4-Same or Worse","Satisfied \n (1+2)"))+
+  theme(panel.grid.major = element_line(color = "grey"),text = element_text(size=12),axis.text.x=element_text(angle=30,hjust=1,vjust=1,size=10))
+
+pdf(paste('figs/cervical_fu2_', practice, '.pdf', sep=''))
+pl
+dev.off()
+  
+
+############################
+
+dfp_readmission <- data.frame(Site= c(practice,"QOD Total",practice,"QOD Total",practice,"QOD Total"),readmit = c("30-day Hospital \n Readmission", "30-day Hospital \n Readmission", "3-month Hospital \n Readmission", "3-month Hospital \n Readmission", "3-month Revision \n Surgery", "3-month Revision \n Surgery"),percent = c(tab_figure[7,1],tab_figure[7,2],tab_figure[9,1],tab_figure[9,2],tab_figure[8,1],tab_figure[8,2]))
+
+
+pl<-ggplot(data=dfp_readmission, aes(x=readmit, y=percent, fill=Site)) +
+  scale_y_continuous(limits=c(0,max(10,max(dfp_readmission$percent))+1),breaks=seq(0,max(10,max(dfp_readmission$percent)+1),1),labels = function(x) paste0(x, "%"))+
+  geom_bar(stat="identity", position=position_dodge())+
+  geom_text(aes(label=percent), vjust=-0.2, color="black",hjust = 0,
+            position = position_dodge(0.9), size=4)+
+  labs(y="Readmission Percent",x="Readmission Category")+
+  scale_fill_brewer(palette="Paired")+scale_x_discrete(limits=c("30-day Hospital \n Readmission", "3-month Hospital \n Readmission", "3-month Revision \n Surgery"))+
+  theme(panel.grid.major = element_line(color = "grey"),text = element_text(size=12),axis.text.x=element_text(angle=30,hjust=1,vjust=1))
+
+pdf(paste('figs/cervical_fu3_', practice, '.pdf', sep=''))
+pl
+dev.off()
+@
+
+
+
+<<echo=FALSE, results=tex>>=
+## Switch list of figures on if running a Quarterly report
+
+
+## follow up rate plot ##
+
+  cat("\\clearpage",
+    "\\begin{figure}[!htbp]",
+    "\\begin{center}",
+    "\\includegraphics[scale=1]{", paste('figs/cervical_fu2_', pracs[k],'.pdf', sep=''), "}",
+    "\\caption[Satisfaction]{Satisfaction from surgery.}",
+    "\\end{center}",
+    "\\end{figure}", sep='')
+
+  cat("\\begin{figure}[!htbp]",
+    "\\begin{center}",
+    "\\includegraphics[scale=1]{", paste('figs/cervical_fu3_', pracs[k],'.pdf', sep=''), "}",
+    "\\caption[Readmission]{Readmission.}",
+    "\\end{center}",
+    "\\end{figure}", sep='')
+
+
+@
+\clearpage
+
+
 <<echo=FALSE, results=tex>>=
 latex(tab7b, title="", caption="Utilization by Surgical Approach for Patients with 3-Month Follow-up", where="!h", size="small", col.just=rep("c",2), colheads=c(latexTranslate(pracs[k]), "QOD Total"), file="", lines.page=100, long=TRUE, insert.bottom =mlCap("* ${\\tiny a}$ b ${\\tiny c}$ represent the lower quantile a, the median b, and the upper quartile c. \\\\  * $x\\pm s$ represents mean$\\pm 1$ Standard Deviation. \\\\ N is the number of non-missing values. \\\\  Denominator lower than 3-month accrual is because of the missing values."))
 @
@@ -205,7 +324,7 @@ latex(tab8, title="", caption="Outcomes at Baseline and 3 Month", where="!h", si
     cat("\\begin{figure}[!htbp]",
         "\\begin{center}",
         "\\includegraphics[width=14cm]{", plotname1, "}",
-        "\\caption[Patient Reported Outcomes]{The left panel shows the means and standard deviations at the three time points. The baseline and 3-month N is the number of patients with 3-month follow-up. The N for 12-month is the number of patients with 12-month follow-up.  The middle panel shows scatter-plots of the 3-month scores versus baseline scores. The N is the number of patients with 3-month follow-up.  The right panel shows the scatter-plots of the 12-month scores versus 3-month scores. The N is the number of patients with 3 and 12-month follow-up. For the middle and right panels, the dotted lines on the figures shows where the patient had scores that were the same at both time points. For the pain scores and the NDI, points below the line indicate that the scores improved over time. For the EQ-5D and mJOA, points above the line indicate that the scores improved over time.}",
+        "\\caption[Patient Reported Outcomes]{The graph shows the means and standard deviations at the three time points.}",
         "\\end{center}",
         "\\end{figure}\n", sep='')
 
@@ -226,16 +345,16 @@ latex(tab8, title="", caption="Outcomes at Baseline and 3 Month", where="!h", si
           file='')
 
 @
+\end{landscape}
 \vspace{-0.1cm}
+\begin{landscape}
 <<echo=FALSE, results=tex>>=
-
     cat("\\begin{figure}[!htbp]",
         "\\begin{center}",
-        "\\includegraphics[width=22cm]{", paste('figs/', pracs[k],'_model.pdf', sep=''), "}",
-        "\\caption[Self-benchmark: Observed vs Expected.]{", latexTranslate(pracs[k]), ": Self-benchmark: observed mean vs expected mean (as in the table above). Parenthesis denotes bootstrap 95$\\%$ CI of observed mean.}",
+        "\\includegraphics[width=25cm]{", paste('figs/', pracs[k],'_model.pdf', sep=''), "}",
+        "\\caption[Self Benchmark Patient Reported Outcomes and Utilization]{", latexTranslate(pracs[k]), ": Self-benchmark: site mean vs risk adjusted QOD mean (as in the table above). Parenthesis denotes bootstrap 95$\\%$ CI of observed mean. Your site is statistically significantly different if triangle is outside parentheses and it is colored with red}",
         "\\end{center}",
         "\\end{figure}", sep='')
-
 @
 \end{landscape}
 \clearpage
@@ -244,7 +363,7 @@ latex(tab8, title="", caption="Outcomes at Baseline and 3 Month", where="!h", si
     cat("\\begin{figure}[!htbp]",
         "\\begin{center}",
         "\\includegraphics[width=9cm]{", paste('figs/', pracs[k],'_model2.pdf', sep=''), "}",
-        "\\caption{", latexTranslate(pracs[k]), ": Kaplan-meier estimates of return to work vs. expected curve based on a multivariable Cox proportional hazards model. Shaded area indicates 95$\\%$ CI of Kaplan-meier estimates. Controlling for your patient characteristics, if the observed is above the expected, then your patients are returning to work sooner than expected based on QOD as a whole. If the observed is below the expected, then your patients are returning to work later than expected based on QOD as a whole.}",
+        "\\caption[Return to Work]{", latexTranslate(pracs[k]), ": Kaplan-meier estimates of site return to work vs. risk adjusted QOD curve based on a multivariable Cox proportional hazards model. Shaded area indicates 95$\\%$ CI of Kaplan-meier estimates. Controlling for your patient characteristics, if the site is above the risk adjusted QOD curve, then your patients are returning to work sooner than expected based on QOD as a whole. If the observed is below the risk adjusted QOD curve, then your patients are returning to work later than expected based on QOD as a whole.}",
         "\\end{center}",
         "\\end{figure}", sep='')
 
