@@ -255,6 +255,9 @@ data$eq5dscore <- eq$score[match(data$com, eq$com)]
 data$eq5dscore.3m <- eq$score[match(data$com.3m, eq$com)]
 data$eq5dscore.12m <- eq$score[match(data$com.12m, eq$com)]
 
+data$revision <- ifelse(data$primary_revision %in% 2, 1, 0)
+
+
 # joa #
 data$joa <- data$mjoa_score_baseline
 data$joa.3m <- data$mjoa_score_3mnth.3m
@@ -294,48 +297,7 @@ data$day[ind] <- ifelse(is.na(data$day2[ind]), data$day1[ind], data$day2[ind])
 data$rtw.3m[is.na(data$day)] <- NA
 
 
-######New Employment Variable##########################################################
 
-data$pt_education_level___1 <- ifelse(data$pt_education_level %in% 1, 1, 0)
-data$pt_education_level___2 <- ifelse(data$pt_education_level %in% 2, 1, 0)
-data$pt_education_level___3 <- ifelse(data$pt_education_level %in% 3, 1, 0)
-data$pt_education_level___4 <- ifelse(data$pt_education_level %in% 4, 1, 0)
-data$pt_education_level___5 <- ifelse(data$pt_education_level %in% 5, 1, 0)
-data$pt_education_level___6 <- ifelse(data$pt_education_level %in% NA, 1, 0)
-
-
-
-data$smoker___1 <- ifelse(data$smoker %in% 1, 1, 0)
-data$smoker___2 <- ifelse(data$smoker %in% 2, 1, 0)
-data$smoker___3 <- ifelse(data$smoker %in% 3, 1, 0)
-
-
-
-data$asa_grade___1 <- ifelse(data$asa_grade %in% 1, 1, 0)
-data$asa_grade___2 <- ifelse(data$asa_grade %in% 2, 1, 0)
-data$asa_grade___3 <- ifelse(data$asa_grade %in% 3, 1, 0)
-data$asa_grade___4 <- ifelse(data$asa_grade %in% 4, 1, 0)
-
-data$surgical_approach___1 <- ifelse(data$surgical_approach %in% 1, 1, 0)
-data$surgical_approach___2 <- ifelse(data$surgical_approach %in% 2, 1, 0)
-data$surgical_approach___3 <- ifelse(data$surgical_approach %in% 3, 1, 0)
-data$surgical_approach___4 <- ifelse(data$surgical_approach %in% 4, 1, 0)
-
-data$pt_satisfaction_index.3m___1 <- ifelse(data$pt_satisfaction_index.3m %in% 1, 1, 0)
-data$pt_satisfaction_index.3m___2 <- ifelse(data$pt_satisfaction_index.3m %in% 2, 1, 0)
-data$pt_satisfaction_index.3m___3 <- ifelse(data$pt_satisfaction_index.3m %in% 3, 1, 0)
-data$pt_satisfaction_index.3m___4 <- ifelse(data$pt_satisfaction_index.3m %in% 4, 1, 0)
-
-
-data$place_discharged_to___6 <- ifelse(data$place_discharged_to %in% 6, 1, 0)
-
-######New Employment Variable##########################################################
-
-data$insurance1___1 <- ifelse(data$insurance1 %in% 1, 1, 0)
-data$insurance1___2 <- ifelse(data$insurance1 %in% 2, 1, 0)
-data$insurance1___3 <- ifelse(data$insurance1 %in% 3, 1, 0)
-data$insurance1___4 <- ifelse(data$insurance1 %in% 4, 1, 0)
-data$insurance1___5 <- ifelse(data$insurance1 %in% 5, 1, 0)
 
 
 
@@ -446,6 +408,10 @@ data$insurance1___5 <- ifelse(data$insurance1 %in% 5, 1, 0)
         return(obs1)
     }
 
+    
+    
+
+    
 
     fmla0 <- "pgender + ptage2 + race + ptethnicity + pt_education_level + workers_comp + liability_claim1 + any_major_surgery_in_the_p + diabetes + cad + osteoporosis + anxiety + depression + smoker + rcs(bmi,4) + predominat_symptom_durg + underlying_pathology + symptom_duration2 + asa_grade + arthrodesis + surgical_approach + work + rcs(ndiscore,3) + rcs(eq5dscore,3) + rcs(neck_pain_vas,3) + rcs(arm_pain_vas1,3)"
     fmla1 <- "pgender + ptage2 + race + ptethnicity + pt_education_level + workers_comp + liability_claim1 + any_major_surgery_in_the_p + diabetes + cad + osteoporosis + anxiety + depression + smoker + rcs(bmi,4) + predominat_symptom_durg + underlying_pathology + symptom_duration2 + asa_grade + arthrodesis + surgical_approach + work + rcs(ndiscore,3) + rcs(eq5dscore,3) + rcs(neck_pain_vas,3) + rcs(arm_pain_vas1,3) + rcs(joa,3)"
@@ -864,6 +830,55 @@ sfun3 <- function(data, vr, ip) {
   return(d)
 }
 
+######New Employment Variable##########################################################
+
+data$pt_education_level___1 <- ifelse(data$pt_education_level %in% 1, 1, 0)
+data$pt_education_level___2 <- ifelse(data$pt_education_level %in% 2, 1, 0)
+data$pt_education_level___3 <- ifelse(data$pt_education_level %in% 3, 1, 0)
+data$pt_education_level___4 <- ifelse(data$pt_education_level %in% 4, 1, 0)
+data$pt_education_level___5 <- ifelse(data$pt_education_level %in% 5, 1, 0)
+data$pt_education_level___6 <- ifelse(data$pt_education_level %in% NA, 1, 0)
+
+
+
+data$smoker___1 <- ifelse(data$smoker %in% 1, 1, 0)
+data$smoker___2 <- ifelse(data$smoker %in% 2, 1, 0)
+data$smoker___3 <- ifelse(data$smoker %in% 3, 1, 0)
+
+
+
+data$asa_grade___1 <- ifelse(data$asa_grade %in% 1, 1, 0)
+data$asa_grade___2 <- ifelse(data$asa_grade %in% 2, 1, 0)
+data$asa_grade___3 <- ifelse(data$asa_grade %in% 3, 1, 0)
+data$asa_grade___4 <- ifelse(data$asa_grade %in% 4, 1, 0)
+
+data$symptom_duration2___1 <- ifelse(data$symptom_duration2 %in% 1, 1, 0)
+data$symptom_duration2___2 <- ifelse(data$symptom_duration2 %in% 2, 1, 0)
+data$symptom_duration2___3 <- ifelse(data$symptom_duration2 %in% 3, 1, 0)
+
+
+
+data$surgical_approach___1 <- ifelse(data$surgical_approach %in% 1, 1, 0)
+data$surgical_approach___2 <- ifelse(data$surgical_approach %in% 2, 1, 0)
+data$surgical_approach___3 <- ifelse(data$surgical_approach %in% 3, 1, 0)
+data$surgical_approach___4 <- ifelse(data$surgical_approach %in% 4, 1, 0)
+
+data$pt_satisfaction_index.3m___1 <- ifelse(data$pt_satisfaction_index.3m %in% 1, 1, 0)
+data$pt_satisfaction_index.3m___2 <- ifelse(data$pt_satisfaction_index.3m %in% 2, 1, 0)
+data$pt_satisfaction_index.3m___3 <- ifelse(data$pt_satisfaction_index.3m %in% 3, 1, 0)
+data$pt_satisfaction_index.3m___4 <- ifelse(data$pt_satisfaction_index.3m %in% 4, 1, 0)
+
+
+data$place_discharged_to___6 <- ifelse(data$place_discharged_to %in% 6, 1, 0)
+
+######New Employment Variable##########################################################
+
+data$insurance1___1 <- ifelse(data$insurance1 %in% 1, 1, 0)
+data$insurance1___2 <- ifelse(data$insurance1 %in% 2, 1, 0)
+data$insurance1___3 <- ifelse(data$insurance1 %in% 3, 1, 0)
+data$insurance1___4 <- ifelse(data$insurance1 %in% 4, 1, 0)
+data$insurance1___5 <- ifelse(data$insurance1 %in% 5, 1, 0)
+
 
 ### generate table template ###
 
@@ -879,19 +894,18 @@ tab2fun <- function(datas) {
   M[10,] <- catfun1(var1="prace___5", var2="prace___5", ilev="1", dfs=datas)
   M[11,] <- catfun1(var1="prace___6", var2="prace___6", ilev="1", dfs=datas)
   M[12,] <- catfun1(var1="ptethnicity", var2="ptethnicity", ilev="1", dfs=datas)
-  M[14,] <- catfun1(var1="pt_education_level", var2="pt_education_level", ilev="1", dfs=datas)
-  M[15,] <- catfun1(var1="pt_education_level", var2="pt_education_level", ilev="2", dfs=datas)
-  M[16,] <- catfun1(var1="pt_education_level", var2="pt_education_level", ilev="3", dfs=datas)
-  M[17,] <- catfun1(var1="pt_education_level", var2="pt_education_level", ilev="4", dfs=datas)
-  M[18,] <- catfun1(var1="pt_education_level", var2="pt_education_level", ilev="5", dfs=datas)
-  M[20,] <- catfun1(var1="insurance1", var2="insurance1", ilev="1", dfs=datas)
-  M[21,] <- catfun1(var1="insurance1", var2="insurance1", ilev="2", dfs=datas)
-  M[22,] <- catfun1(var1="insurance1", var2="insurance1", ilev="3", dfs=datas)
-  M[23,] <- catfun1(var1="insurance1", var2="insurance1", ilev="4", dfs=datas)
-  M[24,] <- catfun1(var1="insurance1", var2="insurance1", ilev="5", dfs=datas)
+  M[14,] <- catfun1(var1="pt_education_level___1", var2="pt_education_level___1", ilev="1", dfs=datas)
+  M[15,] <- catfun1(var1="pt_education_level___2", var2="pt_education_level___2", ilev="1", dfs=datas)
+  M[16,] <- catfun1(var1="pt_education_level___3", var2="pt_education_level___3", ilev="1", dfs=datas)
+  M[17,] <- catfun1(var1="pt_education_level___4", var2="pt_education_level___4", ilev="1", dfs=datas)
+  M[18,] <- catfun1(var1="pt_education_level___5", var2="pt_education_level___5", ilev="1", dfs=datas)
+  M[20,] <- catfun1(var1="insurance1___1", var2="insurance1___1", ilev="1", dfs=datas)
+  M[21,] <- catfun1(var1="insurance1___2", var2="insurance1___2", ilev="1", dfs=datas)
+  M[22,] <- catfun1(var1="insurance1___3", var2="insurance1___3", ilev="1", dfs=datas)
+  M[23,] <- catfun1(var1="insurance1___4", var2="insurance1___4", ilev="1", dfs=datas)
+  M[24,] <- catfun1(var1="insurance1___5", var2="insurance1___5", ilev="1", dfs=datas)
   M[26,] <- catfun1(var1="workers_comp", var2="workers_comp", ilev="1", dfs=datas)
   M[27,] <- catfun1(var1="liability_claim1", var2="liability_claim1", ilev="1", dfs=datas)
-  #M[28,] <- catfun1(var1="cause3", var2="cause3", ilev="1", dfs=datas)
   M[28,] <- catfun1(var1="employment", var2="employment", ilev="1", dfs=datas)
   M[29,] <- catfun1(var1="full_part_time", var2="full_part_time", ilev="1", dfs=datas)
   M[30,] <- catfun1(var1="full_part_time", var2="full_part_time", ilev="2", dfs=datas)
@@ -900,11 +914,11 @@ tab2fun <- function(datas) {
   M[33,] <- catfun1(var1="disability_reason1", var2="disability_reason1", ilev="2", dfs=datas)
   M[34,] <- catfun1(var1="employment", var2="employment", ilev="3", dfs=datas)
   M[35,] <- catfun1(var1="unemployed", var2="unemployed", ilev="1", dfs=datas)
+  M[36,] <- catfun1(var1="disability_reason2", var2="disability_reason2", ilev="1", dfs=datas)
+  M[37,] <- catfun1(var1="disability_reason2", var2="disability_reason2", ilev="2", dfs=datas)
   M[38,] <- catfun1(var1="unemployed", var2="unemployed", ilev="2", dfs=datas)
   M[39,] <- catfun1(var1="unemployed", var2="unemployed", ilev="3", dfs=datas)
   M[40,] <- catfun1(var1="unemployed", var2="unemployed", ilev="4", dfs=datas)
-  M[36,] <- catfun1(var1="disability_reason2", var2="disability_reason2", ilev="1", dfs=datas)
-  M[37,] <- catfun1(var1="disability_reason2", var2="disability_reason2", ilev="2", dfs=datas)
   M[41,] <- catfun1(var1="employment", var2="employment", ilev="4", dfs=datas)
   M[42,] <- catfun1(var1="plan_return_work", var2="plan_return_work", ilev="1", dfs=datas)
   M[44,] <- catfun1(var1="activity_out_home", var2="activity_out_home", ilev="1", dfs=datas)
@@ -913,8 +927,8 @@ tab2fun <- function(datas) {
 }
 
 hltab2 <- function(data, ipr) {
-  hl <- c(1,4,6,7,8,9,10,11,12,13,19,26,27,28,29,31,32, 34, 35, 36, 38:42, 44,45)
-  dv <- rep(0, times=27)
+  hl <- c(1,4,6,7,8,9,10,11,12,14,15,16,17,18,20,21,22,23,24,26,27,28,29, 31, 32, 34, 35, 36, 38:42, 44,45)
+  dv <- rep(0, times=37)
   dv[1] <- sfun2(data=data, vr='pgender', ip=ipr)
   dv[2] <- sfun1(data=data, vr='ptage2', ip=ipr)
   dv[3] <- sfun2(data=data, vr='prace___1', ip=ipr)
@@ -924,126 +938,116 @@ hltab2 <- function(data, ipr) {
   dv[7] <- sfun2(data=data, vr='prace___5', ip=ipr)
   dv[8] <- sfun2(data=data, vr='prace___6', ip=ipr)
   dv[9] <- sfun2(data=data, vr='ptethnicity', ip=ipr)
-  dv[10] <- sfun3(data=data, vr='pt_education_level', ip=ipr)
-  dv[11] <- sfun3(data=data, vr='insurance1', ip=ipr)
-  dv[12] <- sfun2(data=data, vr='workers_comp', ip=ipr)
-  dv[13] <- sfun2(data=data, vr='liability_claim1', ip=ipr)
-  dv[14] <- sfun2(data=data, vr='employment', ip=ipr, lv=1)
-  dv[15] <- sfun2(data=data, vr='full_part_time', ip=ipr)
-  dv[16] <- sfun2(data=data, vr='employment', ip=ipr, lv=2)
-  dv[17] <- sfun2(data=data, vr='disability_reason1', ip=ipr, lv=1)
-  dv[18] <- sfun2(data=data, vr='employment', ip=ipr, lv=3)
-  dv[19] <- sfun2(data=data, vr='unemployed', ip=ipr, lv=1)
-  dv[20] <- sfun2(data=data, vr='disability_reason2', ip=ipr, lv=1)
-  dv[21] <- sfun2(data=data, vr='unemployed', ip=ipr, lv=2)
-  dv[22] <- sfun2(data=data, vr='unemployed', ip=ipr, lv=3)
-  dv[23] <- sfun2(data=data, vr='unemployed', ip=ipr, lv=4)
-  dv[24] <- sfun2(data=data, vr='employment', ip=ipr, lv=4)
-  dv[25] <- sfun2(data=data, vr='plan_return_work', ip=ipr, lv=1)
-  dv[26] <- sfun2(data=data, vr='activity_out_home', ip=ipr, lv=1)
-  dv[27] <- sfun2(data=data, vr='activity_inside_home', ip=ipr, lv=1)
+  dv[10] <- sfun2(data=data, vr='pt_education_level___1', ip=ipr)
+  dv[11] <- sfun2(data=data, vr='pt_education_level___2', ip=ipr)
+  dv[12] <- sfun2(data=data, vr='pt_education_level___3', ip=ipr)
+  dv[13] <- sfun2(data=data, vr='pt_education_level___4', ip=ipr)
+  dv[14] <- sfun2(data=data, vr='pt_education_level___5', ip=ipr)
+  dv[15] <- sfun2(data=data, vr='insurance1___1', ip=ipr)
+  dv[16] <- sfun2(data=data, vr='insurance1___2', ip=ipr)
+  dv[17] <- sfun2(data=data, vr='insurance1___3', ip=ipr)
+  dv[18] <- sfun2(data=data, vr='insurance1___4', ip=ipr)
+  dv[19] <- sfun2(data=data, vr='insurance1___5', ip=ipr)
+  dv[20] <- sfun3(data=data, vr='insurance1', ip=ipr)
+  dv[21] <- sfun2(data=data, vr='workers_comp', ip=ipr)
+  dv[22] <- sfun2(data=data, vr='liability_claim1', ip=ipr)
+  dv[23] <- sfun2(data=data, vr='employment', ip=ipr, lv=1)
+  dv[24] <- sfun2(data=data, vr='full_part_time', ip=ipr)
+  dv[25] <- sfun2(data=data, vr='employment', ip=ipr, lv=2)
+  dv[26] <- sfun2(data=data, vr='employment', ip=ipr, lv=2)
+  dv[27] <- sfun2(data=data, vr='disability_reason1', ip=ipr, lv=1)
+  dv[28] <- sfun2(data=data, vr='employment', ip=ipr, lv=3)
+  dv[29] <- sfun2(data=data, vr='unemployed', ip=ipr, lv=1)
+  dv[30] <- sfun2(data=data, vr='disability_reason2', ip=ipr, lv=1)
+  dv[31] <- sfun2(data=data, vr='unemployed', ip=ipr, lv=2)
+  dv[32] <- sfun2(data=data, vr='unemployed', ip=ipr, lv=3)
+  dv[33] <- sfun2(data=data, vr='unemployed', ip=ipr, lv=4)
+  dv[34] <- sfun2(data=data, vr='employment', ip=ipr, lv=4)
+  dv[35] <- sfun2(data=data, vr='plan_return_work', ip=ipr, lv=1)
+  dv[36] <- sfun2(data=data, vr='activity_out_home', ip=ipr, lv=1)
+  dv[37] <- sfun2(data=data, vr='activity_inside_home', ip=ipr, lv=1)
   dv2 <- ifelse(abs(dv)>=0.4, TRUE, FALSE)
   return(hl[dv2])
 }
 
+
+
 # Table of Medical History #
 tab3fun <- function(datas) {
-  M <- matrix("", nrow=12, ncol=2)
-  M[1,] <- catfun1(var1="any_major_surgery_in_the_p", var2="any_major_surgery_in_the_p", ilev="1", dfs=datas)
-  M[3,] <- catfun1(var1="diabetes", var2="diabetes", ilev=c("1"), dfs=datas)
-  M[4,] <- catfun1(var1="cad", var2="cad", ilev="1", dfs=datas)
-  M[5,] <- catfun1(var1="osteoporosis", var2="osteoporosis", ilev="1", dfs=datas)
-  M[6,] <- catfun1(var1="anxiety", var2="anxiety", ilev="1", dfs=datas)
-  M[7,] <- catfun1(var1="depression", var2="depression", ilev="1", dfs=datas)
-  M[9,] <- catfun1(var1="smoker", var2="smoker", ilev="1", dfs=datas)
-  M[10,] <- catfun1(var1="smoker", var2="smoker", ilev="2", dfs=datas)
-  M[11,] <- catfun1(var1="smoker", var2="smoker", ilev="3", dfs=datas)
-  M[12,] <- confun2(var1="bmi", dig=1, dfs=datas, dig2=1)
+  M <- matrix("", nrow=38, ncol=2)
+  M[2,] <- catfun1(var1="diabetes", var2="diabetes", ilev=c("1"), dfs=datas)
+  M[3,] <- catfun1(var1="cad", var2="cad", ilev="1", dfs=datas)
+  M[4,] <- catfun1(var1="osteoporosis", var2="osteoporosis", ilev="1", dfs=datas)
+  M[5,] <- catfun1(var1="anxiety", var2="anxiety", ilev="1", dfs=datas)
+  M[6,] <- catfun1(var1="depression", var2="depression", ilev="1", dfs=datas)
+  M[8,] <- catfun1(var1="smoker___1", var2="smoker___1", ilev="1", dfs=datas)
+  M[9,] <- catfun1(var1="smoker___2", var2="smoker___2", ilev="1", dfs=datas)
+  M[10,] <- catfun1(var1="smoker___3", var2="smoker___3", ilev="1", dfs=datas)
+  M[11,] <- confun2(var1="bmi", dig=1, dfs=datas, dig2=1)
+  M[12,] <- catfun1(var1="revision", var2="revision", ilev="1", dfs=datas)
+  M[14,] <- catfun1(var1="indication_surgery___1", var2="indication_surgery___1", ilev="1", dfs=datas)
+  M[15,] <- catfun1(var1="indication_surgery___2", var2="indication_surgery___2", ilev="1", dfs=datas)
+  M[16,] <- catfun1(var1="indication_surgery___3", var2="indication_surgery___3", ilev="1", dfs=datas)
+  M[18,] <- catfun1(var1="underlying_pathology___1", var2="underlying_pathology___1", ilev="1", dfs=datas)
+  M[19,] <- catfun1(var1="underlying_pathology___2", var2="underlying_pathology___2", ilev="1", dfs=datas)
+  M[20,] <- catfun1(var1="underlying_pathology___3", var2="underlying_pathology___3", ilev="1", dfs=datas)
+  M[21,] <- catfun1(var1="underlying_pathology___4", var2="underlying_pathology___4", ilev="1", dfs=datas)
+  M[22,] <- catfun1(var1="underlying_pathology___5", var2="underlying_pathology___5", ilev="1", dfs=datas)
+  M[23,] <- catfun1(var1="underlying_pathology___6", var2="underlying_pathology___6", ilev="1", dfs=datas)
+  M[25,] <- catfun1(var1="symptom_duration2___1", var2="symptom_duration2___1", ilev="1", dfs=datas)
+  M[26,] <- catfun1(var1="symptom_duration2___2", var2="symptom_duration2___2", ilev="1", dfs=datas)
+  M[27,] <- catfun1(var1="symptom_duration2___3", var2="symptom_duration2___3", ilev="1", dfs=datas)
+  M[29,] <- catfun1(var1="asa_grade___1", var2="asa_grade___1", ilev="1", dfs=datas)
+  M[30,] <- catfun1(var1="asa_grade___2", var2="asa_grade___2", ilev="1", dfs=datas)
+  M[31,] <- catfun1(var1="asa_grade___3", var2="asa_grade___3", ilev="1", dfs=datas)
+  M[32,] <- catfun1(var1="asa_grade___4", var2="asa_grade___4", ilev="1", dfs=datas)
+  M[33,] <- catfun1(var1="arthrodesis", var2="arthrodesis", ilev="1", dfs=datas)
+  M[35,] <- catfun1(var1="surgical_approach___1", var2="surgical_approach___1", ilev="1", dfs=datas)
+  M[36,] <- catfun1(var1="surgical_approach___2", var2="surgical_approach___2", ilev="1", dfs=datas)
+  M[37,] <- catfun1(var1="surgical_approach___3", var2="surgical_approach___3", ilev="1", dfs=datas)
+  M[38,] <- confun1(var1="levels", var2="levels", dfs=datas, var3="levels")
   return(M)
 }
 
 hltab3 <- function(data, ipr) {
-  hl <- c(1,3,4,5,6,7,8,12)
-  dv <- rep(0, times=8)
-  dv[1] <- sfun2(data=data, vr='any_major_surgery_in_the_p', ip=ipr)
-  dv[2] <- sfun2(data=data, vr='diabetes', ip=ipr)
-  dv[3] <- sfun2(data=data, vr='cad', ip=ipr)
-  dv[4] <- sfun2(data=data, vr='osteoporosis', ip=ipr)
-  dv[5] <- sfun2(data=data, vr='anxiety', ip=ipr)
-  dv[6] <- sfun2(data=data, vr='depression', ip=ipr)
-  dv[7] <- sfun3(data=data, vr='smoker', ip=ipr)
-  dv[8] <- sfun1(data=data, vr='bmi', ip=ipr)
-  dv2 <- ifelse(abs(dv)>=0.4, TRUE, FALSE)
-  return(hl[dv2])
+  hl <- c(2,3,4,5,6,8,9,10,11,12,14,15,16,18,19,20,21,22,23,25,26,27,29:32,33,35:37,38)
+  dv <- rep(0, times=31)
+  dv[1] <- sfun2(data=data, vr='diabetes', ip=ipr)
+  dv[2] <- sfun2(data=data, vr='cad', ip=ipr)
+  dv[3] <- sfun2(data=data, vr='osteoporosis', ip=ipr)
+  dv[4] <- sfun2(data=data, vr='anxiety', ip=ipr)
+  dv[5] <- sfun2(data=data, vr='depression', ip=ipr)
+  dv[6] <- sfun2(data=data, vr='smoker___1', ip=ipr)
+  dv[7] <- sfun2(data=data, vr='smoker___2', ip=ipr)
+  dv[8] <- sfun2(data=data, vr='smoker___3', ip=ipr)
+  dv[9] <- sfun1(data=data, vr='bmi', ip=ipr)
+  dv[10] <- sfun2(data=data, vr='revision', ip=ipr)
+  dv[11] <- sfun2(data=data, vr='indication_surgery___1', ip=ipr)
+  dv[12] <- sfun2(data=data, vr='indication_surgery___2', ip=ipr)
+  dv[13] <- sfun2(data=data, vr='indication_surgery___3', ip=ipr)
+  dv[14] <- sfun2(data=data, vr='underlying_pathology___1', ip=ipr)
+  dv[15] <- sfun2(data=data, vr='underlying_pathology___2', ip=ipr)
+  dv[16] <- sfun2(data=data, vr='underlying_pathology___3', ip=ipr)
+  dv[17] <- sfun2(data=data, vr='underlying_pathology___4', ip=ipr)
+  dv[18] <- sfun2(data=data, vr='underlying_pathology___5', ip=ipr)
+  dv[19] <- sfun2(data=data, vr='underlying_pathology___6', ip=ipr)
+  dv[20] <- sfun2(data=data, vr='dominant_symptom1___1', ip=ipr)
+  dv[21] <- sfun2(data=data, vr='dominant_symptom1___2', ip=ipr)
+  dv[22] <- sfun2(data=data, vr='dominant_symptom1___3', ip=ipr)
+  dv[23] <- sfun2(data=data, vr='asa_grade___1', ip=ipr)
+  dv[24] <- sfun2(data=data, vr='asa_grade___2', ip=ipr)
+  dv[25] <- sfun2(data=data, vr='asa_grade___3', ip=ipr)
+  dv[26] <- sfun2(data=data, vr='asa_grade___4', ip=ipr)
+  dv[27] <- sfun2(data=data, vr='arthrodesis_performed', ip=ipr)
+  dv[28] <- sfun2(data=data, vr='surgical_approach___1', ip=ipr)
+  dv[29] <- sfun2(data=data, vr='surgical_approach___2', ip=ipr)
+  dv[30] <- sfun2(data=data, vr='surgical_approach___3', ip=ipr)
+  dv[31] <- sfun1(data=data, vr='levels', ip=ipr)
+  dv3 <- ifelse(abs(dv)>=0.4, TRUE, FALSE)
+  return(hl[dv3])
 }
 
-# Table of Clinical characteristics #
-tab4fun <- function(datas) {
-  M <- matrix("", nrow=16, ncol=2)
-  M[1,] <- catfun1(var1="primary_revision", var2="primary_revision", ilev="2", dfs=datas)
-  M[3,] <- catfun1(var1="indication_surgery___1", var2="indication_surgery___1", ilev="1", dfs=datas)
-  M[4,] <- catfun1(var1="indication_surgery___2", var2="indication_surgery___2", ilev="1", dfs=datas)
-  M[5,] <- catfun1(var1="indication_surgery___3", var2="indication_surgery___3", ilev="1", dfs=datas)
-  M[7,] <- catfun1(var1="underlying_pathology___1", var2="underlying_pathology___1", ilev="1", dfs=datas)
-  M[8,] <- catfun1(var1="underlying_pathology___2", var2="underlying_pathology___2", ilev="1", dfs=datas)
-  M[9,] <- catfun1(var1="underlying_pathology___3", var2="underlying_pathology___3", ilev="1", dfs=datas)
-  M[10,] <- catfun1(var1="underlying_pathology___4", var2="underlying_pathology___4", ilev="1", dfs=datas)
-  M[11,] <- catfun1(var1="underlying_pathology___5", var2="underlying_pathology___5", ilev="1", dfs=datas)
-  M[12,] <- catfun1(var1="underlying_pathology___6", var2="underlying_pathology___6", ilev="1", dfs=datas)
-  M[14,] <- catfun1(var1="symptom_duration2", var2="symptom_duration2", ilev="1", dfs=datas)
-  M[15,] <- catfun1(var1="symptom_duration2", var2="symptom_duration2", ilev="2", dfs=datas)
-  M[16,] <- catfun1(var1="symptom_duration2", var2="symptom_duration2", ilev="3", dfs=datas)
-  return(M)
-}
 
-hltab4 <- function(data, ipr) {
-  hl <- c(1, 3,4,5,7,8,9,10,11,12,13)
-  dv <- rep(0, times=11)
-  dv[1] <- sfun2(data=data, vr='primary_revision', ip=ipr)
-  dv[2] <- sfun2(data=data, vr='indication_surgery___1', ip=ipr)
-  dv[3] <- sfun2(data=data, vr='indication_surgery___2', ip=ipr)
-  dv[4] <- sfun2(data=data, vr='indication_surgery___3', ip=ipr)
-  dv[5] <- sfun2(data=data, vr='underlying_pathology___1', ip=ipr)
-  dv[6] <- sfun2(data=data, vr='underlying_pathology___2', ip=ipr)
-  dv[7] <- sfun2(data=data, vr='underlying_pathology___3', ip=ipr)
-  dv[8] <- sfun2(data=data, vr='underlying_pathology___4', ip=ipr)
-  dv[9] <- sfun2(data=data, vr='underlying_pathology___5', ip=ipr)
-  dv[10] <- sfun2(data=data, vr='underlying_pathology___6', ip=ipr)
-  dv[11] <- sfun3(data=data, vr='symptom_duration2', ip=ipr)
-  dv2 <- ifelse(abs(dv)>=0.4, TRUE, FALSE)
-  return(hl[dv2])
-}
-
-# Table of baseline outcomes #
-tab5fun <- function(datas) {
-  M <- matrix("", nrow=31, ncol=2)
-  M[3,] <- confun3(var1="neck_pain_vas", dig=1, dfs=datas, var2="newcat1")
-  M[4,] <- confun3(var1="arm_pain_vas1", dig=1, dfs=datas, var2="newcat1")
-  M[5,] <- confun3(var1="ndiscore", dig=1, dfs=datas, var2="newcat1")
-  M[6,] <- confun3(var1="eq5dscore", dig=2, dfs=datas, dig2=2, var2="newcat1")
-  
-  M[9,] <- confun3(var1="neck_pain_vas", dig=1, dfs=datas, var2="newcat2")
-  M[10,] <- confun3(var1="arm_pain_vas1", dig=1, dfs=datas, var2="newcat2")
-  M[11,] <- confun3(var1="ndiscore", dig=1, dfs=datas, var2="newcat2")
-  M[12,] <- confun3(var1="joa", dig=1, dfs=datas, var2="newcat2")
-  M[13,] <- confun3(var1="eq5dscore", dig=2, dfs=datas, dig2=2, var2="newcat2")
-  
-  M[16,] <- confun3(var1="neck_pain_vas", dig=1, dfs=datas, var2="newcat3")
-  M[17,] <- confun3(var1="arm_pain_vas1", dig=1, dfs=datas, var2="newcat3")
-  M[18,] <- confun3(var1="ndiscore", dig=1, dfs=datas, var2="newcat3")
-  M[19,] <- confun3(var1="eq5dscore", dig=2, dfs=datas, dig2=2, var2="newcat3")
-  
-  M[22,] <- confun3(var1="neck_pain_vas", dig=1, dfs=datas, var2="newcat4")
-  M[23,] <- confun3(var1="arm_pain_vas1", dig=1, dfs=datas, var2="newcat4")
-  M[24,] <- confun3(var1="ndiscore", dig=1, dfs=datas, var2="newcat4")
-  M[25,] <- confun3(var1="eq5dscore", dig=2, dfs=datas, dig2=2, var2="newcat4")
-  
-  M[28,] <- confun3(var1="neck_pain_vas", dig=1, dfs=datas, var2="newcat5")
-  M[29,] <- confun3(var1="arm_pain_vas1", dig=1, dfs=datas, var2="newcat5")
-  M[30,] <- confun3(var1="ndiscore", dig=1, dfs=datas, var2="newcat5")
-  M[31,] <- confun3(var1="eq5dscore", dig=2, dfs=datas, dig2=2, var2="newcat5")
-  return(M)
-}
 
 # Table of surgical procedures #
 tab6fun <- function(datas) {

@@ -68,9 +68,12 @@ data$practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\1", data$pt_study_id)
 data$sub_practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\3", data$pt_study_id)
 data$surgeon <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surgeon))
 data$surg_location <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surg_location))
-liste=c("Cornell","Semmes")
-data <- subset(data, practice %in% liste)
-
+#liste=c("Cornell","Semmes")
+#data <- subset(data, practice %in% liste)
+data$practice[data$practice=="Cornell"]<-"ABC"
+data$practice[data$practice=="BSSNY"]<-"ABC"
+data$practice[data$practice=="NSARVA"]<-"ABC"
+data$practice[data$practice=="Semmes"]<-"ABC"
 ## only include sites with at least 20 patients followed up at 3 month #
 tab <- with(subset(data, analysis3month), table(practice))
 pracs1 <- names(tab)[tab>=20]
@@ -461,50 +464,6 @@ data$disability_reason1 <- data$disability_reason2 <- data$disability_reason
 data$disability_reason1[data$employment %in% 3] <- NA
 data$disability_reason2[data$employment %in% 2] <- NA
 
-######New Employment Variable##########################################################
-
-data$pt_education_level___1 <- ifelse(data$pt_education_level %in% 1, 1, 0)
-data$pt_education_level___2 <- ifelse(data$pt_education_level %in% 2, 1, 0)
-data$pt_education_level___3 <- ifelse(data$pt_education_level %in% 3, 1, 0)
-data$pt_education_level___4 <- ifelse(data$pt_education_level %in% 4, 1, 0)
-data$pt_education_level___5 <- ifelse(data$pt_education_level %in% 5, 1, 0)
-data$pt_education_level___6 <- ifelse(data$pt_education_level %in% NA, 1, 0)
-
-
-
-data$smoker___1 <- ifelse(data$smoker %in% 1, 1, 0)
-data$smoker___2 <- ifelse(data$smoker %in% 2, 1, 0)
-data$smoker___3 <- ifelse(data$smoker %in% 3, 1, 0)
-
-data$dominant_symptom1___1 <- ifelse(data$dominant_symptom1 %in% 1, 1, 0)
-data$dominant_symptom1___2 <- ifelse(data$dominant_symptom1 %in% 2, 1, 0)
-data$dominant_symptom1___3 <- ifelse(data$dominant_symptom1 %in% 3, 1, 0)
-
-data$asa_grade___1 <- ifelse(data$asa_grade %in% 1, 1, 0)
-data$asa_grade___2 <- ifelse(data$asa_grade %in% 2, 1, 0)
-data$asa_grade___3 <- ifelse(data$asa_grade %in% 3, 1, 0)
-data$asa_grade___4 <- ifelse(data$asa_grade %in% 4, 1, 0)
-
-data$surgical_approach___1 <- ifelse(data$surgical_approach %in% 1, 1, 0)
-data$surgical_approach___2 <- ifelse(data$surgical_approach %in% 2, 1, 0)
-data$surgical_approach___3 <- ifelse(data$surgical_approach %in% 3, 1, 0)
-data$surgical_approach___4 <- ifelse(data$surgical_approach %in% 4, 1, 0)
-
-data$pt_satisfaction_index.3m___1 <- ifelse(data$pt_satisfaction_index.3m %in% 1, 1, 0)
-data$pt_satisfaction_index.3m___2 <- ifelse(data$pt_satisfaction_index.3m %in% 2, 1, 0)
-data$pt_satisfaction_index.3m___3 <- ifelse(data$pt_satisfaction_index.3m %in% 3, 1, 0)
-data$pt_satisfaction_index.3m___4 <- ifelse(data$pt_satisfaction_index.3m %in% 4, 1, 0)
-
-
-data$place_discharged_to___6 <- ifelse(data$place_discharged_to %in% 6, 1, 0)
-
-######New Employment Variable##########################################################
-
-data$insurance1___1 <- ifelse(data$insurance1 %in% 1, 1, 0)
-data$insurance1___2 <- ifelse(data$insurance1 %in% 2, 1, 0)
-data$insurance1___3 <- ifelse(data$insurance1 %in% 3, 1, 0)
-data$insurance1___4 <- ifelse(data$insurance1 %in% 4, 1, 0)
-data$insurance1___5 <- ifelse(data$insurance1 %in% 5, 1, 0)
 
 
 #######################################################################################
@@ -596,6 +555,7 @@ modfun <- function(dt, fmla, resp1, resp2, prs=data.frame(prac=pracs1)) {
   }
   return(obs1)
 }
+
 
 
 
@@ -967,6 +927,50 @@ sfun3 <- function(data, vr, ip) {
 }
 
 
+######New Employment Variable##########################################################
+
+data$pt_education_level___1 <- ifelse(data$pt_education_level %in% 1, 1, 0)
+data$pt_education_level___2 <- ifelse(data$pt_education_level %in% 2, 1, 0)
+data$pt_education_level___3 <- ifelse(data$pt_education_level %in% 3, 1, 0)
+data$pt_education_level___4 <- ifelse(data$pt_education_level %in% 4, 1, 0)
+data$pt_education_level___5 <- ifelse(data$pt_education_level %in% 5, 1, 0)
+data$pt_education_level___6 <- ifelse(data$pt_education_level %in% NA, 1, 0)
+
+
+
+data$smoker___1 <- ifelse(data$smoker %in% 1, 1, 0)
+data$smoker___2 <- ifelse(data$smoker %in% 2, 1, 0)
+data$smoker___3 <- ifelse(data$smoker %in% 3, 1, 0)
+
+data$dominant_symptom1___1 <- ifelse(data$dominant_symptom1 %in% 1, 1, 0)
+data$dominant_symptom1___2 <- ifelse(data$dominant_symptom1 %in% 2, 1, 0)
+data$dominant_symptom1___3 <- ifelse(data$dominant_symptom1 %in% 3, 1, 0)
+
+data$asa_grade___1 <- ifelse(data$asa_grade %in% 1, 1, 0)
+data$asa_grade___2 <- ifelse(data$asa_grade %in% 2, 1, 0)
+data$asa_grade___3 <- ifelse(data$asa_grade %in% 3, 1, 0)
+data$asa_grade___4 <- ifelse(data$asa_grade %in% 4, 1, 0)
+
+data$surgical_approach___1 <- ifelse(data$surgical_approach %in% 1, 1, 0)
+data$surgical_approach___2 <- ifelse(data$surgical_approach %in% 2, 1, 0)
+data$surgical_approach___3 <- ifelse(data$surgical_approach %in% 3, 1, 0)
+data$surgical_approach___4 <- ifelse(data$surgical_approach %in% 4, 1, 0)
+
+data$pt_satisfaction_index.3m___1 <- ifelse(data$pt_satisfaction_index.3m %in% 1, 1, 0)
+data$pt_satisfaction_index.3m___2 <- ifelse(data$pt_satisfaction_index.3m %in% 2, 1, 0)
+data$pt_satisfaction_index.3m___3 <- ifelse(data$pt_satisfaction_index.3m %in% 3, 1, 0)
+data$pt_satisfaction_index.3m___4 <- ifelse(data$pt_satisfaction_index.3m %in% 4, 1, 0)
+
+
+data$place_discharged_to___6 <- ifelse(data$place_discharged_to %in% 6, 1, 0)
+
+######New Employment Variable##########################################################
+
+data$insurance1___1 <- ifelse(data$insurance1 %in% 1, 1, 0)
+data$insurance1___2 <- ifelse(data$insurance1 %in% 2, 1, 0)
+data$insurance1___3 <- ifelse(data$insurance1 %in% 3, 1, 0)
+data$insurance1___4 <- ifelse(data$insurance1 %in% 4, 1, 0)
+data$insurance1___5 <- ifelse(data$insurance1 %in% 5, 1, 0)
 
 
 ### generate table template ###
@@ -1017,45 +1021,46 @@ tab2fun <- function(datas) {
 }
 
 hltab2 <- function(data, ipr) {
-  hl <- c(1,4,6,7,8,9,10,11,12,14,15,16,17,18,20,21,22,23,24,26,27,28,29, 31, 32, 34, 35, 36, 38:42, 44,45)
-  dv <- rep(0, times=37)
+  hl <- c(1:45)
+  dv <- rep(0, times=45)
   dv[1] <- sfun2(data=data, vr='pgender', ip=ipr)
-  dv[2] <- sfun1(data=data, vr='ptage2', ip=ipr)
-  dv[3] <- sfun2(data=data, vr='prace___1', ip=ipr)
-  dv[4] <- sfun2(data=data, vr='prace___2', ip=ipr)
-  dv[5] <- sfun2(data=data, vr='prace___3', ip=ipr)
-  dv[6] <- sfun2(data=data, vr='prace___4', ip=ipr)
-  dv[7] <- sfun2(data=data, vr='prace___5', ip=ipr)
-  dv[8] <- sfun2(data=data, vr='prace___6', ip=ipr)
-  dv[9] <- sfun2(data=data, vr='ptethnicity', ip=ipr)
-  dv[10] <- sfun2(data=data, vr='pt_education_level___1', ip=ipr)
-  dv[11] <- sfun2(data=data, vr='pt_education_level___2', ip=ipr)
-  dv[12] <- sfun2(data=data, vr='pt_education_level___3', ip=ipr)
-  dv[13] <- sfun2(data=data, vr='pt_education_level___4', ip=ipr)
-  dv[14] <- sfun2(data=data, vr='pt_education_level___5', ip=ipr)
-  dv[15] <- sfun2(data=data, vr='insurance1___1', ip=ipr)
-  dv[16] <- sfun2(data=data, vr='insurance1___2', ip=ipr)
-  dv[17] <- sfun2(data=data, vr='insurance1___3', ip=ipr)
-  dv[18] <- sfun2(data=data, vr='insurance1___4', ip=ipr)
-  dv[19] <- sfun2(data=data, vr='insurance1___5', ip=ipr)
-  dv[20] <- sfun3(data=data, vr='insurance1', ip=ipr)
-  dv[21] <- sfun2(data=data, vr='workers_comp', ip=ipr)
-  dv[22] <- sfun2(data=data, vr='liability_claim1', ip=ipr)
-  dv[23] <- sfun2(data=data, vr='employment', ip=ipr, lv=1)
-  dv[24] <- sfun2(data=data, vr='full_part_time', ip=ipr)
-  dv[25] <- sfun2(data=data, vr='employment', ip=ipr, lv=2)
-  dv[26] <- sfun2(data=data, vr='employment', ip=ipr, lv=2)
-  dv[27] <- sfun2(data=data, vr='disability_reason1', ip=ipr, lv=1)
-  dv[28] <- sfun2(data=data, vr='employment', ip=ipr, lv=3)
-  dv[29] <- sfun2(data=data, vr='unemployed', ip=ipr, lv=1)
-  dv[30] <- sfun2(data=data, vr='disability_reason2', ip=ipr, lv=1)
-  dv[31] <- sfun2(data=data, vr='unemployed', ip=ipr, lv=2)
-  dv[32] <- sfun2(data=data, vr='unemployed', ip=ipr, lv=3)
-  dv[33] <- sfun2(data=data, vr='unemployed', ip=ipr, lv=4)
-  dv[34] <- sfun2(data=data, vr='employment', ip=ipr, lv=4)
-  dv[35] <- sfun2(data=data, vr='plan_return_work', ip=ipr, lv=1)
-  dv[36] <- sfun2(data=data, vr='activity_out_home', ip=ipr, lv=1)
-  dv[37] <- sfun2(data=data, vr='activity_inside_home', ip=ipr, lv=1)
+  dv[4] <- sfun1(data=data, vr='ptage2', ip=ipr)
+  dv[6] <- sfun2(data=data, vr='prace___1', ip=ipr)
+  dv[7] <- sfun2(data=data, vr='prace___2', ip=ipr)
+  dv[8] <- sfun2(data=data, vr='prace___3', ip=ipr)
+  dv[9] <- sfun2(data=data, vr='prace___4', ip=ipr)
+  dv[10] <- sfun2(data=data, vr='prace___5', ip=ipr)
+  dv[11] <- sfun2(data=data, vr='prace___6', ip=ipr)
+  dv[12] <- sfun2(data=data, vr='ptethnicity', ip=ipr)
+  dv[14] <- sfun2(data=data, vr='pt_education_level___1', ip=ipr)
+  dv[15] <- sfun2(data=data, vr='pt_education_level___2', ip=ipr)
+  dv[16] <- sfun2(data=data, vr='pt_education_level___3', ip=ipr)
+  dv[17] <- sfun2(data=data, vr='pt_education_level___4', ip=ipr)
+  dv[18] <- sfun2(data=data, vr='pt_education_level___5', ip=ipr)
+  dv[20] <- sfun2(data=data, vr='insurance1___1', ip=ipr)
+  dv[21] <- sfun2(data=data, vr='insurance1___2', ip=ipr)
+  dv[22] <- sfun2(data=data, vr='insurance1___3', ip=ipr)
+  dv[23] <- sfun2(data=data, vr='insurance1___4', ip=ipr)
+  dv[24] <- sfun2(data=data, vr='insurance1___5', ip=ipr)
+  dv[26] <- sfun2(data=data, vr='workers_comp', ip=ipr)
+  dv[27] <- sfun2(data=data, vr='liability_claim1', ip=ipr)
+  dv[28] <- sfun2(data=data, vr='employment', ip=ipr, lv=1)
+  dv[29] <- sfun2(data=data, vr='full_part_time', ip=ipr, lv=1)
+  dv[30] <- sfun2(data=data, vr='full_part_time', ip=ipr, lv=2)
+  dv[31] <- sfun2(data=data, vr='employment', ip=ipr, lv=2)
+  dv[32] <- sfun2(data=data, vr='disability_reason1', ip=ipr, lv=1)
+  dv[33] <- sfun2(data=data, vr='disability_reason1', ip=ipr, lv=2)
+  dv[34] <- sfun2(data=data, vr='employment', ip=ipr, lv=3)
+  dv[35] <- sfun2(data=data, vr='unemployed', ip=ipr, lv=1)
+  dv[36] <- sfun2(data=data, vr='disability_reason2', ip=ipr, lv=1)
+  dv[37] <- sfun2(data=data, vr='disability_reason2', ip=ipr, lv=2)
+  dv[38] <- sfun2(data=data, vr='unemployed', ip=ipr, lv=2)
+  dv[39] <- sfun2(data=data, vr='unemployed', ip=ipr, lv=3)
+  dv[40] <- sfun2(data=data, vr='unemployed', ip=ipr, lv=4)
+  dv[41] <- sfun2(data=data, vr='employment', ip=ipr, lv=4)
+  dv[42] <- sfun2(data=data, vr='plan_return_work', ip=ipr, lv=1)
+  dv[44] <- sfun2(data=data, vr='activity_out_home', ip=ipr, lv=1)
+  dv[45] <- sfun2(data=data, vr='activity_inside_home', ip=ipr, lv=1)
   dv2 <- ifelse(abs(dv)>=0.4, TRUE, FALSE)
   return(hl[dv2])
 }
@@ -1297,7 +1302,7 @@ figure_construct <- function(datas) {
   M_f[3,] <- catfun1b(var1="pt_satisfaction_index.3m___3", var2="pt_satisfaction_index.3m___3", ilev="1", df=datas)
   M_f[4,] <- catfun1b(var1="pt_satisfaction_index.3m___4", var2="pt_satisfaction_index.3m___4", ilev="1", df=datas)
   M_f[5,] <- catfun1b(var1="pt_satisfaction_index2.3m", var2="pt_satisfaction_index2.3m", ilev="1", df=datas)
-  M_f[6,] <- M_f[1,] + M_f[2,]
+  M_f[6,] <- round(M_f[1,]) + round(M_f[2,])
   M_f[7,] <- catfun1b(var1="readmit30day", var2="readmit30day", ilev="1", df=datas)
   M_f[8,] <- catfun1b(var1="revision_surg_3mths2", var2="revision_surg_3mths2", ilev="1", df=datas)
   M_f[9,] <- catfun1b(var1="readmit3m", var2="readmit3m", ilev="1", df=datas)
@@ -1533,21 +1538,23 @@ tab9fun <- function(ptab, datas) {
 ### plot functions ###
 plotfun1 <- function(x, yli, yma, yla, mai, yll) {
   plot(1:10, 1:10, xlim=c(1.5,8), ylim=yli, type="n", axes=FALSE, xlab="Time after Surgery", ylab=yla, main=mai)
-  legend(x=9, y=0,legend=c(latexTranslate(pracs[k]),'QOD'), pch=c(16,17), col=c('black','red'), bty='n', xpd=NA, ncol=1)
+  legend(x=9, y=0,legend=c('QOD',latexTranslate(pracs[k])), pch=c(20,8), col=c('red','blue'), bty='n', xpd=NA, ncol=1)
   axis(side=1, at=c(2,5,8), labels=paste(c("Baseline", "3-month", "12-month"), "\n N=", c(x[1], x[4], x[7]), sep=''), col='white')
   axis(side=2, at=yma, las=2, labels=yll)
   
   if (x[1]>4) {
-    points(c(2,2,5,5), x[c(2,11,5,14)],  pch=c(16,17,16,17), col=c('black', 'red','black', 'red'))
     arrows(2, x[2]-x[3], 2, x[2]+x[3], angle=90, code=3, length=0.05)
     arrows(5, x[5]-x[6], 5, x[5]+x[6], angle=90, code=3, length=0.05)
     segments(2, x[2], 5, x[5])
+    points(c(2,5), x[c(11,14)],  pch=c(20,20), col=c('red','red'), cex=3)
+    points(c(2,5), x[c(2,5)],  pch=c(8,8), col=c('blue','blue'), cex=1)
   }
   
   if (x[7]>4) {
-    points(c(8,8), x[c(8,17)], pch=c(16,17),col=c('black', 'red'))
     arrows(8, x[8]-x[9], 8, x[8]+x[9], angle=90, code=3, length=0.05)
     segments(5, x[5], 8, x[8])
+    points(c(8), x[c(17)], pch=c(20), col=c('red'), cex=3)
+    points(c(8), x[c(8)], pch=c(8), col=c('blue'), cex=1)
   }
 }
 
@@ -1606,6 +1613,10 @@ if(length(pracs1) > 0L) {
   load('patient_lumbar_index.rda')
   n <- nrow(d)
   d$practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\1", d$pt_study_id)
+  d$practice[d$practice=="Cornell"]<-"ABC"
+  d$practice[d$practice=="BSSNY"]<-"ABC"
+  d$practice[d$practice=="NSARVA"]<-"ABC"
+  d$practice[d$practice=="Semmes"]<-"ABC"
   d$sub_practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\3", d$pt_study_id)
   d <- subset(d, practice %in% pracs1)
   dfp <- aggregate(cbind(usefull3month, usefull12month, analysis3month, analysis12month) ~ practice, FUN=sum, data=d)
@@ -1655,6 +1666,10 @@ if(length(pracs2) > 0L) {
   load('patient_lumbar_index.rda')
   n <- nrow(d)
   d$practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\1", d$pt_study_id)
+  d$practice[d$practice=="Cornell"]<-"ABC"
+  d$practice[d$practice=="BSSNY"]<-"ABC"
+  d$practice[d$practice=="NSARVA"]<-"ABC"
+  d$practice[d$practice=="Semmes"]<-"ABC"
   d$sub_practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\3", d$pt_study_id)
   d <- subset(d, practice %in% pracs2)
   df <- aggregate(cbind(usefull3month, usefull12month, analysis3month, analysis12month) ~ practice, FUN=sum, data=d)
