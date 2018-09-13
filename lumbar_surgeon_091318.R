@@ -1246,11 +1246,11 @@ tab9fun <- function(ptab, datas) {
   return(M)
 }
 
-
+##updated#########
 ### plot functions ###
 plotfun1 <- function(x, yli, yma, yla, mai, yll) {
   plot(1:10, 1:10, xlim=c(1.5,8), ylim=yli, type="n", axes=FALSE, xlab="Time after Surgery", ylab=yla, main=mai)
-  legend(x=9, y=0,legend=c('QOD',latexTranslate(pracs[k])), pch=c(20,8), col=c('red','blue'), bty='n', xpd=NA, ncol=1)
+  legend(x=9, y=0,legend=c(latexTranslate(pracs[w]),latexTranslate(snam[k])), pch=c(20,8), col=c('red','blue'), bty='n', xpd=NA, ncol=1)
   axis(side=1, at=c(2,5,8), labels=paste(c("Baseline", "3-month", "12-month"), "\n N=", c(x[1], x[4], x[7]), sep=''), col='white')
   axis(side=2, at=yma, las=2, labels=yll)
   
@@ -1366,53 +1366,6 @@ if(length(pracs1) > 0L) {
 
 
 
-
-
-
-
-
-## only for site with >20 12m followup ##
-
-
-if(length(pracs2) > 0L) {
-  load('patient_lumbar_index.rda')
-  n <- nrow(d)
-  d$practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\1", d$pt_study_id)
-  d$practice[d$practice=="Cornell"]<-"ABC"
-  d$practice[d$practice=="BSSNY"]<-"ABC"
-  d$practice[d$practice=="NSARVA"]<-"ABC"
-  d$practice[d$practice=="Semmes"]<-"ABC"
-  d$sub_practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\3", d$pt_study_id)
-  d <- subset(d, practice %in% pracs2)
-  df <- aggregate(cbind(usefull3month, usefull12month, analysis3month, analysis12month) ~ practice, FUN=sum, data=d)
-  colnames(df) <- c('practice', 'x3m', 'x12m', 'y3m', 'y12m')
-  ##########Ben ekledim#################
-  df$QOD_3base<-sum(df$x3m,na.rm = FALSE)
-  df$QOD_12base<-sum(df$x12m,na.rm = FALSE)
-  df$QOD_3m<-sum(df$y3m,na.rm = FALSE)
-  df$QOD_12m<-sum(df$y12m,na.rm = FALSE)
-  df$qod_fu3m <- round(df$QOD_3m/df$QOD_3base,2)
-  df$qod_fu12m <-round(df$QOD_12m/df$QOD_12base,2)
-  ################
-  df$fu3m <-0
-  df$fu12m <-0
-  df$fu3m <- round(df$y3m/df$x3m,2)
-  df$fu12m <- round(df$y12m/df$x12m,2)
-  df$fu <- round(df$fu3m + df$fu12m,2)
-  df <- df[order(df$fu),]
-  nm <- nrow(df)
-  df$center <- nm:1
-  num.min <- min(df$x12m)
-  num.max <- max(df$x3m)
-  
-  
-  for (k in 1:nm) {
-    ip <- pracs2[k]
-    df$center <- nm:1
-    df$center[df$practice==ip] <- ip
-    
-  }
-}
 
 
 ##############################################

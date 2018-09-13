@@ -6,19 +6,15 @@
 \usepackage{pdflscape}
 \usepackage{colortbl}
 \providecommand{\shadeRow}{\rowcolor[rgb]{0.529,0.808,0.922}}
-
+\title{STATISTICS and OUTCOMES REPORT \\ LUMBAR}
 \date{}
 \begin{document}
+\maketitle
 \begin{center}
-\Large {\Sexpr{startdate$sdate[startdate$practice==snam[k]]}} $\sim$ {\Sexpr{startdate$edate[startdate$practice == snam[k]]}}
+\Large {\Sexpr{startdate$sdate[startdate$practice==pracs[w]]}} $\sim$ {\Sexpr{dldate}}
 \end{center}
-\vspace{1cm}
 \begin{center}
-
-
-<<echo=FALSE, results=tex>>=
-cat("\\Large \\textbf{{", latexTranslate(snam[k]), "}}\\\\\n")
-@ 
+\Large \textbf{{\Sexpr{paste(pracs[w], ', Surgeon ', snam[k], sep='')}}}\\
 \end{center}
 \vspace{1cm}
 \listoftables
@@ -35,7 +31,7 @@ cat("\\listoffigures\n\\clearpage\n")
 surgeon<-snam[k]
 data1cfp <- subset(dfp, surgeon==snam[k])
 data2cfp <- subset(dfp, surgeon==snam[k])
-dfp_bar <- data.frame(Site= c(surgeon,"QOD Total",surgeon,"QOD Total"),
+dfp_bar <- data.frame(Site= c(surgeon,pracs[w],surgeon,pracs[w]),
                  time_point = c("3m","3m","12m","12m"),
                  percent = c(data1cfp$fu3m,data1cfp$qod_fu3m,data1cfp$fu12m,data1cfp$qod_fu12m)*100)
 
@@ -92,7 +88,7 @@ tab1[2,4] <- nrow(data2c)
 tab1[2,5] <- nrow(data1c)
 colnames(tab1) <- c("$\\#$ Surgeons ", "$\\#$ Hospitals ", "$\\#$ 3-M Accrual ", "$\\#$ 12-M Accrual ","$\\#$ Follow-up
 Accrual ")
-rownames(tab1) <- c("Practice ",latexTranslate(snam[k]))
+rownames(tab1) <- c(latexTranslate(pracs[w]),latexTranslate(snam[k]))
 
 
 ## other tables ##
@@ -158,10 +154,7 @@ rownames(tab7b) <- c("\\underline{Discectomy}", "~~~Estimated Blood Loss (cc)", 
     ## make scatter plot #
     plotname1 <- paste("figs/lumbar_", snam[k], "plot.pdf", sep="")
     plotfun2(datas=data1c, pltnam=plotname1, ptab=cbind(tab9pfun(datas=data1c),tab9pfun(datas=data1)))
-    
-    
-    plotname1 <- paste('figs/', pracs[w], '_', snam[k], "plot.pdf", sep="")
-    plotfun2(datas=data1c, pltnam=plotname1, ptab=cbind(tab8pfun(datas=data1c), tab8pfun(datas=data1c)))
+
 
 @
 \clearpage
@@ -207,9 +200,10 @@ latex(tab7, title="", caption="Indicators of Safety and Quality of Care for Pati
 <<echo=FALSE, results=hide>>=
 ## fig 2##
 surgeon<-snam[k]
+practice<-pracs[w]
 tab_figure <- figure_construct(data=datas)
 
-dfp_satisfaction <- data.frame(Site= c(surgeon,"QOD Total",surgeon,"QOD Total",surgeon,"QOD Total",surgeon,"QOD Total",surgeon,"QOD Total"),satisfaction = c("1-Met","1-Met", "2-Not As Much \n As Hoped", "2-Not As Much \n As Hoped", "3-Would Not \n Undergo", "3-Would Not \n Undergo", "4-Same or Worse", "4-Same or Worse","Satisfied \n (1+2)","Satisfied \n (1+2)"),percent = c(round(tab_figure[1,1]),round(tab_figure[1,2]),round(tab_figure[2,1]),round(tab_figure[2,2]),round(tab_figure[3,1]),round(tab_figure[3,2]),round(tab_figure[4,1]),round(tab_figure[4,2]),round(tab_figure[6,1]),round(tab_figure[6,2])))
+dfp_satisfaction <- data.frame(Site= c(surgeon,practice,surgeon,practice,surgeon,practice,surgeon,practice,surgeon,practice),satisfaction = c("1-Met","1-Met", "2-Not As Much \n As Hoped", "2-Not As Much \n As Hoped", "3-Would Not \n Undergo", "3-Would Not \n Undergo", "4-Same or Worse", "4-Same or Worse","Satisfied \n (1+2)","Satisfied \n (1+2)"),percent = c(round(tab_figure[1,1]),round(tab_figure[1,2]),round(tab_figure[2,1]),round(tab_figure[2,2]),round(tab_figure[3,1]),round(tab_figure[3,2]),round(tab_figure[4,1]),round(tab_figure[4,2]),round(tab_figure[6,1]),round(tab_figure[6,2])))
 
 
 pl<-ggplot(data=dfp_satisfaction, aes(x=satisfaction, y=percent, fill=Site)) +
@@ -228,7 +222,7 @@ dev.off()
 
 ############################
 
-dfp_readmission <- data.frame(Site= c(surgeon,"QOD Total",surgeon,"QOD Total",surgeon,"QOD Total"),readmit = c("30-day Hospital \n Readmission", "30-day Hospital \n Readmission", "3-month Hospital \n Readmission", "3-month Hospital \n Readmission", "3-month Revision \n Surgery", "3-month Revision \n Surgery"),percent = c(tab_figure[7,1],tab_figure[7,2],tab_figure[9,1],tab_figure[9,2],tab_figure[8,1],tab_figure[8,2]))
+dfp_readmission <- data.frame(Site= c(surgeon,practice,surgeon,practice,surgeon,practice),readmit = c("30-day Hospital \n Readmission", "30-day Hospital \n Readmission", "3-month Hospital \n Readmission", "3-month Hospital \n Readmission", "3-month Revision \n Surgery", "3-month Revision \n Surgery"),percent = c(tab_figure[7,1],tab_figure[7,2],tab_figure[9,1],tab_figure[9,2],tab_figure[8,1],tab_figure[8,2]))
 
 
 pl<-ggplot(data=dfp_readmission, aes(x=readmit, y=percent, fill=Site)) +
