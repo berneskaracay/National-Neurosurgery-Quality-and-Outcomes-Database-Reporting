@@ -60,7 +60,7 @@ data <- merge(data, dat3b, by=c('pt_study_id'), all=TRUE)
 ###############################################################
 
 # merge the data with index, so apply exclusions#
-data <- merge(data, d[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month')], by='pt_study_id', all.y=TRUE)
+data <- merge(data, d[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month',"usefull3month","usefull12month")], by='pt_study_id', all.y=TRUE)
 
 # extract practice/center name, patient id, surgeon id, hospital/surg_location #
 n <- nrow(data)
@@ -68,12 +68,12 @@ data$practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\1", data$pt_study_id)
 data$sub_practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\3", data$pt_study_id)
 data$surgeon <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surgeon))
 data$surg_location <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surg_location))
-liste=c("Vanderbilt")
+liste=c("Vanderbilt","Semmes","BSSNY","NSARVA","Cornell")
 data <- subset(data, practice %in% liste)
-data$practice[data$practice=="Cornell"]<-"ABC"
-data$practice[data$practice=="BSSNY"]<-"ABC"
-data$practice[data$practice=="NSARVA"]<-"ABC"
-data$practice[data$practice=="Semmes"]<-"ABC"
+#data$practice[data$practice=="Cornell"]<-"ABC"
+#data$practice[data$practice=="BSSNY"]<-"ABC"
+#data$practice[data$practice=="NSARVA"]<-"ABC"
+#data$practice[data$practice=="Semmes"]<-"ABC"
 ## only include sites with at least 20 patients followed up at 3 month #
 tab <- with(subset(data, analysis3month), table(practice))
 pracs1 <- names(tab)[tab>=20]
@@ -1318,40 +1318,34 @@ plotfun2 <- function(datas, pltnam, ptab) {
 
 
 ##############################################
-#### generate the follow up plot #############
-##############################################
-
-if(length(pracs1) > 0L) {
-  load('patient_lumbar_index.rda')
-  n <- nrow(d)
-  d$practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\1", d$pt_study_id)
-  d$practice[d$practice=="Cornell"]<-"ABC"
-  d$practice[d$practice=="BSSNY"]<-"ABC"
-  d$practice[d$practice=="NSARVA"]<-"ABC"
-  d$practice[d$practice=="Semmes"]<-"ABC"
-  d$sub_practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\3", d$pt_study_id)
-  d <- subset(d, practice %in% pracs1)
-  dfp <- aggregate(cbind(usefull3month, usefull12month, analysis3month, analysis12month) ~ practice, FUN=sum, data=d)
-  colnames(dfp) <- c('practice', 'x3m', 'x12m', 'y3m', 'y12m')
-  ##########Ben ekledim#################
-  dfp$QOD_3base<-sum(dfp$x3m,na.rm = FALSE)
-  dfp$QOD_12base<-sum(dfp$x12m,na.rm = FALSE)
-  dfp$QOD_3m<-sum(dfp$y3m,na.rm = FALSE)
-  dfp$QOD_12m<-sum(dfp$y12m,na.rm = FALSE)
-  dfp$qod_fu3m <- round(dfp$QOD_3m/dfp$QOD_3base,2)
-  dfp$qod_fu12m <-round(dfp$QOD_12m/dfp$QOD_12base,2)
-  ################
-  dfp$fu3m <-0
-  dfp$fu12m <-0
-  dfp$fu3m <- round(dfp$y3m/dfp$x3m,2)
-  dfp$fu12m <- round(dfp$y12m/dfp$x12m,2)
-  dfp$fu <- round(dfp$fu3m + dfp$fu12m,2)
-  dfp <- dfp[order(dfp$fu),]
-  nm <- nrow(dfp)
-  dfp$center <- nm:1
-  num.min <- min(dfp$x12m)
-  num.max <- max(dfp$x3m)
-}
+follow_up <- function(site){
+  data_follow_up <- subset(data, practice==site)
+  if(length(pracs1) > 0L) {
+    n <- nrow(data_follow_up)
+    data_follow_up <- subset(data_follow_up, practice %in% pracs1)
+    dfp <- aggregate(cbind(usefull3month, usefull12month, analysis3month, analysis12month) ~ surgeon, FUN=sum, data=data_follow_up)
+    colnames(dfp) <- c('surgeon', 'x3m', 'x12m', 'y3m', 'y12m')
+    ##########Ben ekledim#################
+    dfp$QOD_3base<-sum(dfp$x3m,na.rm = FALSE)
+    dfp$QOD_12base<-sum(dfp$x12m,na.rm = FALSE)
+    dfp$QOD_3m<-sum(dfp$y3m,na.rm = FALSE)
+    dfp$QOD_12m<-sum(dfp$y12m,na.rm = FALSE)
+    dfp$qod_fu3m <- round(dfp$QOD_3m/dfp$QOD_3base,2)
+    dfp$qod_fu12m <-round(dfp$QOD_12m/dfp$QOD_12base,2)
+    ################
+    dfp$fu3m <-0
+    dfp$fu12m <-0
+    dfp$fu3m <- round(dfp$y3m/dfp$x3m,2)
+    dfp$fu12m <- round(dfp$y12m/dfp$x12m,2)
+    dfp$fu <- round(dfp$fu3m + dfp$fu12m,2)
+    dfp <- dfp[order(dfp$fu),]
+    nm <- nrow(dfp)
+    dfp$center <- nm:1
+    num.min <- min(dfp$x12m)
+    num.max <- max(dfp$x3m)
+    return(dfp)
+  }
+}  
 
 
 
@@ -1373,17 +1367,6 @@ if(length(pracs1) > 0L) {
 ##############################################
 
 
-#########qod TRIM mean surgeon count################
-
-
-follow_3<-data.frame(table(data1$practice))
-trim_mean_follow_3<-0
-trim_mean_follow_3<-round(mean(follow_3$Freq, trim = 0.1, na.rm = FALSE))
-
-
-follow_12<-data.frame(table(data2$practice))
-trim_mean_follow_12<-0
-trim_mean_follow_12<-round(mean(follow_12$Freq, trim = 0.1, na.rm = FALSE))
 
 mlCap <- function(x) {
   sprintf("\\begin{tabular}{l}%s \\end{tabular}", x)

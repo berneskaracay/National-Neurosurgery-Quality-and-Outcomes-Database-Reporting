@@ -60,7 +60,7 @@ data <- merge(data, dat3b, by=c('pt_study_id'), all=TRUE)
 ###############################################################
 
 # merge the data with index, so apply exclusions#
-data <- merge(data, d[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month')], by='pt_study_id', all.y=TRUE)
+data <- merge(data, d[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month','usefull3month', 'usefull12month')], by='pt_study_id', all.y=TRUE)
 
 # extract practice/center name, patient id, surgeon id, hospital/surg_location #
 n <- nrow(data)
@@ -68,8 +68,8 @@ data$practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\1", data$pt_study_id)
 data$sub_practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\3", data$pt_study_id)
 data$surgeon <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surgeon))
 data$surg_location <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surg_location))
-#liste=c("Cornell","Semmes")
-#data <- subset(data, practice %in% liste)
+liste=c("Cornell","Vanderbilt")
+data <- subset(data, practice %in% liste)
 data$practice[data$practice=="Cornell"]<-"ABC"
 data$practice[data$practice=="BSSNY"]<-"ABC"
 data$practice[data$practice=="NSARVA"]<-"ABC"

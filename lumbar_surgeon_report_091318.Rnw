@@ -29,6 +29,8 @@ cat("\\listoffigures\n\\clearpage\n")
 <<echo=FALSE, results=hide>>=
 ## fig 1 ##
 surgeon<-snam[k]
+site=pracs[w]
+dfp=follow_up(site)
 data1cfp <- subset(dfp, surgeon==snam[k])
 data2cfp <- subset(dfp, surgeon==snam[k])
 dfp_bar <- data.frame(Site= c(surgeon,pracs[w],surgeon,pracs[w]),
