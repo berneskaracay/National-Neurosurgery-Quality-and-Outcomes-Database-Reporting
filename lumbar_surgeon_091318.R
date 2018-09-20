@@ -66,10 +66,30 @@ data <- merge(data, d[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', '
 n <- nrow(data)
 data$practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\1", data$pt_study_id)
 data$sub_practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\3", data$pt_study_id)
+data$surgeon_name <- data$surgeon
 data$surgeon <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surgeon))
 data$surg_location <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surg_location))
 liste=c("Vanderbilt","Semmes","BSSNY","NSARVA","Cornell")
 data <- subset(data, practice %in% liste)
+
+
+data <- data[order(data$surgeon),]
+test<-c('pt_study_id', 'surgeon','surgeon_name')
+data_surgeon <-data[test]
+data_surgeon$num <- ave(data_surgeon$pt_study_id, data_surgeon$surgeon , FUN = seq_along)
+data_name <- subset(data_surgeon, num %in% 1)
+
+
+test<-c('surgeon','surgeon_name')
+data_name <-data_name[test]
+
+
+colnames(data_name)[colnames(data_name)=="surgeon_name"] <- "surgeon_new_id"
+
+data <- merge(data,data_name,by="surgeon")
+
+
+
 #data$practice[data$practice=="Cornell"]<-"ABC"
 #data$practice[data$practice=="BSSNY"]<-"ABC"
 #data$practice[data$practice=="NSARVA"]<-"ABC"
@@ -1382,8 +1402,10 @@ for (w in seq(length(pracs))) {
   data2 <- subset(data1, analyzed_12month)
   data3 <- subset(data1, analyzed_3month)
   tab <- table(data1$surgeon)
+  tab2 <- table(data1$surgeon_name)
   if (sum(tab>19) > 0) {
     snam <- names(tab)[tab>19]
+    snam2 <- names(tab2)[tab>19]
     nsg <- length(snam)
     for (k in seq(nsg)) {
       Sweave("lumbar_surgeon_report_091318.rnw", output=paste(pracs[w], '_', snam[k], ".tex", sep="")) 
@@ -1395,16 +1417,13 @@ for (w in seq(length(pracs))) {
   data1 <- subset(data, practice==pracs[w])
   data2 <- subset(data1, analysis12month)
   tab <- table(data1$surgeon)
+  tab2 <- table(data1$surgeon_name)
   if (sum(tab>19) > 0) {
     snam <- names(tab)[tab>19]
+    snam2 <- names(tab2)[tab2>19]
     nsg <- length(snam)
     for (k in seq(nsg)) {
       for (q in 1:3) {system(paste("pdflatex ", paste(pracs[w], '_', snam[k], ".tex", sep="")))}
     }
   }
 }
-
-
-
-
-

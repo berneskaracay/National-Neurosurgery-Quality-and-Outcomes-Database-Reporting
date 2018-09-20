@@ -14,7 +14,7 @@
 \Large {\Sexpr{startdate$sdate[startdate$practice==pracs[w]]}} $\sim$ {\Sexpr{dldate}}
 \end{center}
 \begin{center}
-\Large \textbf{{\Sexpr{paste(pracs[w], ', Surgeon ', snam[k], sep='')}}}\\
+\Large \textbf{{\Sexpr{paste(pracs[w], ', Surgeon ', snam2[k], sep='')}}}\\
 \end{center}
 \vspace{1cm}
 \listoftables
@@ -78,8 +78,8 @@ data2co <- subset(data2o, surgeon==snam[k])
 ## table 1 ##
 
 tab1 <- matrix(NA, nrow=2, ncol=5)
-tab1[1,1] <- length(unique(data$surgeon))
-tab1[1,2] <- length(unique(data$surg_location))
+tab1[1,1] <- length(unique(data1$surgeon))
+tab1[1,2] <- length(unique(data1$surg_location))
 tab1[1,3] <- nrow(data3)
 tab1[1,4] <- nrow(data2)
 tab1[1,5] <- nrow(data1)
