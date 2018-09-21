@@ -29,6 +29,7 @@ d$analyzed_12month <- ifelse(d$analysis12month %in% TRUE | d$dead12month %in% TR
 dldate <- as.character(as.Date("2018-07-03"))
 # only include followed up at 3 month or 12 month #
 d <- subset(d,!scorefail_baseline)
+d_follow_up<-d
 d <- subset(d, analyzed_3month | analyzed_12month)
 
 ### read raw patient data set ###
@@ -60,7 +61,6 @@ data <- merge(data, dat3b, by=c('pt_study_id'), all=TRUE)
 ###############################################################
 
 # merge the data with index, so apply exclusions#
-data <- merge(data, d[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month','usefull3month', 'usefull12month')], by='pt_study_id', all.y=TRUE)
 
 # extract practice/center name, patient id, surgeon id, hospital/surg_location #
 n <- nrow(data)
@@ -68,12 +68,18 @@ data$practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\1", data$pt_study_id)
 data$sub_practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\3", data$pt_study_id)
 data$surgeon <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surgeon))
 data$surg_location <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surg_location))
-liste=c("Cornell","Vanderbilt")
-data <- subset(data, practice %in% liste)
-data$practice[data$practice=="Cornell"]<-"ABC"
-data$practice[data$practice=="BSSNY"]<-"ABC"
-data$practice[data$practice=="NSARVA"]<-"ABC"
-data$practice[data$practice=="Semmes"]<-"ABC"
+
+data_follow_up <- merge(data, d_follow_up[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month',"usefull3month","usefull12month")], by='pt_study_id', all.y=TRUE)
+
+# merge the data with index, so apply exclusions#
+data <- merge(data, d[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month','usefull3month', 'usefull12month')], by='pt_study_id', all.y=TRUE)
+
+#liste=c("Cornell","Vanderbilt","Cornell","AHN")
+#data <- subset(data, practice %in% liste)
+#data$practice[data$practice=="Cornell"]<-"ABC"
+#data$practice[data$practice=="BSSNY"]<-"ABC"
+#data$practice[data$practice=="NSARVA"]<-"ABC"
+#data$practice[data$practice=="Semmes"]<-"ABC"
 ## only include sites with at least 20 patients followed up at 3 month #
 tab <- with(subset(data, analysis3month), table(practice))
 pracs1 <- names(tab)[tab>=20]
@@ -469,11 +475,11 @@ data$disability_reason2[data$employment %in% 2] <- NA
 #######################################################################################
 #######################################################################################
 ds <- data
-ds <- subset(ds, select=c(pgender, ptage2, race, ptethnicity,pt_education_level, workers_comp, liability_claim1, any_major_surgery_in_the_p, diabetes, cad, osteoporosis, anxiety, depression, bmi, diagnosis, dominant_symptom1, motor_def2, symptom_duration2, asa_grade, arthrodesis_performed, interbody_graft, surgical_approach, occupation, work, smoker, odiscore, eq5dscore, back_pain_vas, leg_pain_vas1, odiscore.3m, odiscore.12m, eq5dscore.3m, eq5dscore.12m, back_pain_vas.3m, back_pain_vas.12m, leg_pain_vas1.3m, leg_pain_vas1.12m, pt_satisfaction_index.3m, pt_satisfaction_index.12m, los3, estimated_blood_loss_cc3, rtw.3m, day, practice, pt_study_id, analysis3month, select12m))
+ds <- subset(ds, select=c(pgender, ptage2, race, ptethnicity,pt_education_level, workers_comp, liability_claim1, any_major_surgery_in_the_p, diabetes, cad, osteoporosis, anxiety, depression, bmi, diagnosis, dominant_symptom1, motor_def2, symptom_duration2, asa_grade, arthrodesis_performed, surgical_approach, work, smoker, odiscore, eq5dscore, back_pain_vas, leg_pain_vas1, odiscore.3m, odiscore.12m, eq5dscore.3m, eq5dscore.12m, back_pain_vas.3m, back_pain_vas.12m, leg_pain_vas1.3m, leg_pain_vas1.12m, pt_satisfaction_index.3m, pt_satisfaction_index.12m, los3, estimated_blood_loss_cc3, rtw.3m, day, practice, pt_study_id, analysis3month, select12m))
 rtwdata <- subset(ds, !is.na(rtw.3m))
 
 ## single impute missing covariates ##
-tmp <- transcan(~ pgender + ptage2 + race + ptethnicity + pt_education_level + workers_comp + liability_claim1 + any_major_surgery_in_the_p + diabetes + cad + osteoporosis + anxiety + depression + bmi + diagnosis + dominant_symptom1 + motor_def2 + symptom_duration2 + asa_grade + arthrodesis_performed + interbody_graft + surgical_approach + work + smoker + odiscore + eq5dscore + back_pain_vas + leg_pain_vas1, data=ds, imputed=TRUE, transformed=TRUE, pl=FALSE, pr=FALSE)
+tmp <- transcan(~ pgender + ptage2 + race + ptethnicity + pt_education_level + workers_comp + liability_claim1 + any_major_surgery_in_the_p + diabetes + cad + osteoporosis + anxiety + depression + bmi + diagnosis + dominant_symptom1 + motor_def2 + symptom_duration2 + asa_grade + arthrodesis_performed  + surgical_approach + work + smoker + odiscore + eq5dscore + back_pain_vas + leg_pain_vas1, data=ds, imputed=TRUE, transformed=TRUE, pl=FALSE, pr=FALSE)
 imp <- impute(tmp, data=ds, list.out=TRUE)
 
 ## get complete data set ##
@@ -491,7 +497,7 @@ for (i in names(tmp$imputed)) {
 
 tmp <- transcan(~ pgender + ptage2 + race + ptethnicity + pt_education_level + workers_comp + liability_claim1 + 
                   any_major_surgery_in_the_p + diabetes + cad + osteoporosis + anxiety + depression + bmi + diagnosis + dominant_symptom1 + motor_def2 + symptom_duration2 + asa_grade + 
-                  arthrodesis_performed + interbody_graft + surgical_approach + occupation + smoker + odiscore + eq5dscore + back_pain_vas + leg_pain_vas1,
+                  arthrodesis_performed + surgical_approach  + smoker + odiscore + eq5dscore + back_pain_vas + leg_pain_vas1,
                 data=rtwdata, imputed=TRUE, transformed=TRUE, pl=FALSE, pr=FALSE)
 imp <- impute(tmp, data=rtwdata, list.out=TRUE)
 ## get complete data set ##
@@ -559,7 +565,7 @@ modfun <- function(dt, fmla, resp1, resp2, prs=data.frame(prac=pracs1)) {
 
 
 
-fmla0 <- "pgender + rcs(ptage2,4) + race + ptethnicity + pt_education_level + workers_comp + liability_claim1 + any_major_surgery_in_the_p + diabetes + cad + osteoporosis + anxiety + depression + rcs(bmi,4) + diagnosis + dominant_symptom1 + motor_def2 + symptom_duration2 + asa_grade + arthrodesis_performed + interbody_graft + surgical_approach + work + smoker + rcs(odiscore,3) + rcs(eq5dscore,3) + rcs(back_pain_vas,3) + rcs(leg_pain_vas1,3)"
+fmla0 <- "pgender + rcs(ptage2,4) + race + ptethnicity + pt_education_level + liability_claim1 + any_major_surgery_in_the_p + diabetes + cad + osteoporosis + anxiety + depression + rcs(bmi,4) + diagnosis + dominant_symptom1 + motor_def2 + symptom_duration2 + asa_grade + arthrodesis_performed +  surgical_approach + work + smoker + rcs(odiscore,3) + rcs(eq5dscore,3) + rcs(back_pain_vas,3) + rcs(leg_pain_vas1,3)"
 
 
 
@@ -591,7 +597,7 @@ for (i in 1:np) {
 names(modrst) <- names(table(ds$practice))
 
 # model of return to work #
-fit <- coxph(Surv(day, rtw.3m) ~ pgender + rcs(ptage2,4) + race + ptethnicity + pt_education_level + workers_comp + liability_claim1 + any_major_surgery_in_the_p + diabetes + cad + osteoporosis + anxiety + depression + rcs(bmi,4) + diagnosis + dominant_symptom1 + motor_def2 + symptom_duration2 + asa_grade + arthrodesis_performed + interbody_graft + surgical_approach + occupation + smoker + rcs(odiscore,3) + rcs(eq5dscore,3) + rcs(back_pain_vas,3) + rcs(leg_pain_vas1,3), data=rtwdata)
+fit <- coxph(Surv(day, rtw.3m) ~ pgender + rcs(ptage2,4) + race + ptethnicity + pt_education_level + workers_comp + liability_claim1 + any_major_surgery_in_the_p + diabetes + cad + osteoporosis + anxiety + depression + rcs(bmi,4) + diagnosis + dominant_symptom1 + motor_def2 + symptom_duration2 + asa_grade + arthrodesis_performed  + surgical_approach + smoker + rcs(odiscore,3) + rcs(eq5dscore,3) + rcs(back_pain_vas,3) + rcs(leg_pain_vas1,3), data=rtwdata)
 pred <- survfit(fit, newdata=rtwdata, se.fit=FALSE)
 tmp <- apply(pred$surv, MARGIN=1, FUN=function(x) {
   zxcv <- aggregate(x, by=list(rtwdata$practice), FUN=mean)
@@ -1610,16 +1616,15 @@ plotfun2 <- function(datas, pltnam, ptab) {
 ##############################################
 
 if(length(pracs1) > 0L) {
-  load('patient_lumbar_index.rda')
-  n <- nrow(d)
-  d$practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\1", d$pt_study_id)
-  d$practice[d$practice=="Cornell"]<-"ABC"
-  d$practice[d$practice=="BSSNY"]<-"ABC"
-  d$practice[d$practice=="NSARVA"]<-"ABC"
-  d$practice[d$practice=="Semmes"]<-"ABC"
-  d$sub_practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\3", d$pt_study_id)
-  d <- subset(d, practice %in% pracs1)
-  dfp <- aggregate(cbind(usefull3month, usefull12month, analysis3month, analysis12month) ~ practice, FUN=sum, data=d)
+  n <- nrow(data_follow_up)
+  #d$practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\1", d$pt_study_id)
+  #d$practice[d$practice=="Cornell"]<-"ABC"
+  #d$practice[d$practice=="BSSNY"]<-"ABC"
+  #d$practice[d$practice=="NSARVA"]<-"ABC"
+  #d$practice[d$practice=="Semmes"]<-"ABC"
+  #d$sub_practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\3", d$pt_study_id)
+  data_follow_up_site <- subset(data_follow_up, practice %in% pracs1)
+  dfp <- aggregate(cbind(usefull3month, usefull12month, analysis3month, analysis12month) ~ practice, FUN=sum, data=data_follow_up_site)
   colnames(dfp) <- c('practice', 'x3m', 'x12m', 'y3m', 'y12m')
   ##########Ben ekledim#################
   dfp$QOD_3base<-sum(dfp$x3m,na.rm = FALSE)
@@ -1640,9 +1645,6 @@ if(length(pracs1) > 0L) {
   num.min <- min(dfp$x12m)
   num.max <- max(dfp$x3m)
 }
-
-
-
 
 
 
@@ -1698,8 +1700,6 @@ for (k in seq_along(pracs)) {
       stop("Unable to compile latex document ", filepracs[k], ".tex")
   }
 }
-
-
 
 
 

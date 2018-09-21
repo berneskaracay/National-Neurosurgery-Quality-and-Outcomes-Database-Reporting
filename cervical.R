@@ -69,8 +69,8 @@ data$sub_practice <- sub("^([^*]+)(\\*(.+))?_CP[0-9]{4}$", "\\3", data$pt_study_
 data$pt_id <- sub(".*_", "", as.character(data$pt_study_id))
 data$surgeon <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surgeon))
 data$surg_location <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surg_location))
-liste=c("Cornell","Semmes","Cornell","Vanderbilt","Duke","U_Utah","UVA")
-data <- subset(data, practice %in% liste)
+#liste=c("Cornell","Semmes","Cornell","Vanderbilt","Duke","U_Utah","UVA")
+#data <- subset(data, practice %in% liste)
 # merge the data with index #
 data <- merge(data, d[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month')], by='pt_study_id', all.y=TRUE)
 

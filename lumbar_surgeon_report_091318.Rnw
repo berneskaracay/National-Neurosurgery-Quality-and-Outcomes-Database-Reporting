@@ -14,7 +14,7 @@
 \Large {\Sexpr{startdate$sdate[startdate$practice==pracs[w]]}} $\sim$ {\Sexpr{dldate}}
 \end{center}
 \begin{center}
-\Large \textbf{{\Sexpr{paste(pracs[w], ', Surgeon ', snam2[k], sep='')}}}\\
+\Large \textbf{{\Sexpr{paste(pracs[w], ', Surgeon ', snam2[1], sep='')}}}\\
 \end{center}
 \vspace{1cm}
 \listoftables

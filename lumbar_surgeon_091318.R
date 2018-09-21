@@ -18,6 +18,7 @@ library(rms)
 library(MASS)
 library(survival)
 library(plyr)
+library("stringr", lib.loc="~/R/win-library/3.4")
 
 
 ### read in Thomas' index data ###
@@ -29,6 +30,7 @@ d$analyzed_12month <- ifelse(d$analysis12month %in% TRUE | d$dead12month %in% TR
 dldate <- as.character(as.Date("2018-07-03"))
 # only include followed up at 3 month or 12 month #
 d <- subset(d,!scorefail_baseline)
+d_follow_up<-d
 d <- subset(d, analyzed_3month | analyzed_12month)
 
 ### read raw patient data set ###
@@ -59,18 +61,22 @@ data <- merge(data, dat3b, by=c('pt_study_id'), all=TRUE)
 
 ###############################################################
 
-# merge the data with index, so apply exclusions#
-data <- merge(data, d[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month',"usefull3month","usefull12month")], by='pt_study_id', all.y=TRUE)
 
 # extract practice/center name, patient id, surgeon id, hospital/surg_location #
 n <- nrow(data)
 data$practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\1", data$pt_study_id)
 data$sub_practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\3", data$pt_study_id)
 data$surgeon_name <- data$surgeon
+data$surgeon_name <- str_replace_all(data$surgeon_name, "[[:punct:]]", " ")
 data$surgeon <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surgeon))
 data$surg_location <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surg_location))
-liste=c("Vanderbilt","Semmes","BSSNY","NSARVA","Cornell")
-data <- subset(data, practice %in% liste)
+data_follow_up1 <- merge(data, d_follow_up[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month',"usefull3month","usefull12month")], by='pt_study_id', all.y=TRUE)
+#liste=c("Vanderbilt","Semmes","BSSNY","NSARVA","Cornell")
+data <- merge(data, d[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month',"usefull3month","usefull12month")], by='pt_study_id', all.y=TRUE)
+
+
+#liste=c("Vanderbilt")
+#data <- subset(data, practice %in% liste)
 
 
 data <- data[order(data$surgeon),]
@@ -1339,10 +1345,9 @@ plotfun2 <- function(datas, pltnam, ptab) {
 
 ##############################################
 follow_up <- function(site){
-  data_follow_up <- subset(data, practice==site)
+  data_follow_up <- subset(data_follow_up1, practice==site)
   if(length(pracs1) > 0L) {
     n <- nrow(data_follow_up)
-    data_follow_up <- subset(data_follow_up, practice %in% pracs1)
     dfp <- aggregate(cbind(usefull3month, usefull12month, analysis3month, analysis12month) ~ surgeon, FUN=sum, data=data_follow_up)
     colnames(dfp) <- c('surgeon', 'x3m', 'x12m', 'y3m', 'y12m')
     ##########Ben ekledim#################
@@ -1402,12 +1407,11 @@ for (w in seq(length(pracs))) {
   data2 <- subset(data1, analyzed_12month)
   data3 <- subset(data1, analyzed_3month)
   tab <- table(data1$surgeon)
-  tab2 <- table(data1$surgeon_name)
   if (sum(tab>19) > 0) {
     snam <- names(tab)[tab>19]
-    snam2 <- names(tab2)[tab>19]
     nsg <- length(snam)
     for (k in seq(nsg)) {
+      snam2 <- data1$surgeon_new_id[data1$surgeon==snam[k]]
       Sweave("lumbar_surgeon_report_091318.rnw", output=paste(pracs[w], '_', snam[k], ".tex", sep="")) 
     }
   }
@@ -1417,10 +1421,8 @@ for (w in seq(length(pracs))) {
   data1 <- subset(data, practice==pracs[w])
   data2 <- subset(data1, analysis12month)
   tab <- table(data1$surgeon)
-  tab2 <- table(data1$surgeon_name)
   if (sum(tab>19) > 0) {
     snam <- names(tab)[tab>19]
-    snam2 <- names(tab2)[tab2>19]
     nsg <- length(snam)
     for (k in seq(nsg)) {
       for (q in 1:3) {system(paste("pdflatex ", paste(pracs[w], '_', snam[k], ".tex", sep="")))}

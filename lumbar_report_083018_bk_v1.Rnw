@@ -348,4 +348,3 @@ N-12 is the number of non-missing values at 12 month.  \\\\ Numbers after percen
 \clearpage
 
 \end{document}
-
