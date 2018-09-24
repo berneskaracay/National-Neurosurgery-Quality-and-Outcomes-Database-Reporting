@@ -212,6 +212,8 @@ data$plan_return_work = factor(data$plan_return_work,levels=c("1","0","3"))
 data$activity_out_home = factor(data$activity_out_home,levels=c("1","0"))
 data$activity_inside_home = factor(data$activity_inside_home,levels=c("1","0"))
 
+### occupation should with unemployed
+
 data$occupation <- factor(data$pre_illness_work2, levels=1:4)
 
 data$work <- data$pre_illness_work2
