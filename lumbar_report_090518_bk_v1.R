@@ -21,7 +21,7 @@ library(plyr)
 
 
 ### read in Thomas' index data ###
-load('patient_lumbar_index.rda')
+load('data\\patient_lumbar_index.rda')
 d$death3m <- ifelse(d$deadhospital %in% TRUE | d$dead30day %in% TRUE | d$dead3month %in% TRUE, TRUE, FALSE)
 d$analyzed_3month <- ifelse(d$analysis3month %in% TRUE | d$death3m %in% TRUE, TRUE, FALSE)
 d$analyzed_12month <- ifelse(d$analysis12month %in% TRUE | d$dead12month %in% TRUE, TRUE, FALSE)
@@ -33,7 +33,7 @@ d_follow_up<-d
 d <- subset(d, analyzed_3month | analyzed_12month)
 
 ### read raw patient data set ###
-data=read.csv('patient_lumbar.csv', stringsAsFactors=FALSE)
+data=read.csv('data\\patient_lumbar.csv', stringsAsFactors=FALSE)
 
 # subset data as baseline, 3/12-month data #
 dat1 <- subset(data, redcap_event_name=="baseline_arm_1")
@@ -74,8 +74,8 @@ data_follow_up <- merge(data, d_follow_up[,c('pt_study_id', 'analyzed_3month', '
 # merge the data with index, so apply exclusions#
 data <- merge(data, d[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month','usefull3month', 'usefull12month')], by='pt_study_id', all.y=TRUE)
 
-#liste=c("Cornell","Vanderbilt","Cornell","AHN")
-#data <- subset(data, practice %in% liste)
+liste=c("Cornell","Vanderbilt","AHN")
+data <- subset(data, practice %in% liste)
 #data$practice[data$practice=="Cornell"]<-"ABC"
 #data$practice[data$practice=="BSSNY"]<-"ABC"
 #data$practice[data$practice=="NSARVA"]<-"ABC"
@@ -212,14 +212,19 @@ data$plan_return_work = factor(data$plan_return_work,levels=c("1","0","3"))
 data$activity_out_home = factor(data$activity_out_home,levels=c("1","0"))
 data$activity_inside_home = factor(data$activity_inside_home,levels=c("1","0"))
 
-### occupation should with unemployed
 
-data$occupation <- factor(data$pre_illness_work2, levels=1:4)
 
-data$work <- data$pre_illness_work2
-data$work[data$employment %in% c(3,4)] <- 7
+#data$occupation <- factor(data$pre_illness_work2, levels=1:4)
+
+data$work<-NA
+data$work[data$pre_illness_work2==1] <- 1
+data$work[data$pre_illness_work2==2] <- 2
+data$work[data$pre_illness_work2==3] <- 3
+data$work[data$pre_illness_work2==4] <- 4
 data$work[data$unemployed %in% 1] <- 5
 data$work[data$unemployed %in% 2] <- 6
+data$work[data$unemployed %in% c(3,4)|
+            data$employment %in% 4] <- 7
 data$work <- factor(data$work, levels=c(1,2,3,4,5,6,7))
 
 
@@ -455,7 +460,7 @@ data$usual_activities_int.12m <- ifelse(is.na(data$usual_activities_int.12m), da
 data$pain_discomfort_int.12m <- ifelse(is.na(data$pain_discomfort_int.12m), data$pain_self_admin_discomfort.12m, data$pain_discomfort_int.12m)
 data$anxiety_depression_int.12m <- ifelse(is.na(data$anxiety_depression_int.12m), data$anxiety_self_admin_depression.12m, data$anxiety_depression_int.12m)
 
-eq <- read.csv('eq5dscore.csv')
+eq <- read.csv('data\\eq5dscore.csv')
 eq$com <- paste(eq$MO, eq$SC, eq$UA, eq$PD, eq$AD, sep='')
 
 data$com <- with(data, paste(mobility_int, self_care_int, usual_activities_int, pain_discomfort_int, anxiety_depression_int, sep=''))
@@ -567,7 +572,7 @@ modfun <- function(dt, fmla, resp1, resp2, prs=data.frame(prac=pracs1)) {
 
 
 
-fmla0 <- "pgender + rcs(ptage2,4) + race + ptethnicity + pt_education_level + liability_claim1 + any_major_surgery_in_the_p + diabetes + cad + osteoporosis + anxiety + depression + rcs(bmi,4) + diagnosis + dominant_symptom1 + motor_def2 + symptom_duration2 + asa_grade + arthrodesis_performed +  surgical_approach + work + smoker + rcs(odiscore,3) + rcs(eq5dscore,3) + rcs(back_pain_vas,3) + rcs(leg_pain_vas1,3)"
+fmla0 <- "pgender + rcs(ptage2,4) + race + ptethnicity + pt_education_level + workers_comp + liability_claim1 + any_major_surgery_in_the_p + diabetes + cad + osteoporosis + anxiety + depression + rcs(bmi,4) + diagnosis + dominant_symptom1 + motor_def2 + symptom_duration2 + asa_grade + arthrodesis_performed +  surgical_approach + work + smoker + rcs(odiscore,3) + rcs(eq5dscore,3) + rcs(back_pain_vas,3) + rcs(leg_pain_vas1,3)"
 
 
 
