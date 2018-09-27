@@ -166,9 +166,9 @@ rownames(tab7b) <- c("\\underline{Discectomy}", "~~~Estimated Blood Loss (cc)", 
 latex(tab1, title="", caption="Frequency", where="!h", col.just=rep("c",5), size='footnotesize',  file="")
 @
 
-The number of patients with baseline and 3 month data at your site is \Sexpr{round(tab1[2,3])}. This is regardless of whether they have 12 month data.
-The number of patients with baseline and 12 month data at your site is \Sexpr{round(tab1[2,4])}. This is regardless of whether they have 3 month data.
-The total number of patients at your site included in this report (called "follow-up accrual") is \Sexpr{round(tab1[2,5])}. This includes: 1) patients with 3 and 12 month follow-up, 2) patients who have 12 month follow-up but missed 3 month follow-up, 3) patients with 3 month follow-up and are not yet eligible for 12 month follow-up.
+The number of patients with baseline and 3 month data at your site is \Sexpr{round(tab1[1,3])}. This is regardless of whether they have 12 month data.
+The number of patients with baseline and 12 month data at your site is \Sexpr{round(tab1[1,4])}. This is regardless of whether they have 3 month data.
+The total number of patients at your site included in this report (called "follow-up accrual") is \Sexpr{round(tab1[1,5])}. This includes: 1) patients with 3 and 12 month follow-up, 2) patients who have 12 month follow-up but missed 3 month follow-up, 3) patients with 3 month follow-up and are not yet eligible for 12 month follow-up.
 
 <<echo=FALSE, results=tex>>=  
 

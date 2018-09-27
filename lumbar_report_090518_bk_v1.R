@@ -74,8 +74,8 @@ data_follow_up <- merge(data, d_follow_up[,c('pt_study_id', 'analyzed_3month', '
 # merge the data with index, so apply exclusions#
 data <- merge(data, d[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month','usefull3month', 'usefull12month')], by='pt_study_id', all.y=TRUE)
 
-liste=c("Cornell","Vanderbilt","AHN", "NVARSA")
-data <- subset(data, practice %in% liste)
+liste=c("Augusta")
+data <- subset(data, practice %nin% liste)
 #data$practice[data$practice=="Cornell"]<-"ABC"
 #data$practice[data$practice=="BSSNY"]<-"ABC"
 #data$practice[data$practice=="NSARVA"]<-"ABC"
@@ -1707,6 +1707,4 @@ for (k in seq_along(pracs)) {
       stop("Unable to compile latex document ", filepracs[k], ".tex")
   }
 }
-
-
 

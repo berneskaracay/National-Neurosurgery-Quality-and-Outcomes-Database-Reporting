@@ -22,19 +22,19 @@ library("stringr", lib.loc="~/R/win-library/3.4")
 
 
 ### read in Thomas' index data ###
-load('patient_lumbar_index.rda')
+load('data\\patient_lumbar_index.rda')
 d$death3m <- ifelse(d$deadhospital %in% TRUE | d$dead30day %in% TRUE | d$dead3month %in% TRUE, TRUE, FALSE)
 d$analyzed_3month <- ifelse(d$analysis3month %in% TRUE | d$death3m %in% TRUE, TRUE, FALSE)
 d$analyzed_12month <- ifelse(d$analysis12month %in% TRUE | d$dead12month %in% TRUE, TRUE, FALSE)
 # download date #
-dldate <- as.character(as.Date("2018-07-03"))
+dldate <- as.character(as.Date("2018-09-20"))
 # only include followed up at 3 month or 12 month #
 d <- subset(d,!scorefail_baseline)
 d_follow_up<-d
 d <- subset(d, analyzed_3month | analyzed_12month)
 
 ### read raw patient data set ###
-data=read.csv('patient_lumbar.csv', stringsAsFactors=FALSE)
+data=read.csv('data\\patient_lumbar.csv', stringsAsFactors=FALSE)
 
 # subset data as baseline, 3/12-month data #
 dat1 <- subset(data, redcap_event_name=="baseline_arm_1")
@@ -71,12 +71,12 @@ data$surgeon_name <- str_replace_all(data$surgeon_name, "[[:punct:]]", " ")
 data$surgeon <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surgeon))
 data$surg_location <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surg_location))
 data_follow_up1 <- merge(data, d_follow_up[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month',"usefull3month","usefull12month")], by='pt_study_id', all.y=TRUE)
-#liste=c("Vanderbilt","Semmes","BSSNY","NSARVA","Cornell")
 data <- merge(data, d[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month',"usefull3month","usefull12month")], by='pt_study_id', all.y=TRUE)
 
 
 #liste=c("Vanderbilt")
 #data <- subset(data, practice %in% liste)
+
 
 
 data <- data[order(data$surgeon),]
@@ -340,7 +340,7 @@ data$pneumonia = factor(data$pneumonia,levels=c("1","0"))
 ##########      Patient Interview        ###################
 ############################################################
 
-data$pt_satisfaction_index2.3m <- ifelse(data$pt_satisfaction_index.3m%in%c(1,2), 1,2)
+data$pt_satisfaction_index2.3m <- ifelse(data$pt_satisfaction_index.3m %in% c(1,2), 1,2)
 data$pt_satisfaction_index2.3m[is.na(data$pt_satisfaction_index.3m)] <- NA
 data$pt_satisfaction_index2.3m <- factor(data$pt_satisfaction_index2.3m, levels=c("1", "2"))
 data$pt_satisfaction_index.3m = factor(data$pt_satisfaction_index.3m,levels=c("1","2","3","4"))
@@ -353,10 +353,10 @@ data$pt_satisfaction_index.12m <- as.numeric(data$pt_satisfaction_index.12m)
 
 
 data$return_to_activities.3m = factor(data$return_to_activities.3m,levels=c("1","0"))
-data$return_to_work.3m[!data$plan_return_work.3m %in% 1] <- NA
-data$return_to_work.3m <- factor(data$return_to_work.3m, levels=c('1','0','2'))
+data$return_to_work.3m[!data$plan_return_work %in% 1] <- NA
+data$return_to_work.3m <- factor(data$return_to_work, levels=c('1','0','2'))
 data$return_to_activities.12m = factor(data$return_to_activities.12m,levels=c("1","0"))
-data$return_to_work.12m[!data$plan_return_work.12m %in% 1] <- NA
+data$return_to_work.12m[!data$plan_return_work %in% 1] <- NA
 data$return_to_work.12m <- factor(data$return_to_work.12m, levels=c('1','0','2'))
 
 ## return to work ##
@@ -473,7 +473,7 @@ data$usual_activities_int.12m <- ifelse(is.na(data$usual_activities_int.12m), da
 data$pain_discomfort_int.12m <- ifelse(is.na(data$pain_discomfort_int.12m), data$pain_self_admin_discomfort.12m, data$pain_discomfort_int.12m)
 data$anxiety_depression_int.12m <- ifelse(is.na(data$anxiety_depression_int.12m), data$anxiety_self_admin_depression.12m, data$anxiety_depression_int.12m)
 
-eq <- read.csv('eq5dscore.csv')
+eq <- read.csv('data\\eq5dscore.csv')
 eq$com <- paste(eq$MO, eq$SC, eq$UA, eq$PD, eq$AD, sep='')
 
 data$com <- with(data, paste(mobility_int, self_care_int, usual_activities_int, pain_discomfort_int, anxiety_depression_int, sep=''))
@@ -674,34 +674,63 @@ data$pt_education_level___4 <- ifelse(data$pt_education_level %in% 4, 1, 0)
 data$pt_education_level___5 <- ifelse(data$pt_education_level %in% 5, 1, 0)
 data$pt_education_level___6 <- ifelse(data$pt_education_level %in% NA, 1, 0)
 
-
+data$pt_education_level___1[is.na(data$pt_education_level)]<-NA
+data$pt_education_level___2[is.na(data$pt_education_level)]<-NA
+data$pt_education_level___3[is.na(data$pt_education_level)]<-NA
+data$pt_education_level___4[is.na(data$pt_education_level)]<-NA
+data$pt_education_level___5[is.na(data$pt_education_level)]<-NA
+data$pt_education_level___6[is.na(data$pt_education_level)]<-NA
 
 data$smoker___1 <- ifelse(data$smoker %in% 1, 1, 0)
 data$smoker___2 <- ifelse(data$smoker %in% 2, 1, 0)
 data$smoker___3 <- ifelse(data$smoker %in% 3, 1, 0)
 
+data$smoker___1[is.na(data$smoker)]<-NA
+data$smoker___2[is.na(data$smoker)]<-NA
+data$smoker___3[is.na(data$smoker)]<-NA
+
 data$dominant_symptom1___1 <- ifelse(data$dominant_symptom1 %in% 1, 1, 0)
 data$dominant_symptom1___2 <- ifelse(data$dominant_symptom1 %in% 2, 1, 0)
 data$dominant_symptom1___3 <- ifelse(data$dominant_symptom1 %in% 3, 1, 0)
+
+data$dominant_symptom1___1[is.na(data$dominant_symptom1)]<-NA
+data$dominant_symptom1___2[is.na(data$dominant_symptom1)]<-NA
+data$dominant_symptom1___3[is.na(data$dominant_symptom1)]<-NA
 
 data$asa_grade___1 <- ifelse(data$asa_grade %in% 1, 1, 0)
 data$asa_grade___2 <- ifelse(data$asa_grade %in% 2, 1, 0)
 data$asa_grade___3 <- ifelse(data$asa_grade %in% 3, 1, 0)
 data$asa_grade___4 <- ifelse(data$asa_grade %in% 4, 1, 0)
 
+data$asa_grade___1[is.na(data$asa_grade)]<-NA
+data$asa_grade___2[is.na(data$asa_grade)]<-NA
+data$asa_grade___3[is.na(data$asa_grade)]<-NA
+data$asa_grade___4[is.na(data$asa_grade)]<-NA
+
+
 data$surgical_approach___1 <- ifelse(data$surgical_approach %in% 1, 1, 0)
 data$surgical_approach___2 <- ifelse(data$surgical_approach %in% 2, 1, 0)
 data$surgical_approach___3 <- ifelse(data$surgical_approach %in% 3, 1, 0)
 data$surgical_approach___4 <- ifelse(data$surgical_approach %in% 4, 1, 0)
+
+data$surgical_approach___1[is.na(data$surgical_approach)]<-NA
+data$surgical_approach___2[is.na(data$surgical_approach)]<-NA
+data$surgical_approach___3[is.na(data$surgical_approach)]<-NA
+data$surgical_approach___4[is.na(data$surgical_approach)]<-NA
 
 data$pt_satisfaction_index.3m___1 <- ifelse(data$pt_satisfaction_index.3m %in% 1, 1, 0)
 data$pt_satisfaction_index.3m___2 <- ifelse(data$pt_satisfaction_index.3m %in% 2, 1, 0)
 data$pt_satisfaction_index.3m___3 <- ifelse(data$pt_satisfaction_index.3m %in% 3, 1, 0)
 data$pt_satisfaction_index.3m___4 <- ifelse(data$pt_satisfaction_index.3m %in% 4, 1, 0)
 
+data$pt_satisfaction_index.3m___1[is.na(data$pt_satisfaction_index.3m)]<-NA
+data$pt_satisfaction_index.3m___2[is.na(data$pt_satisfaction_index.3m)]<-NA
+data$pt_satisfaction_index.3m___3[is.na(data$pt_satisfaction_index.3m)]<-NA
+data$pt_satisfaction_index.3m___4[is.na(data$pt_satisfaction_index.3m)]<-NA
+
 
 data$place_discharged_to___6 <- ifelse(data$place_discharged_to %in% 6, 1, 0)
-
+data$place_discharged_to___6[is.na(data$place_discharged_to)]<-NA
 ######New Employment Variable##########################################################
 
 data$insurance1___1 <- ifelse(data$insurance1 %in% 1, 1, 0)
@@ -710,7 +739,11 @@ data$insurance1___3 <- ifelse(data$insurance1 %in% 3, 1, 0)
 data$insurance1___4 <- ifelse(data$insurance1 %in% 4, 1, 0)
 data$insurance1___5 <- ifelse(data$insurance1 %in% 5, 1, 0)
 
-
+data$insurance1___1[is.na(data$insurance1)]<-NA
+data$insurance1___2[is.na(data$insurance1)]<-NA
+data$insurance1___3[is.na(data$insurance1)]<-NA
+data$insurance1___4[is.na(data$insurance1)]<-NA
+data$insurance1___5[is.na(data$insurance1)]<-NA
 ### generate table template ###
 
 ## table of baseline characteristics ##
@@ -976,10 +1009,10 @@ tab7fun <- function(datas, datasb) {
   M[16,] <- catfun1(var1="incidental_durotomy", var2="incidental_durotomy", ilev="1", df=datas)
   M[17,] <- catfun1(var1="pneumonia", var2="pneumonia", ilev="1", df=datas)
   M[18,] <- catfun1(var1="minorade", var2="minorade", ilev="1", df=datas)
-  M[20,] <- catfun1(var1="pt_satisfaction_index.3m___1", var2="pt_satisfaction_index.3m___1", ilev="1", df=datas)
-  M[21,] <- catfun1(var1="pt_satisfaction_index.3m___2", var2="pt_satisfaction_index.3m___2", ilev="1", df=datas)
-  M[22,] <- catfun1(var1="pt_satisfaction_index.3m___3", var2="pt_satisfaction_index.3m___3", ilev="1", df=datas)
-  M[23,] <- catfun1(var1="pt_satisfaction_index.3m___4", var2="pt_satisfaction_index.3m___4", ilev="1", df=datas)
+  M[20,] <- catfun1(var1="pt_satisfaction_index.3m", var2="pt_satisfaction_index.3m", ilev="1", df=datas)
+  M[21,] <- catfun1(var1="pt_satisfaction_index.3m", var2="pt_satisfaction_index.3m", ilev="2", df=datas)
+  M[22,] <- catfun1(var1="pt_satisfaction_index.3m", var2="pt_satisfaction_index.3m", ilev="3", df=datas)
+  M[23,] <- catfun1(var1="pt_satisfaction_index.3m", var2="pt_satisfaction_index.3m", ilev="4", df=datas)
   M[24,] <- catfun1(var1="pt_satisfaction_index2.3m", var2="pt_satisfaction_index2.3m", ilev="1", df=datas)
   M[26,] <- confun2(var1="estimated_blood_loss_cc3", dfs=datas, dig=0)
   M[27,] <- confun2(var1="length_of_surgery", dfs=datas, dig=0)
@@ -1403,9 +1436,9 @@ filepracs <- gsub('*', '+', pracs, fixed=TRUE)
 
 for (w in seq(length(pracs))) {
   data1 <- subset(data, practice==pracs[w])
-  data2o <- subset(data1, analyzed_3month | analyzed_12month)
-  data2 <- subset(data1, analyzed_12month)
-  data3 <- subset(data1, analyzed_3month)
+  data2o <- subset(data1,analysis3month | analysis12month)
+  data2 <- subset(data1, analysis12month)
+  data3 <- subset(data1, analysis3month)
   tab <- table(data1$surgeon)
   if (sum(tab>19) > 0) {
     snam <- names(tab)[tab>19]
