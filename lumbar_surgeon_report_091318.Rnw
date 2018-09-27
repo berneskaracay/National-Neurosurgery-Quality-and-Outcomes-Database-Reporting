@@ -30,6 +30,7 @@ cat("\\listoffigures\n\\clearpage\n")
 ## fig 1 ##
 surgeon<-snam[k]
 site=pracs[w]
+file_name<-paste0(site,"_",surgeon)
 dfp=follow_up(site)
 data1cfp <- subset(dfp, surgeon==snam[k])
 data2cfp <- subset(dfp, surgeon==snam[k])
@@ -47,7 +48,7 @@ pl<-ggplot(data=dfp_bar, aes(x=time_point, y=percent, fill=Site)) +
   scale_fill_brewer(palette="Paired")+scale_x_discrete(limits=c("3m", "12m"))+
   theme(panel.grid.major = element_line(color = "grey"),text = element_text(size=18))
 
-pdf(paste('figs/lumbar_fu_', surgeon, '.pdf', sep=''))
+pdf(paste('figs/lumbar_fu_', file_name, '.pdf', sep=''))
 pl
 dev.off()
 @
@@ -61,7 +62,7 @@ dev.off()
   cat("\\clearpage",
     "\\begin{figure}[!htbp]",
     "\\begin{center}",
-    "\\includegraphics[scale=0.5]{", paste('figs/lumbar_fu_', snam[k],'.pdf', sep=''), "}",
+    "\\includegraphics[scale=0.5]{", paste('figs/lumbar_fu_', file_name,'.pdf', sep=''), "}",
     "\\caption[Follow-up rate.]{Follow-up rate at 3m and 12m post surgery. The goal is 80$\\%$ and above.}",
     "\\end{center}",
     "\\end{figure}", sep='')
@@ -154,7 +155,7 @@ rownames(tab7b) <- c("\\underline{Discectomy}", "~~~Estimated Blood Loss (cc)", 
     rownames(tab9) <- c("\\underline{Discectomy}", "~~~Pain", "~~~~~~Back Pain", "~~~~~~Leg Pain", "~~~ODI Score ($\\%$)", "~~~EQ-5D Score", "~~~Return to Activity", "~~~Return to Work", "~~~Patient Satisfaction (Expectation Met)", "\\underline{Laminectomy}", "~~~Pain", "~~~~~~Back Pain", "~~~~~~Leg Pain", "~~~ODI Score ($\\%$)", "~~~EQ-5D Score", "~~~Return to Activity", "~~~Return to Work", "~~~Patient Satisfaction (Expectation Met)", "\\underline{PLF}", "~~~Pain", "~~~~~~Back Pain", "~~~~~~Leg Pain", "~~~ODI Score ($\\%$)", "~~~EQ-5D Score", "~~~Return to Activity", "~~~Return to Work", "~~~Patient Satisfaction (Expectation Met)", "\\underline{PLIF/TLIF}", "~~~Pain", "~~~~~~Back Pain", "~~~~~~Leg Pain", "~~~ODI Score ($\\%$)", "~~~EQ-5D Score", "~~~Return to Activity", "~~~Return to Work", "~~~Patient Satisfaction (Expectation Met)", "\\underline{ALIF}", "~~~Pain", "~~~~~~Back Pain", "~~~~~~Leg Pain", "~~~ODI Score ($\\%$)", "~~~EQ-5D Score", "~~~Return to Activity", "~~~Return to Work", "~~~Patient Satisfaction (Expectation Met)", "\\underline{XLIF/DLIF}", "~~~Pain", "~~~~~~Back Pain", "~~~~~~Leg Pain", "~~~ODI Score ($\\%$)", "~~~EQ-5D Score", "~~~Return to Activity", "~~~Return to Work", "~~~Patient Satisfaction (Expectation Met)")
 
     ## make scatter plot #
-    plotname1 <- paste("figs/lumbar_", snam[k], "plot.pdf", sep="")
+    plotname1 <- paste("figs/lumbar_", file_name, "plot.pdf", sep="")
     plotfun2(datas=data1c, pltnam=plotname1, ptab=cbind(tab9pfun(datas=data1c),tab9pfun(datas=data1)))
 
 
@@ -217,7 +218,7 @@ pl<-ggplot(data=dfp_satisfaction, aes(x=satisfaction, y=percent, fill=Site)) +
   scale_fill_brewer(palette="Paired")+scale_x_discrete(limits=c("1-Met", "2-Not As Much \n As Hoped","3-Would Not \n Undergo", "4-Same or Worse","Satisfied \n (1+2)"))+
   theme(panel.grid.major = element_line(color = "grey"),text = element_text(size=12),axis.text.x=element_text(angle=30,hjust=1,vjust=1,size=10))
 
-pdf(paste('figs/lumbar_fu2_', surgeon, '.pdf', sep=''))
+pdf(paste('figs/lumbar_fu2_', file_name, '.pdf', sep=''))
 pl
 dev.off()
   
@@ -236,7 +237,7 @@ pl<-ggplot(data=dfp_readmission, aes(x=readmit, y=percent, fill=Site)) +
   scale_fill_brewer(palette="Paired")+scale_x_discrete(limits=c("30-day Hospital \n Readmission", "3-month Hospital \n Readmission", "3-month Revision \n Surgery"))+
   theme(panel.grid.major = element_line(color = "grey"),text = element_text(size=12),axis.text.x=element_text(angle=30,hjust=1,vjust=1))
 
-pdf(paste('figs/lumbar_fu3_', surgeon, '.pdf', sep=''))
+pdf(paste('figs/lumbar_fu3_', file_name, '.pdf', sep=''))
 pl
 dev.off()
 @
@@ -250,14 +251,14 @@ dev.off()
   cat("\\clearpage",
     "\\begin{figure}[!htbp]",
     "\\begin{center}",
-    "\\includegraphics[scale=1]{", paste('figs/lumbar_fu2_', snam[k],'.pdf', sep=''), "}",
+    "\\includegraphics[scale=1]{", paste('figs/lumbar_fu2_', file_name,'.pdf', sep=''), "}",
     "\\caption[Satisfaction]{Satisfaction from surgery.}",
     "\\end{center}",
     "\\end{figure}", sep='')
 
   cat("\\begin{figure}[!htbp]",
     "\\begin{center}",
-    "\\includegraphics[scale=1]{", paste('figs/lumbar_fu3_',  snam[k],'.pdf', sep=''), "}",
+    "\\includegraphics[scale=1]{", paste('figs/lumbar_fu3_',  file_name,'.pdf', sep=''), "}",
     "\\caption[Readmission]{Readmission.}",
     "\\end{center}",
     "\\end{figure}", sep='')
@@ -307,4 +308,3 @@ N-12 is the number of non-missing values at 12 month.  \\\\ Numbers after percen
 
 
 \end{document}
-
