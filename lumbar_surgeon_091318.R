@@ -74,7 +74,7 @@ data_follow_up1 <- merge(data, d_follow_up[,c('pt_study_id', 'analyzed_3month', 
 data <- merge(data, d[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month',"usefull3month","usefull12month")], by='pt_study_id', all.y=TRUE)
 
 
-liste=c("Vanderbilt","CNSA")
+liste=c("Vanderbilt","CNSA","Semmes")
 data <- subset(data, practice %in% liste)
 
 
@@ -354,7 +354,7 @@ data$pt_satisfaction_index.12m <- as.numeric(data$pt_satisfaction_index.12m)
 
 data$return_to_activities.3m = factor(data$return_to_activities.3m,levels=c("1","0"))
 data$return_to_work.3m[!data$plan_return_work %in% 1] <- NA
-data$return_to_work.3m <- factor(data$return_to_work, levels=c('1','0','2'))
+data$return_to_work.3m <- factor(data$return_to_work.3m, levels=c('1','0','2'))
 data$return_to_activities.12m = factor(data$return_to_activities.12m,levels=c("1","0"))
 data$return_to_work.12m[!data$plan_return_work %in% 1] <- NA
 data$return_to_work.12m <- factor(data$return_to_work.12m, levels=c('1','0','2'))
