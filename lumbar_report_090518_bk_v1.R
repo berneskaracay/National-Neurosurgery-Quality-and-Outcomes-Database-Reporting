@@ -26,7 +26,7 @@ d$death3m <- ifelse(d$deadhospital %in% TRUE | d$dead30day %in% TRUE | d$dead3mo
 d$analyzed_3month <- ifelse(d$analysis3month %in% TRUE | d$death3m %in% TRUE, TRUE, FALSE)
 d$analyzed_12month <- ifelse(d$analysis12month %in% TRUE | d$dead12month %in% TRUE, TRUE, FALSE)
 # download date #
-dldate <- as.character(as.Date("2018-07-03"))
+dldate <- as.character(as.Date("2018-09-20"))
 # only include followed up at 3 month or 12 month #
 d <- subset(d,!scorefail_baseline)
 d_follow_up<-d
@@ -74,8 +74,8 @@ data_follow_up <- merge(data, d_follow_up[,c('pt_study_id', 'analyzed_3month', '
 # merge the data with index, so apply exclusions#
 data <- merge(data, d[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month','usefull3month', 'usefull12month')], by='pt_study_id', all.y=TRUE)
 
-liste=c("Vanderbilt","Semmes","Cornell")
-data <- subset(data, practice %in% liste)
+#liste=c("Vanderbilt","Semmes","Cornell")
+#data <- subset(data, practice %in% liste)
 #data$practice[data$practice=="Cornell"]<-"ABC"
 #data$practice[data$practice=="BSSNY"]<-"ABC"
 #data$practice[data$practice=="NSARVA"]<-"ABC"
@@ -1719,9 +1719,9 @@ if(length(pracs1) > 0L) {
 #### run .rnw file to generate pdf report ####
 ##############################################
 data1 <- data
-data2o <- subset(data, analysis3month | analysis12month)
-data2 <- subset(data, analysis12month)
-data3 <- subset(data, analysis3month)
+data2o <- subset(data, analyzed_3month | analyzed_12month)
+data2 <- subset(data, analyzed_12month)
+data3 <- subset(data, analyzed_3month)
 #########qod TRIM mean surgeon count################
 
 

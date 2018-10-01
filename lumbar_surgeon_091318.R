@@ -1436,9 +1436,9 @@ filepracs <- gsub('*', '+', pracs, fixed=TRUE)
 
 for (w in seq(length(pracs))) {
   data1 <- subset(data, practice==pracs[w])
-  data2o <- subset(data1,analysis3month | analysis12month)
-  data2 <- subset(data1, analysis12month)
-  data3 <- subset(data1, analysis3month)
+  data2o <- subset(data1,analyzed_3month | analyzed_12month)
+  data2 <- subset(data1, analyzed_12month)
+  data3 <- subset(data1, analyzed_3month)
   tab <- table(data1$surgeon)
   if (sum(tab>19) > 0) {
     snam <- names(tab)[tab>19]
@@ -1452,7 +1452,7 @@ for (w in seq(length(pracs))) {
 
 for (w in seq(length(pracs))) {
   data1 <- subset(data, practice==pracs[w])
-  data2 <- subset(data1, analysis12month)
+  data2 <- subset(data1, analyzed_12month)
   tab <- table(data1$surgeon)
   if (sum(tab>19) > 0) {
     snam <- names(tab)[tab>19]
