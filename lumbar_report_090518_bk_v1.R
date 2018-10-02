@@ -26,7 +26,7 @@ d$death3m <- ifelse(d$deadhospital %in% TRUE | d$dead30day %in% TRUE | d$dead3mo
 d$analyzed_3month <- ifelse(d$analysis3month %in% TRUE | d$death3m %in% TRUE, TRUE, FALSE)
 d$analyzed_12month <- ifelse(d$analysis12month %in% TRUE | d$dead12month %in% TRUE, TRUE, FALSE)
 # download date #
-dldate <- as.character(as.Date("2018-09-20"))
+dldate <- as.character(as.Date("2018-10-01"))
 # only include followed up at 3 month or 12 month #
 d <- subset(d,!scorefail_baseline)
 d_follow_up<-d
@@ -64,17 +64,20 @@ data <- merge(data, dat3b, by=c('pt_study_id'), all=TRUE)
 
 # extract practice/center name, patient id, surgeon id, hospital/surg_location #
 n <- nrow(data)
-data$practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\1", data$pt_study_id)
+#data$practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\1", data$pt_study_id)
+data$practice <- sub("_LP[0-9]{4}$", "", data$pt_study_id)
+data$practice <- gsub('*', '_', data$practice, fixed=TRUE)
 data$sub_practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\3", data$pt_study_id)
 data$surgeon <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surgeon))
 data$surg_location <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surg_location))
-
+#data_sites=data[, c("practice","sub_practice")]
+#deduped.data <- unique( data_sites[ ,] )
 data_follow_up <- merge(data, d_follow_up[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month',"usefull3month","usefull12month")], by='pt_study_id', all.y=TRUE)
 
 # merge the data with index, so apply exclusions#
 data <- merge(data, d[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month','usefull3month', 'usefull12month')], by='pt_study_id', all.y=TRUE)
 
-#liste=c("Vanderbilt","Semmes","Cornell")
+#liste=c("Vanderbilt","Semmes","Cornell","CHS_KMH","CHS_MHB","CHS_SOC")
 #data <- subset(data, practice %in% liste)
 #data$practice[data$practice=="Cornell"]<-"ABC"
 #data$practice[data$practice=="BSSNY"]<-"ABC"
@@ -256,9 +259,10 @@ data$interbody_graft <- factor(data$interbody_graft_1, levels=1:0)
 
 
 data$estimated_blood_loss_cc3 <- as.numeric(sub(".*[-]+", "", gsub("[^0-9-]*", "", data$estimated_blood_loss_cc)))
-data$estimated_blood_loss_cc3[data$estimated_blood_loss_cc3>10000] <- NA
-
-
+data$estimated_blood_loss_cc3[data$estimated_blood_loss_cc3>10000 & !is.na(data$estimated_blood_loss_cc3)] <- NA
+#data$estimated_blood_loss_cc3[data$estimated_blood_loss_cc3>10000] <- NA
+#data$estimated_blood_loss_cc3[data$est_blood_loss==1] <- 0
+data$estimated_blood_loss_cc3[data$est_blood_loss == 1 & !is.na(data$est_blood_loss)] <- 0
 
 
 
@@ -547,7 +551,8 @@ modfun <- function(dt, fmla, resp1, resp2, prs=data.frame(prac=pracs1)) {
   tmp <- aggregate(dt1[[resp1]], by=list(dt1$practice), FUN=btfun)
   obs1 <- data.frame(prac=tmp[[1]], n=tmp[[2]][,1], m=tmp[[2]][,2], lower=tmp[[2]][,3], upper=tmp[[2]][,4])
   if (resp1=='estimated_blood_loss_cc3') {
-    dt1$estimated_blood_loss_cc3 <- ifelse(dt1$estimated_blood_loss_cc3<10, dt1$estimated_blood_loss_cc3, round(dt1$estimated_blood_loss_cc3/5, 0)*5)
+    dt1$estimated_blood_loss_cc3[dt1$estimated_blood_loss_cc3 >= 500 & !is.na(dt1$estimated_blood_loss_cc3)] <- 500
+    dt1$estimated_blood_loss_cc3 <- round(dt1$estimated_blood_loss_cc3/10, 0)*10
   }
   dd <<- datadist('dt1')
   options(datadist='dd')
@@ -562,10 +567,7 @@ modfun <- function(dt, fmla, resp1, resp2, prs=data.frame(prac=pracs1)) {
     dt2 <- dt[dt$select12m & !is.na(dt[[resp2]]), ]
     tmp <- aggregate(dt2[[resp2]], by=list(dt2$practice), FUN=btfun)
     obs2 <- data.frame(prac=tmp[[1]], n2=tmp[[2]][,1], m2=tmp[[2]][,2], lower2=tmp[[2]][,3], upper2=tmp[[2]][,4])
-    if (resp1=='estimated_blood_loss_cc3') {
-      dt1$estimated_blood_loss_cc3 <- ifelse(dt1$estimated_blood_loss_cc3<10, dt1$estimated_blood_loss_cc3, round(dt1$estimated_blood_loss_cc3/5, 0)*5)
-    }
-    dd <<- datadist('dt2')
+    dd <- datadist('dt2')
     options(datadist='dd')
     fmla2 <- as.formula(paste(resp2, '~', fmla))
     fit2 <- orm(fmla2, data=dt2, x=TRUE, y=TRUE)

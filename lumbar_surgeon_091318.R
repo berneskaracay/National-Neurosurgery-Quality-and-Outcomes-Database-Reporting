@@ -270,7 +270,8 @@ data$interbody_graft <- factor(data$interbody_graft_1, levels=1:0)
 
 data$estimated_blood_loss_cc3 <- as.numeric(sub(".*[-]+", "", gsub("[^0-9-]*", "", data$estimated_blood_loss_cc)))
 data$estimated_blood_loss_cc3[data$estimated_blood_loss_cc3>10000] <- NA
-
+data$estimated_blood_loss_cc3[data$estimated_blood_loss_cc3>=500] <- 500
+data$estimated_blood_loss_cc3[data$estimated_blood_loss_cc3==1] <- 0
 ############################################################
 ##########      Thirty Day Morbidity        ################
 ############################################################
