@@ -78,7 +78,8 @@ data_follow_up <- merge(data, d_follow_up[,c('pt_study_id', 'analyzed_3month', '
 data <- merge(data, d[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month','usefull3month', 'usefull12month')], by='pt_study_id', all.y=TRUE)
 
 #liste=c("Vanderbilt","Semmes","Cornell","CHS_KMH","CHS_MHB","CHS_SOC")
-#data <- subset(data, practice %in% liste)
+liste=c("Vanderbilt","Semmes","Cornell","AHN")
+data <- subset(data, practice %in% liste)
 #data$practice[data$practice=="Cornell"]<-"ABC"
 #data$practice[data$practice=="BSSNY"]<-"ABC"
 #data$practice[data$practice=="NSARVA"]<-"ABC"
@@ -1553,9 +1554,9 @@ tab9pfun <- function(datas) {
     tmp_12 <- subset(datas, analyzed_12month)
     tmp_3 <- subset(datas, analyzed_3month)
     tmp_base<- datas
-    M[i,1] <- nrow(tmp_base)
-    M[i,4] <- nrow(tmp_3)
-    M[i,7] <- nrow(tmp_12)
+    M[i,1] <- sum(!is.na(tmp_base[,vars1[i]]))
+    M[i,4] <- sum(!is.na(tmp_3[,vars2[i]]))
+    M[i,7] <- sum(!is.na(tmp_12[,vars3[i]]))
     M[i,2] <- mean(tmp_base[,vars1[i]], na.rm = TRUE)
     M[i,3] <- sd(tmp_base[,vars1[i]], na.rm = TRUE)
     M[i,5] <- mean(tmp_3[,vars2[i]], na.rm = TRUE)
