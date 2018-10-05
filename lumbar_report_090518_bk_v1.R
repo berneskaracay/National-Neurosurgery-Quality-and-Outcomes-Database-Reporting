@@ -77,8 +77,7 @@ data_follow_up <- merge(data, d_follow_up[,c('pt_study_id', 'analyzed_3month', '
 # merge the data with index, so apply exclusions#
 data <- merge(data, d[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month','usefull3month', 'usefull12month')], by='pt_study_id', all.y=TRUE)
 
-#liste=c("Vanderbilt","Semmes","Cornell","CHS_KMH","CHS_MHB","CHS_SOC")
-liste=c("Vanderbilt","Semmes","Cornell","AHN")
+liste=c("Vanderbilt","Semmes","Cornell")
 data <- subset(data, practice %in% liste)
 #data$practice[data$practice=="Cornell"]<-"ABC"
 #data$practice[data$practice=="BSSNY"]<-"ABC"
@@ -1216,7 +1215,7 @@ hltab3 <- function(data, ipr) {
 
 ## table of surgical procedures by diagnosis group ##
 tab6bfun <- function(datas) {
-  M <- matrix("", nrow=60, ncol=2)
+  M <- matrix("", nrow=72, ncol=2)
   
   M[2,] <- catfun1(var1="arthrodesis_performed", var2="diagnosis1", ilev="0", dfs=datas)
   M[3,] <- catfun1(var1="arthrodesis_performed", var2="diagnosis1", ilev="1", dfs=datas)
@@ -1277,6 +1276,20 @@ tab6bfun <- function(datas) {
   M[58,] <- catfun1(var1="laminectomy_level", var2="diagnosis5", ilev="5", dfs=datas, var3="laminectomy_level")
   M[59,] <- catfun1(var1="laminectomy_level", var2="diagnosis5", ilev="6", dfs=datas, var3="laminectomy_level")
   M[60,] <- catfun1(var1="laminectomy_level", var2="diagnosis5", ilev="7", dfs=datas, var3="laminectomy_level")
+  
+  M[62,] <- catfun1(var1="arthrodesis_performed", var2="diagnosis6", ilev="0", dfs=datas)
+  M[63,] <- catfun1(var1="arthrodesis_performed", var2="diagnosis6", ilev="1", dfs=datas)
+  M[64,] <- catfun1(var1="interbody_graft", var2="diagnosis6", ilev="1", dfs=datas)
+  M[65,] <- catfun1(var1="laminectomy_performed", var2="diagnosis6", ilev="1", dfs=datas)
+  M[66,] <- catfun1(var1="laminectomy_level", var2="diagnosis6", ilev="1", dfs=datas, var3="laminectomy_level")
+  M[67,] <- catfun1(var1="laminectomy_level", var2="diagnosis6", ilev="2", dfs=datas, var3="laminectomy_level")
+  M[68,] <- catfun1(var1="laminectomy_level", var2="diagnosis6", ilev="3", dfs=datas, var3="laminectomy_level")
+  M[69,] <- catfun1(var1="laminectomy_level", var2="diagnosis6", ilev="4", dfs=datas, var3="laminectomy_level")
+  M[70,] <- catfun1(var1="laminectomy_level", var2="diagnosis6", ilev="5", dfs=datas, var3="laminectomy_level")
+  M[71,] <- catfun1(var1="laminectomy_level", var2="diagnosis6", ilev="6", dfs=datas, var3="laminectomy_level")
+  M[72,] <- catfun1(var1="laminectomy_level", var2="diagnosis6", ilev="7", dfs=datas, var3="laminectomy_level")
+  
+  
   return(M)
 }
 

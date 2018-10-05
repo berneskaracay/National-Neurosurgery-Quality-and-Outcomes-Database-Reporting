@@ -107,12 +107,17 @@ rownames(tab3) <- c("Comorbidity", "~~~Diabetes", "~~~Coronary Artery Disease", 
 hl3 <- hltab3(data=data1, ipr=snam[k])
 
 
-
+@
+    
+<<echo=FALSE, results=hide>>=
 
 
 tab6b <- tab6bfun(datas=datas)
-rownames(tab6b) <- c("\\underline{Spondylolisthesis }", "~~~Decompression Alone", "~~~Arthrodesis", "~~~Interbody Graft", "~~~Laminectomy Performed", "~~~~~~Level 1", "~~~~~~Level 2",  "~~~~~~Level 3", "~~~~~~Level 4", "~~~~~~Level 5-7",  "~~~~~~Level 8-11", "~~~~~~Level >11",   "\\underline{Disc Herniation }", "~~~Decompression Alone", "~~~Arthrodesis", "~~~Interbody Graft", "~~~Laminectomy Performed", "~~~~~~Level 1", "~~~~~~Level 2",  "~~~~~~Level 3", "~~~~~~Level 4", "~~~~~~Level 5-7",  "~~~~~~Level 8-11", "~~~~~~Level >11",  "\\underline{Stenosis }", "~~~Decompression Alone", "~~~Arthrodesis", "~~~Interbody Graft", "~~~Laminectomy Performed", "~~~~~~Level 1", "~~~~~~Level 2",  "~~~~~~Level 3", "~~~~~~Level 4", "~~~~~~Level 5-7",  "~~~~~~Level 8-11", "~~~~~~Level >11", "\\underline{Adjacent Segment Disease }", "~~~Decompression Alone", "~~~Arthrodesis", "~~~Interbody Graft", "~~~Laminectomy Performed", "~~~~~~Level 1", "~~~~~~Level 2",  "~~~~~~Level 3", "~~~~~~Level 4", "~~~~~~Level 5-7",  "~~~~~~Level 8-11", "~~~~~~Level >11", "\\underline{Symptomatic Mechanical Disc Collapse }", "~~~Decompression Alone", "~~~Arthrodesis", "~~~Interbody Graft", "~~~Laminectomy Performed", "~~~~~~Level 1", "~~~~~~Level 2",  "~~~~~~Level 3", "~~~~~~Level 4", "~~~~~~Level 5-7",  "~~~~~~Level 8-11", "~~~~~~Level >11")
+rownames(tab6b) <- c("\\underline{Spondylolisthesis}", "~~~Decompression Alone", "~~~Arthrodesis", "~~~Interbody Graft", "~~~Laminectomy Performed", "~~~~~~Level 1", "~~~~~~Level 2",  "~~~~~~Level 3", "~~~~~~Level 4", "~~~~~~Level 5-7",  "~~~~~~Level 8-11", "~~~~~~Level >11",  "\\underline{Disc Herniation}", "~~~Decompression Alone", "~~~Arthrodesis", "~~~Interbody Graft", "~~~Laminectomy Performed", "~~~~~~Level 1", "~~~~~~Level 2",  "~~~~~~Level 3", "~~~~~~Level 4", "~~~~~~Level 5-7",  "~~~~~~Level 8-11", "~~~~~~Level >11",  "\\underline{Stenosis}", "~~~Decompression Alone", "~~~Arthrodesis", "~~~Interbody Graft", "~~~Laminectomy Performed", "~~~~~~Level 1", "~~~~~~Level 2",  "~~~~~~Level 3", "~~~~~~Level 4", "~~~~~~Level 5-7",  "~~~~~~Level 8-11", "~~~~~~Level >11", "\\underline{Adjacent Segment Disease}", "~~~Decompression Alone", "~~~Arthrodesis", "~~~Interbody Graft", "~~~Laminectomy Performed", "~~~~~~Level 1", "~~~~~~Level 2",  "~~~~~~Level 3", "~~~~~~Level 4", "~~~~~~Level 5-7",  "~~~~~~Level 8-11", "~~~~~~Level >11", "\\underline{Mechanical disc collapse}", "~~~Decompression Alone", "~~~Arthrodesis", "~~~Interbody Graft", "~~~Laminectomy Performed", "~~~~~~Level 1", "~~~~~~Level 2",  "~~~~~~Level 3", "~~~~~~Level 4", "~~~~~~Level 5-7",  "~~~~~~Level 8-11", "~~~~~~Level >11", "\\underline{Pseudoarthrosis}", "~~~Decompression Alone", "~~~Arthrodesis", "~~~Interbody Graft", "~~~Laminectomy Performed", "~~~~~~Level 1", "~~~~~~Level 2",  "~~~~~~Level 3", "~~~~~~Level 4", "~~~~~~Level 5-7",  "~~~~~~Level 8-11", "~~~~~~Level >11")
 
+@
+    
+<<echo=FALSE, results=hide>>=
 
 tab7 <- tab7fun(datas=datas, datasb=datas)
 rownames(tab7) <- c("Mortality", "~~~Hospital Mortality", "~~~30-day Mortality", "~~~3-Month Mortality", "Major Adverse Events", "~~~Pulmonary Embolism", "~~~Stroke", "~~~Myocardial Infarction", "~~~Surgical Site Infection", "~~~Surgical Site Hematoma", "~~~New Neuro Deficit", "~~~Any Major AE", "Minor Adverse Event", "~~~Deep Venous Thrombosis", "~~~Urinary Tract Infection", "~~~Incidental Durotomy", "~~~Pneumonia", "~~~Any Minor AE", "Patient Satisfaction", "~~~1 Met", "~~~2 Not As Much As Hoped", "~~~3 Would Not Undergo", "~~~4 Same or Worse", "~~~Top 2 (1$\\&$2)", "Utilization", "~~~Estimated Blood Loss (cc)*", "~~~Duration of Surgery (min)*", "~~~Hospital Length of Stay (days)*", "~~~30-day Return to OR", "~~~30-day Hospital Readmission", "~~~3-month Revision Surgery", "~~~3-month Hospital Readmission")
@@ -189,7 +194,7 @@ latex(tab3, title="", caption="Medical and Clinical History for Patients with Fo
 
 
 <<echo=FALSE, results=tex>>=
-latex(tab6b, title="", caption="Surgical Procedures by Diagnosis Group for Patients with Follow-up", where="!h", size="footnotesize", col.just=rep("c",2),colheads=c(snam[k], pracs[w]), longtable=TRUE, lines.page=100, file="", insert.bottom =mlCap("$x\\pm s$ represents mean$\\pm 1$ Standard Deviation for Number of Levels. \\\\ N is the number of non-missing values. \\\\  Denominator lower than 3-month accrual is because of the missing values.\\\\ A patient could possibly fall into more than one diagnosis group"))
+latex(tab6b, title="", caption="Surgical Procedures by Diagnosis Group for Patients with Follow-up", where="!h", size="footnotesize", col.just=rep("c",2),colheads=c(snam[k], pracs[w]), longtable=TRUE, lines.page=60, file="", insert.bottom =mlCap("$x\\pm s$ represents mean$\\pm 1$ Standard Deviation for Number of Levels. \\\\ N is the number of non-missing values. \\\\  Denominator lower than 3-month accrual is because of the missing values.\\\\ A patient could possibly fall into more than one diagnosis group"))
 @
 \clearpage
 <<echo=FALSE, results=tex>>=
