@@ -74,8 +74,8 @@ data_follow_up1 <- merge(data, d_follow_up[,c('pt_study_id', 'analyzed_3month', 
 data <- merge(data, d[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month',"usefull3month","usefull12month")], by='pt_study_id', all.y=TRUE)
 
 
-liste=c("Vanderbilt")
-data <- subset(data, practice %in% liste)
+#liste=c("Vanderbilt")
+#data <- subset(data, practice %in% liste)
 
 
 
