@@ -26,7 +26,7 @@ d$death3m <- ifelse(d$deadhospital %in% TRUE | d$dead30day %in% TRUE | d$dead3mo
 d$analyzed_3month <- ifelse(d$analysis3month %in% TRUE | d$death3m %in% TRUE, TRUE, FALSE)
 d$analyzed_12month <- ifelse(d$analysis12month %in% TRUE | d$dead12month %in% TRUE, TRUE, FALSE)
 # download date #
-dldate <- as.character(as.Date("2018-10-01"))
+dldate <- as.character(as.Date("2018-10-03"))
 # only include followed up at 3 month or 12 month #
 d <- subset(d,!scorefail_baseline)
 d_follow_up<-d
@@ -257,6 +257,8 @@ data$laminectomy_performed = factor(data$laminectomy_performed,levels=c("1","0")
 data$laminectomy_level = factor(data$laminectomy_level,levels=1:7)
 data$interbody_graft <- factor(data$interbody_graft_1, levels=1:0)
 
+
+#table(data$interbody_graft_1,exclude=NULL)
 
 data$estimated_blood_loss_cc3 <- as.numeric(sub(".*[-]+", "", gsub("[^0-9-]*", "", data$estimated_blood_loss_cc)))
 data$estimated_blood_loss_cc3[data$estimated_blood_loss_cc3>10000 & !is.na(data$estimated_blood_loss_cc3)] <- NA
@@ -490,11 +492,12 @@ data$disability_reason2[data$employment %in% 2] <- NA
 #######################################################################################
 #######################################################################################
 ds <- data
-ds <- subset(ds, select=c(pgender, ptage2, race, ptethnicity,pt_education_level, workers_comp, liability_claim1, any_major_surgery_in_the_p, diabetes, cad, osteoporosis, anxiety, depression, bmi, diagnosis, dominant_symptom1, motor_def2, symptom_duration2, asa_grade, arthrodesis_performed, surgical_approach, work, smoker, odiscore, eq5dscore, back_pain_vas, leg_pain_vas1, odiscore.3m, odiscore.12m, eq5dscore.3m, eq5dscore.12m, back_pain_vas.3m, back_pain_vas.12m, leg_pain_vas1.3m, leg_pain_vas1.12m, pt_satisfaction_index.3m, pt_satisfaction_index.12m, los3, estimated_blood_loss_cc3, rtw.3m, day, practice, pt_study_id, analysis3month, select12m))
+ds$interbody_graft[ds$arthrodesis_performed != 1]<-0
+ds <- subset(ds, select=c(interbody_graft,pgender, ptage2, race, ptethnicity,pt_education_level, workers_comp, liability_claim1, any_major_surgery_in_the_p, diabetes, cad, osteoporosis, anxiety, depression, bmi, diagnosis, dominant_symptom1, motor_def2, symptom_duration2, asa_grade, arthrodesis_performed, surgical_approach, work, smoker, odiscore, eq5dscore, back_pain_vas, leg_pain_vas1, odiscore.3m, odiscore.12m, eq5dscore.3m, eq5dscore.12m, back_pain_vas.3m, back_pain_vas.12m, leg_pain_vas1.3m, leg_pain_vas1.12m, pt_satisfaction_index.3m, pt_satisfaction_index.12m, los3, estimated_blood_loss_cc3, rtw.3m, day, practice, pt_study_id, analysis3month, select12m))
 rtwdata <- subset(ds, !is.na(rtw.3m))
 
 ## single impute missing covariates ##
-tmp <- transcan(~ pgender + ptage2 + race + ptethnicity + pt_education_level + workers_comp + liability_claim1 + any_major_surgery_in_the_p + diabetes + cad + osteoporosis + anxiety + depression + bmi + diagnosis + dominant_symptom1 + motor_def2 + symptom_duration2 + asa_grade + arthrodesis_performed  + surgical_approach + work + smoker + odiscore + eq5dscore + back_pain_vas + leg_pain_vas1, data=ds, imputed=TRUE, transformed=TRUE, pl=FALSE, pr=FALSE)
+tmp <- transcan(~ interbody_graft + pgender + ptage2 + race + ptethnicity + pt_education_level + workers_comp + liability_claim1 + any_major_surgery_in_the_p + diabetes + cad + osteoporosis + anxiety + depression + bmi + diagnosis + dominant_symptom1 + motor_def2 + symptom_duration2 + asa_grade + arthrodesis_performed  + surgical_approach + work + smoker + odiscore + eq5dscore + back_pain_vas + leg_pain_vas1, data=ds, imputed=TRUE, transformed=TRUE, pl=FALSE, pr=FALSE)
 imp <- impute(tmp, data=ds, list.out=TRUE)
 
 ## get complete data set ##
@@ -510,7 +513,7 @@ for (i in names(tmp$imputed)) {
 }
 
 
-tmp <- transcan(~ pgender + ptage2 + race + ptethnicity + pt_education_level + workers_comp + liability_claim1 + 
+tmp <- transcan(~ interbody_graft + pgender + ptage2 + race + ptethnicity + pt_education_level + workers_comp + liability_claim1 + 
                   any_major_surgery_in_the_p + diabetes + cad + osteoporosis + anxiety + depression + bmi + diagnosis + dominant_symptom1 + motor_def2 + symptom_duration2 + asa_grade + 
                   arthrodesis_performed + surgical_approach  + smoker + odiscore + eq5dscore + back_pain_vas + leg_pain_vas1,
                 data=rtwdata, imputed=TRUE, transformed=TRUE, pl=FALSE, pr=FALSE)
@@ -1322,7 +1325,7 @@ tab7fun <- function(datas, datasb) {
   M[28,] <- confun2(var1="los3", dfs=datas, dig=1)
   M[29,] <- catfun1( var1="returned_to_or_with_30_day", var2="returned_to_or_with_30_day", ilev="1", df=datas)
   M[30,] <- catfun1(var1="readmit30day", var2="readmit30day", ilev="1", df=datas)
-  M[31,] <- catfun1(var1="revision_surg_3mths2", var2="revision_surg_3mths2", ilev="1", df=datas)
+  M[31,] <- catfun1(var1="revision_surg_3mths.3m", var2="revision_surg_3mths.3m", ilev="1", df=datas)
   M[32,] <- catfun1(var1="readmit3m", var2="readmit3m", ilev="1", df=datas)
   
   return(M)
@@ -1358,7 +1361,7 @@ hltab7 <- function(data, ipr) {
   dv[23] <- sfun1(data=data, vr='los3', ip=ipr)
   dv[24] <- sfun2(data=data, vr='returned_to_or_with_30_day', ip=ipr)
   dv[25] <- sfun2(data=data, vr='readmit30day', ip=ipr)
-  dv[26] <- sfun2(data=data, vr='revision_surg_3mths2', ip=ipr)
+  dv[26] <- sfun2(data=data, vr='revision_surg_3mths.3m', ip=ipr)
   dv[27] <- sfun2(data=data, vr='readmit3m', ip=ipr)
   dv7 <- ifelse(abs(dv)>=0.4, TRUE, FALSE)
   return(hl[dv7])
@@ -1378,7 +1381,7 @@ figure_construct <- function(datas) {
   M_f[5,] <- catfun1b(var1="pt_satisfaction_index2.3m", var2="pt_satisfaction_index2.3m", ilev="1", df=datas)
   M_f[6,] <- round(M_f[1,]) + round(M_f[2,])
   M_f[7,] <- catfun1b(var1="readmit30day", var2="readmit30day", ilev="1", df=datas)
-  M_f[8,] <- catfun1b(var1="revision_surg_3mths2", var2="revision_surg_3mths2", ilev="1", df=datas)
+  M_f[8,] <- catfun1b(var1="revision_surg_3mths.3m", var2="revision_surg_3mths.3m", ilev="1", df=datas)
   M_f[9,] <- catfun1b(var1="readmit3m", var2="readmit3m", ilev="1", df=datas)
   return(M_f)
 }
@@ -1399,7 +1402,7 @@ tab7bfun <- function(datas) {
   M[4,] <- confun3(var1="los3", var2="newcat1", dfs=datas, var3="los3", dig=1)
   M[5,] <- catfun1(var1="returned_to_or_with_30_day", var2="newcat1", ilev="1", df=datas)
   M[6,] <- catfun1(var1="readmit30day", var2="newcat1", ilev="1", df=datas)
-  M[7,] <- catfun1(var1="revision_surg_3mths", var2="newcat1", ilev="1", df=datas)
+  M[7,] <- catfun1(var1="revision_surg_3mths.3m", var2="newcat1", ilev="1", df=datas)
   M[8,] <- catfun1(var1="readmit3m", var2="newcat1", ilev="1", df=datas)
   
   M[10,] <- confun3(var1="estimated_blood_loss_cc3", var2="newcat2", dfs=datas, var3="estimated_blood_loss_cc3", dig=0)
@@ -1407,7 +1410,7 @@ tab7bfun <- function(datas) {
   M[12,] <- confun3(var1="los3", var2="newcat2", dfs=datas, var3="los3", dig=1)
   M[13,] <- catfun1(var1="returned_to_or_with_30_day", var2="newcat2", ilev="1", df=datas)
   M[14,] <- catfun1(var1="readmit30day", var2="newcat2", ilev="1", df=datas)
-  M[15,] <- catfun1(var1="revision_surg_3mths", var2="newcat2", ilev="1", df=datas)
+  M[15,] <- catfun1(var1="revision_surg_3mths.3m", var2="newcat2", ilev="1", df=datas)
   M[16,] <- catfun1(var1="readmit3m", var2="newcat2", ilev="1", df=datas)
   
   M[18,] <- confun3(var1="estimated_blood_loss_cc3", var2="newcat3", dfs=datas, var3="estimated_blood_loss_cc3", dig=0)
@@ -1415,7 +1418,7 @@ tab7bfun <- function(datas) {
   M[20,] <- confun3(var1="los3", var2="newcat3", dfs=datas, var3="los3", dig=1)
   M[21,] <- catfun1(var1="returned_to_or_with_30_day", var2="newcat3", ilev="1", df=datas)
   M[22,] <- catfun1(var1="readmit30day", var2="newcat3", ilev="1", df=datas)
-  M[23,] <- catfun1(var1="revision_surg_3mths", var2="newcat3", ilev="1", df=datas)
+  M[23,] <- catfun1(var1="revision_surg_3mths.3m", var2="newcat3", ilev="1", df=datas)
   M[24,] <- catfun1(var1="readmit3m", var2="newcat3", ilev="1", df=datas)
   
   
@@ -1424,7 +1427,7 @@ tab7bfun <- function(datas) {
   M[28,] <- confun3(var1="los3", var2="newcat4", dfs=datas, var3="los3", dig=1)
   M[29,] <- catfun1(var1="returned_to_or_with_30_day", var2="newcat4", ilev="1", df=datas)
   M[30,] <- catfun1(var1="readmit30day", var2="newcat4", ilev="1", df=datas)
-  M[31,] <- catfun1(var1="revision_surg_3mths", var2="newcat4", ilev="1", df=datas)
+  M[31,] <- catfun1(var1="revision_surg_3mths.3m", var2="newcat4", ilev="1", df=datas)
   M[32,] <- catfun1(var1="readmit3m", var2="newcat4", ilev="1", df=datas)
   
   M[34,] <- confun3(var1="estimated_blood_loss_cc3", var2="newcat5", dfs=datas, var3="estimated_blood_loss_cc3", dig=0)
@@ -1432,7 +1435,7 @@ tab7bfun <- function(datas) {
   M[36,] <- confun3(var1="los3", var2="newcat5", dfs=datas, var3="los3", dig=1)
   M[37,] <- catfun1(var1="returned_to_or_with_30_day", var2="newcat5", ilev="1", df=datas)
   M[38,] <- catfun1(var1="readmit30day", var2="newcat5", ilev="1", df=datas)
-  M[39,] <- catfun1(var1="revision_surg_3mths", var2="newcat5", ilev="1", df=datas)
+  M[39,] <- catfun1(var1="revision_surg_3mths.3m", var2="newcat5", ilev="1", df=datas)
   M[40,] <- catfun1(var1="readmit3m", var2="newcat5", ilev="1", df=datas)
   
   M[42,] <- confun3(var1="estimated_blood_loss_cc3", var2="newcat6", dfs=datas, var3="estimated_blood_loss_cc3", dig=0)
@@ -1440,7 +1443,7 @@ tab7bfun <- function(datas) {
   M[44,] <- confun3(var1="los3", var2="newcat6", dfs=datas, var3="los3", dig=1)
   M[45,] <- catfun1(var1="returned_to_or_with_30_day", var2="newcat6", ilev="1", df=datas)
   M[46,] <- catfun1(var1="readmit30day", var2="newcat6", ilev="1", df=datas)
-  M[47,] <- catfun1(var1="revision_surg_3mths", var2="newcat6", ilev="1", df=datas)
+  M[47,] <- catfun1(var1="revision_surg_3mths.3m", var2="newcat6", ilev="1", df=datas)
   M[48,] <- catfun1(var1="readmit3m", var2="newcat6", ilev="1", df=datas)
   
   return(M)
