@@ -65,6 +65,8 @@ data <- merge(data, dat3b, by=c('pt_study_id'), all=TRUE)
 # extract practice/center name, patient id, surgeon id, hospital/surg_location #
 n <- nrow(data)
 data$practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\1", data$pt_study_id)
+data$practice <- gsub('*', '_', data$practice, fixed=TRUE)
+#data$practice <- gsub('_', '', data$practice, fixed=TRUE)
 data$sub_practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\3", data$pt_study_id)
 data$surgeon_name <- data$surgeon
 data$surgeon_name <- str_replace_all(data$surgeon_name, "[[:punct:]]", " ")
@@ -74,8 +76,8 @@ data_follow_up1 <- merge(data, d_follow_up[,c('pt_study_id', 'analyzed_3month', 
 data <- merge(data, d[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month',"usefull3month","usefull12month")], by='pt_study_id', all.y=TRUE)
 
 
-liste=c("Semmes")
-data <- subset(data, practice %in% liste)
+#liste=c("Albany","Atlantic_NS")
+#data <- subset(data, practice %in% liste)
 
 
 
