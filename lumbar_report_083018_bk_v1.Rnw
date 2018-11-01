@@ -313,7 +313,7 @@ N-12 is the number of non-missing values at 12 month.  \\\\ Numbers after percen
     tab <- modrst2[[pracs[k]]]
     latex(tab, 
           title='', 
-          caption=paste("Site", ': Self Benchmark Patient Reported Ouctomes and Utilization', sep=''), 
+          caption=paste("Site", ': Self Benchmark Patient Reported Outcomes and Utilization', sep=''), 
           colheads=rep(c('N', 'Observed \n Mean ~~~~~~ (95$\\%$ CI)$^1$', 'Expected$^2$ \n Mean'),2), 
           cgroup=c('3-Month Post-Surgery', '12-Month Post-Surgery'), 
           rowname=c('$\\textbf{Back Pain}$', '$\\textbf{Leg Pain}$', '$\\textbf{ODI}$', '$\\textbf{EQ5D}$', '$\\textbf{Patient Satisfaction}^3$', '$\\textbf{Blood Loss (ml)}$', '$\\textbf{Length of Hospital Stay (day)}$'), 
