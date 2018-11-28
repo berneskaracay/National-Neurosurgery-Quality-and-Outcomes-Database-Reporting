@@ -38,3 +38,6 @@ data/
 *.lot
 *.pdf
 *.tex
+*.csv
+*.rda
+*.xlsx
