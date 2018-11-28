@@ -1,7 +1,7 @@
 ### Datasets 
 National Neurosurgery Quality and Outcomes Database. Data avaliable for 180+ hospital participating the registry.
-- lumbar database
-- cervical database 
+- Lumbar database
+- Cervical database 
 - Cerebrovascular database
 
 ### Files:
