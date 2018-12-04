@@ -20,7 +20,7 @@
 rm(list=ls())
 
 ### set working directory###
-setwd("C:\\Users\\karacb1\\Desktop\\qod-project-codes")
+setwd("C:\\Users\\karacb1\\Desktop\\QOD-reporting")
 
 library(Hmisc)
 library(rms)
@@ -32,7 +32,7 @@ library(survival)
 #################################################
 
 ### read in Thomas' index data ###
-load('patient_cervical_index.rda')
+load('data\\patient_cervical_index.rda')
 
 # download date #
 dldate <- as.character(as.Date(DataTimestamp))
@@ -40,10 +40,16 @@ dldate <- as.character(as.Date(DataTimestamp))
 d$death3m <- ifelse(d$deadhospital %in% TRUE | d$dead30day %in% TRUE | d$dead3month %in% TRUE, TRUE, FALSE)
 d$analyzed_3month <- ifelse(d$analysis3month %in% TRUE | d$death3m %in% TRUE, TRUE, FALSE)
 d$analyzed_12month <- ifelse(d$analysis12month %in% TRUE | d$dead12month %in% TRUE, TRUE, FALSE)
+
+# only include followed up at 3 month or 12 month #
+d <- subset(d,!scorefail_baseline)
+d_follow_up<-d
+
+
 d <- subset(d, analyzed_3month | analyzed_12month)
 
 ### read in patient data set ###
-data=read.csv('patient_cervical.csv', stringsAsFactors=FALSE)
+data=read.csv('data\\patient_cervical.csv', stringsAsFactors=FALSE)
 # combine baseline data and 3/12-month data #
 dat1 <- subset(data, redcap_event_name=="baseline_arm_1")
 dat1 <- dat1[!duplicated(dat1$pt_study_id),]
@@ -72,6 +78,10 @@ data$surg_location <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surg_lo
 #liste=c("Cornell","Semmes","Cornell","Vanderbilt","Duke","U_Utah","UVA")
 #data <- subset(data, practice %in% liste)
 # merge the data with index #
+data_follow_up <- merge(data, d_follow_up[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month',"usefull3month","usefull12month")], by='pt_study_id', all.y=TRUE)
+
+
+
 data <- merge(data, d[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month')], by='pt_study_id', all.y=TRUE)
 
 data$surgery_date <- as.Date(data$date_surgery_performed)
@@ -245,7 +255,7 @@ data$self_care.12m <- ifelse(is.na(data$self_care_int.12m), data$self_care_self.
 data$usual_activities.12m <- ifelse(is.na(data$usual_activities_int.12m), data$usual_activities_self.12m, data$usual_activities_int.12m)
 data$pain_discomfort.12m <- ifelse(is.na(data$pain_discomfort_int.12m), data$pain_discomfort_self.12m, data$pain_discomfort_int.12m)
 data$anxiety_depression.12m <- ifelse(is.na(data$anxiety_depression_int.12m), data$anxiety_depression_self.12m, data$anxiety_depression_int.12m)
-eq <- read.csv('eq5dscore.csv')
+eq <- read.csv('data\\eq5dscore.csv')
 eq$com <- paste(eq$MO, eq$SC, eq$UA, eq$PD, eq$AD, sep='')
 data$com <- with(data, paste(mobility, self_care, usual_activities, pain_discomfort, anxiety_depression, sep=''))
 data$com.3m <- with(data, paste(mobility.3m, self_care.3m, usual_activities.3m, pain_discomfort.3m, anxiety_depression.3m, sep=''))
@@ -1383,7 +1393,7 @@ plotfun2 <- function(datas, pltnam, ptab) {
 
 
 plot12mfun1 <- function(x, yli, yma, yla, mai, yll) {
-  plot(1:10, 1:10, xlim=c(1.5,7), ylim=yli, type="n", axes=FALSE, xlab="Time after Surgery", ylab=yla, main=mai)
+  plot(1:10, 1:10, xlim=c(1.5,8), ylim=yli, type="n", axes=FALSE, xlab="Time after Surgery", ylab=yla, main=mai)
   axis(side=1, at=c(2,4,7), labels=c("Baseline", "3-month", "12-month"))
   axis(side=2, at=yma, las=2, labels=yll)
   points(c(2,4), x[c(2,4)], pch=19)
@@ -1421,28 +1431,13 @@ plot12mfun1c <- function(dat, iv, xyli, xyma, xla, yla, idline, mai) {
 }
 
 plot12mfun2 <- function(datas, pltnam, ptab) {
-  pdf(pltnam, width=10.5, height=17)
-  par(mfrow=c(5,3), mar=c(7,10,6,1))
-  
+  pdf(pltnam, width=6, height=16)
+  par(mfrow=c(4,1), mar=c(4,9.3,4,11))
   plot12mfun1(x=ptab[1,], mai="Neck Pain", yli=c(0,10), yma=c(0,2,4,6,8,10), yla="Pain Score", yll=c("  \n 0\n No Pain", 2,4,6,8, "  \n 10\n Worst Pain"))
-  plot12mfun1b(dat=datas, iv=1, xyli=c(0,10), xyma=c(0,2,4,6,8,10), xla="Pre-surgery Pain Score", yla="3-month Pain Score", idline=c(0,0,10,10), mai="Neck Pain")
-  plot12mfun1c(dat=datas, iv=1, xyli=c(0,10), xyma=c(0,2,4,6,8,10), xla="3-month Pain Score", yla="12-month Pain Score", idline=c(0,0,10,10), mai="Neck Pain")
-  
   plot12mfun1(x=ptab[2,], mai="Arm Pain", yli=c(0,10), yma=c(0,2,4,6,8,10), yla="Pain Score", yll=c("  \n 0\n No Pain", 2,4,6,8, "  \n 10\n Worst Pain"))
-  plot12mfun1b(dat=datas, iv=2, xyli=c(0,10), xyma=c(0,2,4,6,8,10), xla="Pre-surgery Pain Score", yla="3-month Pain Score", idline=c(0,0,10,10), mai="Arm Pain")
-  plot12mfun1c(dat=datas, iv=2, xyli=c(0,10), xyma=c(0,2,4,6,8,10), xla="3-month Pain Score", yla="12-month Pain Score", idline=c(0,0,10,10), mai="Arm Pain")
-  
   plot12mfun1(x=ptab[3,], mai="Neck Disability Index", yli=c(0,100), yma=c(0,20,40,60,80,100), yla="NDI", yll=c("  \n 0\n No Impairment", 20,40,60,80, "  \n 100\n Functional Impairment"))
-  plot12mfun1b(dat=datas, iv=3, xyli=c(0,100), xyma=c(0,20,40,60,80,100), xla="Pre-surgery NDI", yla="3-month NDI", idline=c(0,0,100,100), mai="Neck Disability Index")
-  plot12mfun1c(dat=datas, iv=3, xyli=c(0,100), xyma=c(0,20,40,60,80,100), xla="3-month NDI", yla="12-month NDI", idline=c(0,0,100,100), mai="Neck Disability Index")
-  
   plot12mfun1(x=ptab[4,], mai="Euroqual Quality of Life", yli=c(-0.1, 1.0), yma=c(-0.1, 0, 0.2, 0.4, 0.6, 0.8, 1.0), yla="EQ-5D", yll=c("  \n -0.1\n Worst Health", 0,0.2,0.4,0.6,0.8, "  \n 1.0\n Best Health"))
-  plot12mfun1b(dat=datas, iv=4, xyli=c(-0.1,1.0), xyma=c(-0.1, 0, 0.2, 0.4, 0.6, 0.8, 1.0), xla="Pre-surgery EQ-5D", yla="3-month EQ-5D", idline=c(-0.1,-0.1,1,1), mai="Euroqual Quality of Life")
-  plot12mfun1c(dat=datas, iv=4, xyli=c(-0.1,1.0), xyma=c(-0.1, 0, 0.2, 0.4, 0.6, 0.8, 1.0), xla="3-month EQ-5D", yla="12-month EQ-5D", idline=c(-0.1,-0.1,1,1), mai="Euroqual Quality of Life")
-  
   plot12mfun1(x=ptab[5,], mai="mJOA", yli=c(0,17), yma=c(0,3,6,9,12,14,17), yla="mJOA", yll=c("  \n 0\n Severe", 3,6,9,12,14, "  \n 17\n Mild"))
-  plot12mfun1b(dat=datas, iv=5, xyli=c(0,17), xyma=c(0,3,6,9,12,14,17), xla="Pre-surgery mJOA", yla="3-month mJOA", idline=c(0,0,17,17), mai="mJOA")
-  plot12mfun1c(dat=datas, iv=5, xyli=c(0,17), xyma=c(0,3,6,9,12,14,17), xla="3-month mJOA", yla="12-month mJOA", idline=c(0,0,17,17), mai="mJOA")
   dev.off()
 }
 
@@ -1483,42 +1478,38 @@ if(length(pracs1) > 0L) {
 
 ## only for site with >20 12m followup ##
 
-
-if(length(pracs2) > 0L) {
-  load('patient_cervical_index.rda')
-  n <- nrow(d)
-  d$practice <- sub("^([^*]+)(\\*(.+))?_CP[0-9]{4}$", "\\1", d$pt_study_id)
-  d$sub_practice <- sub("^([^*]+)(\\*(.+))?_CP[0-9]{4}$", "\\3", d$pt_study_id)
-  d <- subset(d, practice %in% pracs2)
-  df <- aggregate(cbind(usefull3month, usefull12month, analysis3month, analysis12month) ~ practice, FUN=sum, data=d)
-  colnames(df) <- c('practice', 'x3m', 'x12m', 'y3m', 'y12m')
+if(length(pracs1) > 0L) {
+  n <- nrow(data_follow_up)
+  #d$practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\1", d$pt_study_id)
+  #d$practice[d$practice=="Cornell"]<-"ABC"
+  #d$practice[d$practice=="BSSNY"]<-"ABC"
+  #d$practice[d$practice=="NSARVA"]<-"ABC"
+  #d$practice[d$practice=="Semmes"]<-"ABC"
+  #d$sub_practice <- sub("^([^*]+)(\\*(.+))?_LP[0-9]{4}$", "\\3", d$pt_study_id)
+  data_follow_up_site <- subset(data_follow_up, practice %in% pracs1)
+  dfp <- aggregate(cbind(usefull3month, usefull12month, analysis3month, analysis12month) ~ practice, FUN=sum, data=data_follow_up_site)
+  colnames(dfp) <- c('practice', 'x3m', 'x12m', 'y3m', 'y12m')
   ##########Ben ekledim#################
-  df$QOD_3base<-sum(df$x3m,na.rm = FALSE)
-  df$QOD_12base<-sum(df$x12m,na.rm = FALSE)
-  df$QOD_3m<-sum(df$y3m,na.rm = FALSE)
-  df$QOD_12m<-sum(df$y12m,na.rm = FALSE)
-  df$qod_fu3m <- round(df$QOD_3m/df$QOD_3base,2)
-  df$qod_fu12m <-round(df$QOD_12m/df$QOD_12base,2)
+  dfp$QOD_3base<-sum(dfp$x3m,na.rm = FALSE)
+  dfp$QOD_12base<-sum(dfp$x12m,na.rm = FALSE)
+  dfp$QOD_3m<-sum(dfp$y3m,na.rm = FALSE)
+  dfp$QOD_12m<-sum(dfp$y12m,na.rm = FALSE)
+  dfp$qod_fu3m <- round(dfp$QOD_3m/dfp$QOD_3base,2)
+  dfp$qod_fu12m <-round(dfp$QOD_12m/dfp$QOD_12base,2)
   ################
-  df$fu3m <-0
-  df$fu12m <-0
-  df$fu3m <- round(df$y3m/df$x3m,2)
-  df$fu12m <- round(df$y12m/df$x12m,2)
-  df$fu <- round(df$fu3m + df$fu12m,2)
-  df <- df[order(df$fu),]
-  nm <- nrow(df)
-  df$center <- nm:1
-  num.min <- min(df$x12m)
-  num.max <- max(df$x3m)
-  
-  
-  for (k in 1:nm) {
-    ip <- pracs2[k]
-    df$center <- nm:1
-    df$center[df$practice==ip] <- ip
-    
-  }
+  dfp$fu3m <-0
+  dfp$fu12m <-0
+  dfp$fu3m <- round(dfp$y3m/dfp$x3m,2)
+  dfp$fu12m <- round(dfp$y12m/dfp$x12m,2)
+  dfp$fu <- round(dfp$fu3m + dfp$fu12m,2)
+  dfp <- dfp[order(dfp$fu),]
+  nm <- nrow(dfp)
+  dfp$center <- nm:1
+  num.min <- min(dfp$x12m)
+  num.max <- max(dfp$x3m)
 }
+
+
 
 
 
@@ -1540,7 +1531,7 @@ pracs <- pracs1
 filepracs <- gsub('*', '+', pracs, fixed=TRUE)
 
 for (k in seq_along(pracs)) {
-    Sweave("cervical_report.Rnw", output=paste0(filepracs[k], ".tex"))
+    Sweave("cervical_report_generate.Rnw", output=paste0(filepracs[k], ".tex"))
 }
 
 for (k in seq_along(pracs)) {
