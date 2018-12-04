@@ -35,6 +35,8 @@ data/
 *.knit.md
 *.aux
 *.lof
+*.gz
+*.RData
 *.log
 *.lot
 *.pdf
