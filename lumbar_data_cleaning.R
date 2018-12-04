@@ -6,7 +6,7 @@
 rm(list=ls())
 
 ### set working directory###
-setwd("C:\\Users\\karacb1\\Desktop\\qod-project-codes")
+setwd("C:\\Users\\karacb1\\Desktop\\QOD-reporting")
 
 
 
@@ -1762,7 +1762,7 @@ filepracs <- gsub('*', '+', pracs, fixed=TRUE)
 
 
 for (k in seq_along(pracs)) {
-  Sweave("lumbar_report_083018_bk_v1.Rnw", output=paste0(filepracs[k], ".tex"))
+  Sweave("lumbar_report_generate.Rnw", output=paste0(filepracs[k], ".tex"))
 }
 
 for (k in seq_along(pracs)) {
@@ -1771,4 +1771,3 @@ for (k in seq_along(pracs)) {
       stop("Unable to compile latex document ", filepracs[k], ".tex")
   }
 }
-
