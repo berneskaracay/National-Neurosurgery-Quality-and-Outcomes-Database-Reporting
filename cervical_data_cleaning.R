@@ -472,81 +472,102 @@ data$rtw.3m[is.na(data$day)] <- NA
         }
         return(y)
     }
-
+#####################################################################   
+    
     for (j in 1:np) {
-        tprac <- pracs1[j]
-        pnam <- paste('figs/',tprac, '_model.pdf', sep='')
-        if (tprac %nin% pracs2) {
-            pdf(pnam, width=16, height=6)
-            par(mar=c(2,10,4,0), xpd=NA, mfrow=c(1,1))
-            plot(0:210, seq(from=0.5, to=8.5, length=211), xlim=c(-2,220), ylim=c(0.8,9.5), xlab='', ylab='', main='', axes=FALSE, type='n')
-            for (i in 1:8) {
-                segments(0, i, 100, i, lty=2, col='grey60')
-            }
-            trst <- modrst[[tprac]]
-            trst3 <- trst2 <- trst
-            trst2['satisfy', c(2:5)] <- trst['satisfy', c(2:5)] - 1
-            trst3[,c(2:5)] <- rerange(x=trst2[,c(2:5)], ranges=c(10,10,100,1,17,3,700,10))
-            trst4 <- format(round(trst,2), nsmall=2)
-            trst4[c(3,7),] <- format(round(trst[c(3,7),],1), nsmall=1)
-            for (i in 1:8) {
-                points(as.numeric(trst3[i,c('m', 'pred')]), c(9-i, 9-i), pch=c(16,17), col=c('black', 'blue'))
-                points(as.numeric(trst3[i,c('lower', 'upper')]), c(9-i, 9-i), pch=c('(', ')'))
-                text(trst3[i,'m'], 9-i, trst4[i,'m'], pos=3, cex=0.6)
-                text(trst3[i,'pred'], 9-i, trst4[i,'pred'], pos=1, col='blue', cex=0.6)
-                text(0, 9-i, c(0,0,0,0,0,1,0,0)[i], pos=1)
-                text(100, 9-i, c(10,10,100,1,17,4,700,10)[i], pos=1)
-            }
-            axis(side=2, at=8:1, labels=c('Neck Pain', 'Arm Pain', 'NDI', 'EQ5D', 'mJOA', 'Patient Satisfaction', 'Blood Loss \n (ml)', 'Length of Hospital Stay \n (day)'), las=2, col='white', font=2, line=-2)
-            legend(x=150, y=2, legend=c('Observed', 'Expected'), pch=c(16,17), col=c('black', 'blue'), bty='n', xpd=NA, ncol=2)
-            title(main=paste(tprac, ': Self Benchmark Patient Reported Outcomes and Utilization', sep=''))
-            text(50, 8.6, '3-Month Post-Surgery', pos=3)
-            dev.off()
-        } else {
-            pdf(pnam, width=16, height=6)
-            par(mar=c(2,10,4,0), xpd=NA, mfrow=c(1,1))
-            plot(0:210, seq(from=0.5, to=8.5, length=211), xlim=c(-2,220), ylim=c(0.8,9.5), xlab='', ylab='', main='', axes=FALSE, type='n')
-            for (i in 8:3) {
-                segments(0, i, 100, i, lty=2, col='grey60')
-                segments(100+10, i, 200+10, i, lty=2, col='grey60')
-            }
-            for (i in 2:1) {
-                segments(0, i, 100, i, lty=2, col='grey60')
-            }
-            trst <- modrst[[tprac]]
-            trst3 <- trst2 <- trst
-            trst2['satisfy', c(2:5, 7:10)] <- trst['satisfy', c(2:5, 7:10)] - 1
-            trst3[,c(2:5, 7:10)] <- rerange(x=trst2[,c(2:5, 7:10)], ranges=c(10,10,100,1,17,3,700,10))
-            trst4 <- format(round(trst,2), nsmall=2)
-            trst4[c(3,7),] <- format(round(trst[c(3,7),],1), nsmall=1)
-            for (i in 1:8) {
-                points(as.numeric(trst3[i,c('m', 'pred')]), c(9-i, 9-i), pch=c(16,17), col=c('black', 'blue'))
-                points(as.numeric(trst3[i,c('lower', 'upper')]), c(9-i, 9-i), pch=c('(', ')'))
-                text(trst3[i,'m'], 9-i, trst4[i,'m'], pos=3, cex=0.6)
-                text(trst3[i,'pred'], 9-i, trst4[i,'pred'], pos=1, col='blue', cex=0.6)
-                text(0, 9-i, c(0,0,0,0,0,1,0,0)[i], pos=1)
-                text(100, 9-i, c(10,10,100,1,17,4,700,10)[i], pos=1)
-            }
-            for (i in 1:6) {
-                points(as.numeric(trst3[i,c('m2', 'pred2')]) + 110, c(9-i, 9-i), pch=c(16,17), col=c('black', 'blue'))
-                points(as.numeric(trst3[i,c('lower2', 'upper2')]) + 110, c(9-i, 9-i), pch=c('(', ')'))
-                text(trst3[i,'m2'] + 110, 9-i, trst4[i,'m2'], pos=3, cex=0.6)
-                text(trst3[i,'pred2'] + 110, 9-i, trst4[i,'pred2'], pos=1, col='blue', cex=0.6)
-                text(110, 9-i, c(0,0,0,0,0,1,0,0)[i], pos=1)
-                text(210, 9-i, c(10,10,100,1,17,4,700,10)[i], pos=1)
-            }
-            axis(side=2, at=8:1, labels=c('Neck Pain', 'Arm Pain', 'NDI', 'EQ5D', 'mJOA', 'Patient Satisfaction', 'Blood Loss \n (ml)', 'Length of Hospital Stay \n (day)'), las=2, col='white', font=2, line=-2)
-            legend(x=150, y=2, legend=c('Observed', 'Expected'), pch=c(16,17), col=c('black', 'blue'), bty='n', xpd=NA, ncol=1)
-            title(main=paste(tprac, ': Self Benchmark Patient Reported Outcomes and Utilization', sep=''))
-            text(50, 8.6, '3-Month Post-Surgery', pos=3)
-            text(160, 8.6, '12-Month Post-Surgery', pos=3)
-            dev.off()
+      tprac <- pracs1[j]
+      sp <- 10
+      pnam <- paste('figs/',tprac, '_model.pdf', sep='')
+      pdf(pnam, width=16, height=6)
+      par(mar=c(2,10,4,0), xpd=NA, mfrow=c(1,1))
+      plot(0:210, seq(from=0.5, to=7.5, length=211), xlim=c(-2,220), ylim=c(0.8,9.5), xlab='', ylab='', main='', axes=FALSE, type='n')
+      for (i in 8:3) {
+        segments(0, i, 100, i, lty=2, col='grey60')
+        segments(100+sp, i, 200+sp, i, lty=2, col='grey60')
+      }
+      for (i in 2:1) {
+        segments(0, i, 100, i, lty=2, col='grey60')
+      }
+      trst <- modrst[[tprac]]
+      trst3 <- trst2 <- trst
+      trst2['satisfy', c(2:5,7:10)] <- trst['satisfy', c(2:5,7:10)] - 1
+      trst3[,c(2:5,7:10)] <- rerange(x=trst2[,c(2:5,7:10)], ranges=c(10,10,100,1,17,3,700,10))
+      trst4 <- format(round(trst,2), nsmall=2)
+      trst4[c(3,7),] <- format(round(trst[c(3,7),],1), nsmall=1)
+      for (i in 1:8) {
+        if(!is.nan(trst3[i,'pred'])){
+          if (trst3[i,'pred'] > trst3[i,'upper'] | trst3[i,'pred'] < trst3[i,"lower"]){
+            points(as.numeric(trst3[i,c('m', 'pred')]), c(9-i, 9-i), pch=c(16,17), col=c('blue', 'red'))
+            points(as.numeric(trst3[i,c('lower', 'upper')]), c(9-i, 9-i), pch=c('(', ')'), col=c('blue', 'blue'))
+            text(trst3[i,'m'], 9-i, trst4[i,'m'], pos=3, col='blue', cex=0.8)
+            text(trst3[i,'pred'], 9-i, trst4[i,'pred'], pos=1, col='red', cex=0.8)
+            text(0, 9-i, c(0,0,0,0,0,1,0,0)[i], pos=1)
+            text(100, 9-i, c(10,10,100,1,17,4,700,10)[i], pos=1)
+          }
+          else{
+            points(as.numeric(trst3[i,c('m', 'pred')]), c(9-i, 9-i), pch=c(16,18), col=c('blue', 'forestgreen'))
+            points(as.numeric(trst3[i,c('lower', 'upper')]), c(9-i, 9-i), pch=c('(', ')'), col=c('blue', 'blue'))
+            text(trst3[i,'m'], 9-i, trst4[i,'m'], pos=3, col='blue', cex=0.8)
+            text(trst3[i,'pred'], 9-i, trst4[i,'pred'], pos=1, col='forestgreen', cex=0.8)
+            text(0, 9-i, c(0,0,0,0,0,1,0,0)[i], pos=1)
+            text(100, 9-i, c(10,10,100,1,17,4,700,10)[i], pos=1)
+          }
         }
-                                        # survival plot #
-        pnam <- paste('figs/', tprac, '_model2.pdf', sep='')
+        else{
+          points(as.numeric(trst3[i,c('m', 'pred')]), c(9-i, 9-i), pch=c(16,17), col=c('blue', 'red'))
+          points(as.numeric(trst3[i,c('lower', 'upper')]), c(9-i, 9-i), pch=c('(', ')'), col=c('blue', 'blue'))
+          text(trst3[i,'m'], 9-i, trst4[i,'m'], pos=3, col='blue', cex=0.8)
+          text(trst3[i,'pred'], 9-i, trst4[i,'pred'], pos=1, col='red', cex=0.8)
+          text(0, 9-i, c(0,0,0,0,0,1,0,0)[i], pos=1)
+          text(100, 9-i, c(10,10,100,1,17,4,700,10)[i], pos=1)
+        }
+      }
+      
+      if (tprac %in% pracs2) {
+        for (i in 1:6) {
+          if(!is.nan(trst3[i,'pred2'])){
+            if (trst3[i,'pred2'] > trst3[i,'upper2'] | trst3[i,'pred2'] < trst3[i,"lower2"]){
+              points(as.numeric(trst3[i,c('m2', 'pred2')]) + 100 + sp, c(9-i, 9-i), pch=c(16,17), col=c('blue', 'red'))
+              points(as.numeric(trst3[i,c('lower2', 'upper2')]) + 100 + sp, c(9-i, 9-i), pch=c('(', ')'), col=c('blue', 'blue'))
+              text(trst3[i,'m2'] + 100 + sp, 9-i, trst4[i,'m2'], pos=3, col='blue', cex=0.8)
+              text(trst3[i,'pred2'] + 100 + sp, 9-i, trst4[i,'pred2'], pos=1, col='red', cex=0.8)
+              text(100+sp, 9-i, c(0,0,0,0,0,1,0,0)[i], pos=1)
+              text(200+sp, 9-i, c(10,10,100,1,17,4,700,10)[i], pos=1)
+            }
+            else{
+              points(as.numeric(trst3[i,c('m2', 'pred2')]) + 100 + sp, c(9-i, 9-i), pch=c(16,18), col=c('blue', 'forestgreen'))
+              points(as.numeric(trst3[i,c('lower2', 'upper2')]) + 100 + sp, c(9-i, 9-i), pch=c('(', ')'), col=c('blue', 'blue'))
+              text(trst3[i,'m2'] + 100 + sp, 9-i, trst4[i,'m2'], pos=3, col='blue', cex=0.8)
+              text(trst3[i,'pred2'] + 100 + sp, 9-i, trst4[i,'pred2'], pos=1, col='forestgreen', cex=0.8)
+              text(100+sp, 9-i, c(0,0,0,0,0,1,0,0)[i], pos=1)
+              text(200+sp, 9-i, c(10,10,100,1,17,4,700,10)[i], pos=1)
+            }
+          }
+          else{
+            points(as.numeric(trst3[i,c('m2', 'pred2')]) + 100 + sp, c(9-i, 9-i), pch=c(16,17), col=c('blue', 'red'))
+            points(as.numeric(trst3[i,c('lower2', 'upper2')]) + 100 + sp, c(9-i, 9-i), pch=c('(', ')'), col=c('blue', 'blue'))
+            text(trst3[i,'m2'] + 100 + sp, 9-i, trst4[i,'m2'], pos=3, col='blue', cex=0.8)
+            text(trst3[i,'pred2'] + 100 + sp, 9-i, trst4[i,'pred2'], pos=1, col='red', cex=0.8)
+            text(100+sp, 9-i, c(0,0,0,0,0,1,0,0)[i], pos=1)
+            text(200+sp, 9-i, c(10,10,100,1,17,4,700,10)[i], pos=1)
+          }
+        }
+      }
+      
+      axis(side=2, at=8:1, labels=c('Neck Pain', 'Arm Pain', 'NDI', 'EQ5D', 'mJOA', 'Patient Satisfaction', 'Blood Loss \n (ml)', 'Length of Hospital Stay \n (day)'), las=2, col='white', font=2, line=-2)
+      legend(x=130, y=2,  legend=c('QOD risk adjusted estimate (significantly different from site)','QOD risk adjusted estimate (no significant difference with site)',latexTranslate(tprac)), pch=c(17,18,16), col=c('red','forestgreen', 'blue'), bty='n', xpd=NA, ncol=1)
+      text(50, 8, '')
+      title(main=paste(tprac, ': Self Benchmark Patient Reported Outcomes and Utilization', sep=''))
+      text(50, 7.6, '3-Month Post-Surgery', pos=3)
+      text(150+sp, 7.6, '12-Month Post-Surgery', pos=3)
+      dev.off()
+      
+      # survival plot #
+      nsample <- sum(rtwdata$practice==tprac)
+      if (nsample>0) {
+        pnam <- paste('figs/cervical_' ,tprac, '_model2.pdf', sep='')
         pdf(pnam, width=6, height=6)
-        par(mar=c(5,4,4,2))
-        nsample <- sum(rtwdata$practice==tprac)
+        par(mar=c(5,4,4,2), mfrow=c(1,1))
         dt <- subset(rtwdata, practice==tprac)
         tmp <- summary(survfit(Surv(day, rtw.3m) ~ 1, data=dt))
         tmp2 <- tmp
@@ -554,18 +575,20 @@ data$rtw.3m[is.na(data$day)] <- NA
         tmp2$surv <- tmp$surv[!is.na(tmp$lower) & !is.na(tmp$upper)]
         tmp2$lower <- tmp$lower[!is.na(tmp$lower) & !is.na(tmp$upper)]
         tmp2$upper <- tmp$upper[!is.na(tmp$lower) & !is.na(tmp$upper)]
-        plot(tmp$time, 1-tmp$surv, type='n', xlim=c(0,150), ylim=c(0,1), xlab='Days Post-Surgery', ylab='Proportion of Return to Work')
+        plot(tmp$time, 1-tmp$surv, type='n', xlim=c(0,200), ylim=c(0,1), xlab='Days Post-Surgery', ylab='Proportion of Return to Work')
         polygon(c(tmp2$time, rev(tmp2$time)), c(1-tmp2$lower, rev(1-tmp2$upper)), col='grey80', border=NA)
         lines(tmp$time, 1-tmp$surv, type='s')
         lines(survs$time, 1-survs[[tprac]], type='s', col='blue')
-        title(main=paste(tprac, ': Self Benchmark Return to Work \n (N=', nsample, ')', sep=''))
-        legend('bottomright', bty='n', lty=1:1, col=c('black', 'blue'), legend=c('Observed', 'Expected'))
-        dev.off() 
+        title(main=paste(tprac, ': Self Benchmark Return to Work \n (N=', nsample, ')', sep=''), line=4.3)
+        legend('bottomright', bty='n', lty=1:1, col=c('black', 'blue'), legend=c(latexTranslate(tprac), 'QOD risk adjusted'))
+        dev.off()
+      } else {
+        print(tprac)
+      }
     }
 
-
-
-                                        # generate tables of predicted values #
+    #####################################################################
+    
     modrst2 <- vector('list', 0)
     for (i in 1:np) {
         tprac <- pracs1[i]

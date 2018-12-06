@@ -353,7 +353,7 @@ N-12 is the number of non-missing values at 12 month.  \\\\ Numbers after percen
 
     cat("\\begin{figure}[!htbp]",
         "\\begin{center}",
-        "\\includegraphics[width=9cm]{", paste('figs/', pracs[k],'_model2.pdf', sep=''), "}",
+        "\\includegraphics[width=9cm]{", paste('figs/cervical_', pracs[k],'_model2.pdf', sep=''), "}",
         "\\caption[Return to Work]{", latexTranslate(pracs[k]), ": Kaplan-meier estimates of site return to work vs. risk adjusted QOD curve based on a multivariable Cox proportional hazards model. Shaded area indicates 95$\\%$ CI of Kaplan-meier estimates. Controlling for your patient characteristics, if the site is above the risk adjusted QOD curve, then your patients are returning to work sooner than expected based on QOD as a whole. If the observed is below the risk adjusted QOD curve, then your patients are returning to work later than expected based on QOD as a whole.}",
         "\\end{center}",
         "\\end{figure}", sep='')
