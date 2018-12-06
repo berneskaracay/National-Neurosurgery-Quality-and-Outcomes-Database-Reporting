@@ -163,7 +163,7 @@ rownames(tab7b) <- c("\\underline{Posterior laminectomy only}", "~~~Estimated Bl
     data2co_5 <- subset(data2co, !is.na(newcat5))
 
     
-    tab9a <- tab9fun(ptab=cbind(tab9pfun(datas=data2co), tab9pfun(datas=data2o)), datas=list(data2co, data2o))
+    tab9a_0 <- tab9fun(ptab=cbind(tab9pfun(datas=data2co), tab9pfun(datas=data2o)), datas=list(data2co, data2o))
     tab9b <- tab9fun(ptab=cbind(tab9pfun(datas=data2co_1), tab9pfun(datas=data2o_1)), datas=list(data2co_1, data2o_1))
     tab9c <- tab9fun(ptab=cbind(tab9pfun(datas=data2co_2), tab9pfun(datas=data2o_2)), datas=list(data2co_2, data2o_2))
     tab9d <- tab9fun(ptab=cbind(tab9pfun(datas=data2co_3), tab9pfun(datas=data2o_3)), datas=list(data2co_3, data2o_3))
@@ -173,11 +173,16 @@ rownames(tab7b) <- c("\\underline{Posterior laminectomy only}", "~~~Estimated Bl
 
 
 <<echo=FALSE, results=hide>>=
+tab9a <- rbind(rep('',12), tab9a_0)      
+    
+rownames(tab9a) <- c('\\underline{Overall}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D','~~~mJOA', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)')    
+    
+    
 tab9 <- rbind(rep('',12), tab9b[-6,], rep('',12), tab9c, rep('',12),tab9d[-6,], rep('',12),tab9e[-6,], rep('',12),tab9f[-6,])
 rownames(tab9) <- c('\\underline{Posterior laminectomy only}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)', '\\underline{Posterior laminectomy and fusion}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~mJOA', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)', '\\underline{Posterior forminotomy only}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)', '\\underline{ACDF only}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)', '\\underline{Corpectomy only}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)')
 
 plotname1 <- paste('figs/', pracs[k], "plot.pdf", sep="")
-plot12mfun2(datas=data1c, pltnam=plotname1, ptab=cbind(tab8pfun(datas=data1c), tab9pfun(datas=data1c)))
+plotfun2(datas=data1c, pltnam=plotname1, ptab=cbind(tab9pfun(datas=data1c),tab9pfun(datas=data1)))
 @
 \clearpage
 
@@ -290,7 +295,23 @@ latex(tab7b, title="", caption="Utilization by Surgical Approach for Patients wi
 @
 \clearpage
 
+<<echo=FALSE, results=tex>>=
+    latex(tab9a, title="", caption="Outcomes at Baseline, 3 Month and 12 Month for Patients with 12-month Follow-up", where="!h", size="footnotesize", col.just=c("r", "c","r", "c","r","c", "r", "c","r", "c","r", "c"), colheads=rep(c("N-B", "Baseline","N-3", "3-Month","N-12", "12-Month"),2), cgroup=c(latexTranslate(pracs[k]), "QOD Total"), file='', lines.page=25, longtable=TRUE, landscape=TRUE, insert.bottom =mlCap("${\\tiny a}$ b ${\\tiny c}$ represent the lower quantile a, the median b, and the upper quartile c.  \\\\ $x\\pm s$ represents $\\bar{X}\\pm 1$ Standard Deviation. \\\\  N-B is the number of non-missing values at baseline. \\\\ N-3 is the number of non-missing values at 3 month. \\\\
+N-12 is the number of non-missing values at 12 month."))
 
+@
+\clearpage
+<<echo=FALSE, results=tex>>=
+
+    cat("\\begin{figure}[!htbp]",
+        "\\begin{center}",
+        "\\includegraphics[width=15cm]{", plotname1, "}",
+        "\\caption[Patient Reported Outcomes]{The graph shows the means and standard deviations at the three time points.}",
+        "\\end{center}",
+        "\\end{figure}\n", sep='')
+
+@
+\clearpage
 
 <<echo=FALSE, results=tex>>=
     latex(tab9, title="", caption="Outcomes at Baseline, 3 Month and 12 Month for Patients with 12-month Follow-up", where="!h", size="footnotesize", col.just=c("r", "c","r", "c","r","c", "r", "c","r", "c","r", "c"), colheads=rep(c("N-B", "Baseline","N-3", "3-Month","N-12", "12-Month"),2), cgroup=c(latexTranslate(pracs[k]), "QOD Total"), file='', lines.page=25, longtable=TRUE, landscape=TRUE, insert.bottom =mlCap("${\\tiny a}$ b ${\\tiny c}$ represent the lower quantile a, the median b, and the upper quartile c.  \\\\ $x\\pm s$ represents $\\bar{X}\\pm 1$ Standard Deviation. \\\\  N-B is the number of non-missing values at baseline. \\\\ N-3 is the number of non-missing values at 3 month. \\\\
@@ -298,17 +319,7 @@ N-12 is the number of non-missing values at 12 month.  \\\\ Numbers after percen
 
 @
 
-\clearpage
-<<echo=FALSE, results=tex>>=
 
-    cat("\\begin{figure}[!htbp]",
-        "\\begin{center}",
-        "\\includegraphics[width=14cm]{", plotname1, "}",
-        "\\caption[Patient Reported Outcomes]{The graph shows the means and standard deviations at the three time points.}",
-        "\\end{center}",
-        "\\end{figure}\n", sep='')
-
-@
 \clearpage
 \begin{landscape}
 <<echo=FALSE, results=tex>>=

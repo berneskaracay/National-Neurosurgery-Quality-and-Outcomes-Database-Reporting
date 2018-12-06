@@ -75,7 +75,7 @@ data$sub_practice <- sub("^([^*]+)(\\*(.+))?_CP[0-9]{4}$", "\\3", data$pt_study_
 data$pt_id <- sub(".*_", "", as.character(data$pt_study_id))
 data$surgeon <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surgeon))
 data$surg_location <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surg_location))
-liste=c("Cornell","Semmes","Cornell","Vanderbilt","Duke","U_Utah","UVA")
+liste=c("Semmes","Vanderbilt","Duke")
 data <- subset(data, practice %in% liste)
 # merge the data with index #
 data_follow_up <- merge(data, d_follow_up[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month',"usefull3month","usefull12month")], by='pt_study_id', all.y=TRUE)
@@ -1283,6 +1283,7 @@ tab7bfun <- function(datas) {
   return(M)
 }
 
+
   
 
 tab9pfun <- function(datas) {
@@ -1332,14 +1333,29 @@ tab9fun <- function(ptab, datas) {
   return(M)
 }
 
+
+
+### plot functions ###
 plotfun1 <- function(x, yli, yma, yla, mai, yll) {
-  plot(1:10, 1:10, xlim=c(1.5,7), ylim=yli, type="n", axes=FALSE, xlab="Time after Surgery", ylab=yla, main=mai)
-  axis(side=1, at=c(2,4,7), labels=c("Baseline", "3-month", "12-month"))
+  plot(1:10, 1:10, xlim=c(1.5,8), ylim=yli, type="n", axes=FALSE, xlab="Time after Surgery", ylab=yla, main=mai)
+  legend(x=9, y=0,legend=c('QOD',latexTranslate(pracs[k])), pch=c(20,8), col=c('red','blue'), bty='n', xpd=NA, ncol=1)
+  axis(side=1, at=c(2,5,8), labels=paste(c("Baseline", "3-month", "12-month"), "\n N=", c(x[1], x[4], x[7]), sep=''), col='white')
   axis(side=2, at=yma, las=2, labels=yll)
-  points(c(2,4), x[c(2,4)], pch=19)
-  arrows(2, x[2]-x[3], 2, x[2]+x[3], angle=90, code=3, length=0.05)
-  arrows(4, x[4]-x[5], 4, x[4]+x[5], angle=90, code=3, length=0.05)
-  segments(2, x[2], 4, x[4])
+  
+  if (x[1]>4) {
+    arrows(2, x[2]-x[3], 2, x[2]+x[3], angle=90, code=3, length=0.05)
+    arrows(5, x[5]-x[6], 5, x[5]+x[6], angle=90, code=3, length=0.05)
+    segments(2, x[2], 5, x[5])
+    points(c(2,5), x[c(11,14)],  pch=c(20,20), col=c('red','red'), cex=3)
+    points(c(2,5), x[c(2,5)],  pch=c(8,8), col=c('blue','blue'), cex=1)
+  }
+  
+  if (x[7]>4) {
+    arrows(8, x[8]-x[9], 8, x[8]+x[9], angle=90, code=3, length=0.05)
+    segments(5, x[5], 8, x[8])
+    points(c(8), x[c(17)], pch=c(20), col=c('red'), cex=3)
+    points(c(8), x[c(8)], pch=c(8), col=c('blue'), cex=1)
+  }
 }
 
 plotfun1b <- function(dat, iv, xyli, xyma, xla, yla, idline, mai) {
@@ -1356,24 +1372,13 @@ plotfun1b <- function(dat, iv, xyli, xyma, xla, yla, idline, mai) {
 
 
 plotfun2 <- function(datas, pltnam, ptab) {
-  pdf(pltnam, width=7.3, height=15.5)
-  par(mfrow=c(5,2), mar=c(5,10,4,0))
+  pdf(pltnam, width=8, height=12)
+  par(mfrow=c(3,2), mar=c(7,10,6,7))
   plotfun1(x=ptab[1,], mai="Neck Pain", yli=c(0,10), yma=c(0,2,4,6,8,10), yla="Pain Score", yll=c("  \n 0\n No Pain", 2,4,6,8, "  \n 10\n Worst Pain"))
-  plotfun1b(dat=datas, iv=1, xyli=c(0,10), xyma=c(0,2,4,6,8,10), xla="Pre-surgery Pain Score", yla="3-month Pain Score", idline=c(0,0,10,10), mai="Neck Pain")
-  
   plotfun1(x=ptab[2,], mai="Arm Pain", yli=c(0,10), yma=c(0,2,4,6,8,10), yla="Pain Score", yll=c("  \n 0\n No Pain", 2,4,6,8, "  \n 10\n Worst Pain"))
-  plotfun1b(dat=datas, iv=2, xyli=c(0,10), xyma=c(0,2,4,6,8,10), xla="Pre-surgery Pain Score", yla="3-month Pain Score", idline=c(0,0,10,10), mai="Arm Pain")
-  
   plotfun1(x=ptab[3,], mai="Neck Disability Index", yli=c(0,100), yma=c(0,20,40,60,80,100), yla="NDI", yll=c("  \n 0\n No Impairment", 20,40,60,80, "  \n 100\n Functional Impairment"))
-  plotfun1b(dat=datas, iv=3, xyli=c(0,100), xyma=c(0,20,40,60,80,100), xla="Pre-surgery NDI", yla="3-month NDI", idline=c(0,0,100,100), mai="Neck Disability Index")
-  
   plotfun1(x=ptab[4,], mai="Euroqual Quality of Life", yli=c(-0.1, 1.0), yma=c(-0.1, 0, 0.2, 0.4, 0.6, 0.8, 1.0), yla="EQ-5D", yll=c("  \n -0.1\n Worst Health", 0,0.2,0.4,0.6,0.8, "  \n 1.0\n Best Health"))
-  plotfun1b(dat=datas, iv=4, xyli=c(-0.1,1.0), xyma=c(-0.1, 0, 0.2, 0.4, 0.6, 0.8, 1.0), xla="Pre-surgery EQ-5D", yla="3-month EQ-5D", idline=c(-0.1,-0.1,1,1), mai="Euroqual Quality of Life")
-  
   plotfun1(x=ptab[5,], mai="mJOA", yli=c(0,17), yma=c(0,3,6,9,12,14,17), yla="mJOA", yll=c("  \n 0\n Severe", 3,6,9,12,14, "  \n 17\n Mild"))
-  plotfun1b(dat=datas, iv=5, xyli=c(0,17), xyma=c(0,3,6,9,12,14,17), xla="Pre-surgery mJOA", yla="3-month mJOA", idline=c(0,0,17,17), mai="mJOA")
-  
-  
   dev.off()
 }
 
@@ -1425,7 +1430,7 @@ plot12mfun1c <- function(dat, iv, xyli, xyma, xla, yla, idline, mai) {
 }
 
 plot12mfun2 <- function(datas, pltnam, ptab) {
-  pdf(pltnam, width=6, height=16)
+  pdf(pltnam, width=6, height=17)
   par(mfrow=c(4,1), mar=c(4,9.3,4,11))
   plot12mfun1(x=ptab[1,], mai="Neck Pain", yli=c(0,10), yma=c(0,2,4,6,8,10), yla="Pain Score", yll=c("  \n 0\n No Pain", 2,4,6,8, "  \n 10\n Worst Pain"))
   plot12mfun1(x=ptab[2,], mai="Arm Pain", yli=c(0,10), yma=c(0,2,4,6,8,10), yla="Pain Score", yll=c("  \n 0\n No Pain", 2,4,6,8, "  \n 10\n Worst Pain"))
