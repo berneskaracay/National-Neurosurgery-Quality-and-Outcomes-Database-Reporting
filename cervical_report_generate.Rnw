@@ -148,20 +148,6 @@ rownames(tab7) <- c("Mortality", "~~~Hospital Mortality", "~~~30-day Mortality",
 tab7b <- tab7bfun(datas=datas)
 rownames(tab7b) <- c("\\underline{Posterior laminectomy only}", "~~~Estimated Blood Loss (cc)", "~~~Duration of Surgery (min)", "~~~Arthrodesis", "~~~Hospital Length of Stay (days)", "~~~30-day Return to OR", "~~~30-day Hospital Readmission", "~~~3-month Revision Surgery", "~~~3-month Hospital Readmission", "\\underline{Posterior laminectomy and fusion}", "~~~Estimated Blood Loss (cc)", "~~~Duration of Surgery (min)", "~~~Arthrodesis", "~~~Hospital Length of Stay (days)", "~~~30-day Return to OR", "~~~30-day Hospital Readmission", "~~~3-month Revision Surgery", "~~~3-month Hospital Readmission", "\\underline{Posterior foraminotomy only}", "~~~Estimated Blood Loss (cc)", "~~~Duration of Surgery (min)", "~~~Arthrodesis", "~~~Hospital Length of Stay (days)", "~~~30-day Return to OR", "~~~30-day Hospital Readmission", "~~~3-month Revision Surgery", "~~~3-month Hospital Readmission", "\\underline{ACDF only}", "~~~Estimated Blood Loss (cc)", "~~~Duration of Surgery (min)", "~~~Arthrodesis", "~~~Hospital Length of Stay (days)", "~~~30-day Return to OR", "~~~30-day Hospital Readmission", "~~~3-month Revision Surgery", "~~~3-month Hospital Readmission", "\\underline{Corpectomy only}", "~~~Estimated Blood Loss (cc)", "~~~Duration of Surgery (min)", "~~~Arthrodesis", "~~~Hospital Length of Stay (days)", "~~~30-day Return to OR", "~~~30-day Hospital Readmission", "~~~3-month Revision Surgery", "~~~3-month Hospital Readmission")
 
-tab8a <- tab8fun(ptab=cbind(tab8pfun(datas=data1c), tab8pfun(datas=data1)), datas=list(data1c, data1))
-tab8b <- tab8fun(ptab=cbind(tab8pfun(datas=subset(data1c, !is.na(newcat1))), tab8pfun(datas=subset(data1, !is.na(newcat1)))), datas=list(subset(data1c, !is.na(newcat1)), subset(data1, !is.na(newcat1))))
-tab8c <- tab8fun(ptab=cbind(tab8pfun(datas=subset(data1c, !is.na(newcat2))), tab8pfun(datas=subset(data1, !is.na(newcat2)))), datas=list(subset(data1c, !is.na(newcat2)), subset(data1, !is.na(newcat2))))
-tab8d <- tab8fun(ptab=cbind(tab8pfun(datas=subset(data1c, !is.na(newcat3))), tab8pfun(datas=subset(data1, !is.na(newcat3)))), datas=list(subset(data1c, !is.na(newcat3)), subset(data1, !is.na(newcat3))))
-tab8e <- tab8fun(ptab=cbind(tab8pfun(datas=subset(data1c, !is.na(newcat4))), tab8pfun(datas=subset(data1, !is.na(newcat4)))), datas=list(subset(data1c, !is.na(newcat4)), subset(data1, !is.na(newcat4))))
-tab8f <- tab8fun(ptab=cbind(tab8pfun(datas=subset(data1c, !is.na(newcat5))), tab8pfun(datas=subset(data1, !is.na(newcat5)))), datas=list(subset(data1c, !is.na(newcat5)), subset(data1, !is.na(newcat5))))
-@
-
-
-<<echo=FALSE, results=hide>>=
-tab8 <- rbind(rep('',6), tab8b[-6,], rep('',6), tab8c, rep('',6),tab8d[-6,], rep('',6),tab8e[-6,], rep('',6),tab8f[-6,])
-rownames(tab8) <- c('\\underline{Posterior laminectomy only}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)', '\\underline{Posterior laminectomy and fusion}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~mJOA', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)', '\\underline{Posterior foraminotomy only}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)', '\\underline{ACDF only}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)', '\\underline{Corpectomy only}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)')
-
-
 
     data2o_1 <- subset(data2o, !is.na(newcat1))
     data2o_2 <- subset(data2o, !is.na(newcat2))

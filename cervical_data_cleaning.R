@@ -1283,46 +1283,6 @@ tab7bfun <- function(datas) {
   return(M)
 }
 
-
-## baseline and 3m scores ##
-tab8pfun <- function(datas) {
-  M <- matrix(NA, nrow=5, ncol=5)
-  vars1 <- c("neck_pain_vas", "arm_pain_vas1", "ndiscore", "eq5dscore", "joa")
-  vars2 <- paste(c("neck_pain_vas", "arm_pain_vas1", "ndiscore", "eq5dscore", "joa"), ".3m", sep="")
-  for (i in 1:5) {
-    tmp <- datas[!is.na(datas[[vars1[i]]]) & !is.na(datas[[vars2[i]]]),]
-    
-    M[i,1] <- nrow(tmp)
-    if (nrow(tmp)>0) {
-    M[i,2] <- mean(tmp[[vars1[i]]])
-    M[i,3] <- sd(tmp[[vars1[i]]])
-    M[i,4] <- mean(tmp[[vars2[i]]])
-    M[i,5] <- sd(tmp[[vars2[i]]])
-    }
-  }
-  return(M)
-}
-
-
-tab8fun <- function(ptab, datas) {
-  M <- matrix("", nrow=8, ncol=6)
-  M[c(2,3,4,5,6),c(1,4)] <- ptab[,c(1,6)]
-  digs <- c(1,1,1,1,2)
-  for (i in 1:5){
-    if (ptab[i,1] > 0) {
-    M[(i+1), 2] <- paste(format(round(ptab[i,2], digs[i]), nsmall=digs[i]), "$\\pm$", format(round(ptab[i,3], digs[i]), nsmall=digs[i]), sep="")
-    M[(i+1), 3] <- paste(format(round(ptab[i,4], digs[i]), nsmall=digs[i]), "$\\pm$", format(round(ptab[i,5], digs[i]), nsmall=digs[i]), sep="")
-    }
-    M[(i+1), 5] <- paste(format(round(ptab[i,7], digs[i]), nsmall=digs[i]), "$\\pm$", format(round(ptab[i,8], digs[i]), nsmall=digs[i]), sep="")
-    M[(i+1), 6] <- paste(format(round(ptab[i,9], digs[i]), nsmall=digs[i]), "$\\pm$", format(round(ptab[i,10], digs[i]), nsmall=digs[i]), sep="")
-  }
-  
-  M[7,1:3] <- catfun2(ds=datas[[1]], vars='return_to_work.3m')
-  M[7,4:6] <- catfun2(ds=datas[[2]], vars='return_to_work.3m')
-  M[8,1:3] <- catfun2(ds=datas[[1]], vars='pt_satisfaction_index.3m')
-  M[8,4:6] <- catfun2(ds=datas[[2]], vars='pt_satisfaction_index.3m')
-  return(M)
-}
   
 
 tab9pfun <- function(datas) {
