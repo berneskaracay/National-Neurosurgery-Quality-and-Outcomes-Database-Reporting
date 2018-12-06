@@ -26,7 +26,7 @@ library(Hmisc)
 library(rms)
 library(MASS)
 library(survival)
-
+library(plyr)
 #################################################
 #### organize data set and prepare variables ####
 #################################################
@@ -675,6 +675,28 @@ catfun2 <- function(ds, vars) {
   return(M)
 }
 
+catfun2a <- function(ds, vars) {
+  n <- length(vars)
+  M <- rep('',4)
+  dt3 <- ds[!is.na(ds[[vars[1]]]), ]
+  dt12 <- ds[!is.na(ds[[vars[2]]]), ]
+  M[1] <- nrow(dt3)
+  M[3] <- nrow(dt12)
+  if (nrow(dt3) > 0) {
+    tmp <- dt3[[vars[1]]]
+    num <- sum(tmp %in% c(1))
+    den <- nrow(dt3)
+    pct <- format(round(100*num/den,1), nsmall=1) 
+    M[2] <- paste(pct, "$\\%$ (", num, ")", sep="")
+    tmp <- dt12[[vars[2]]]
+    num <- sum(tmp %in% c(1))
+    den <- nrow(dt12)
+    pct <- format(round(100*num/den,1), nsmall=1) 
+    M[4] <- paste(pct, "$\\%$ (", num, ")", sep="")
+  }
+  
+  return(M)
+}
 
 
 # continuous variable #
@@ -1343,10 +1365,10 @@ tab9fun <- function(ptab, datas) {
     M[(i+1), 12] <- paste(format(round(ptab[i,17], digs[i]), nsmall=digs[i]), "$\\pm$", format(round(ptab[i,18], digs[i]), nsmall=digs[i]), sep="")
   }
   
-  M[7,c(3,4,5,6)] <- catfun2(ds=datas[[1]], vars=c('return_to_work.3m','return_to_work.12m'))
-  M[7,c(9,10,11,12)] <- catfun2(ds=datas[[2]], vars=c('return_to_work.3m','return_to_work.12m'))
-  M[8,c(3,4,5,6)] <- catfun2(ds=datas[[1]], vars=c('pt_satisfaction_index.3m','pt_satisfaction_index.12m'))
-  M[8,c(9,10,11,12)] <- catfun2(ds=datas[[2]], vars=c('pt_satisfaction_index.3m','pt_satisfaction_index.12m'))
+  M[7,c(3,4,5,6)] <- catfun2a(ds=datas[[1]], vars=c('return_to_work.3m','return_to_work.12m'))
+  M[7,c(9,10,11,12)] <- catfun2a(ds=datas[[2]], vars=c('return_to_work.3m','return_to_work.12m'))
+  M[8,c(3,4,5,6)] <- catfun2a(ds=datas[[1]], vars=c('pt_satisfaction_index.3m','pt_satisfaction_index.12m'))
+  M[8,c(9,10,11,12)] <- catfun2a(ds=datas[[2]], vars=c('pt_satisfaction_index.3m','pt_satisfaction_index.12m'))
   return(M)
 }
 
