@@ -75,8 +75,8 @@ data$sub_practice <- sub("^([^*]+)(\\*(.+))?_CP[0-9]{4}$", "\\3", data$pt_study_
 data$pt_id <- sub(".*_", "", as.character(data$pt_study_id))
 data$surgeon <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surgeon))
 data$surg_location <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surg_location))
-#liste=c("Cornell","Semmes","Cornell","Vanderbilt","Duke","U_Utah","UVA")
-#data <- subset(data, practice %in% liste)
+liste=c("Cornell","Semmes","Cornell","Vanderbilt","Duke","U_Utah","UVA")
+data <- subset(data, practice %in% liste)
 # merge the data with index #
 data_follow_up <- merge(data, d_follow_up[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month',"usefull3month","usefull12month")], by='pt_study_id', all.y=TRUE)
 
@@ -1304,20 +1304,24 @@ tab8fun <- function(ptab, datas) {
   
 
 tab9pfun <- function(datas) {
-  M <- matrix(NA, nrow=5, ncol=7)
+  M <- matrix(NA, nrow=5, ncol=9)
   vars1 <- c("neck_pain_vas", "arm_pain_vas1", "ndiscore", "eq5dscore", "joa")
   vars2 <- paste(c("neck_pain_vas", "arm_pain_vas1", "ndiscore", "eq5dscore", "joa"), ".3m", sep="")
   vars3 <- paste(c("neck_pain_vas", "arm_pain_vas1", "ndiscore", "eq5dscore", "joa"), ".12m", sep="")
   for (i in 1:5) {
-    tmp <- datas[!is.na(datas[[vars1[i]]]) & !is.na(datas[[vars2[i]]]) & !is.na(datas[[vars3[i]]]),]
-    M[i,1] <- nrow(tmp)
-    if (nrow(tmp)>0) {
-      M[i,2] <- mean(tmp[[vars1[i]]])
-      M[i,3] <- sd(tmp[[vars1[i]]])
-      M[i,4] <- mean(tmp[[vars2[i]]])
-      M[i,5] <- sd(tmp[[vars2[i]]])
-      M[i,6] <- mean(tmp[[vars3[i]]])
-      M[i,7] <- sd(tmp[[vars3[i]]])
+    tmp_12 <- subset(datas, analyzed_12month)
+    tmp_3 <- subset(datas, analyzed_3month)
+    tmp_base<- datas
+    M[i,1] <- sum(!is.na(tmp_base[,vars1[i]]))
+    M[i,4] <- sum(!is.na(tmp_3[,vars2[i]]))
+    M[i,7] <- sum(!is.na(tmp_12[,vars3[i]]))
+    M[i,2] <- mean(tmp_base[,vars1[i]], na.rm = TRUE)
+    M[i,3] <- sd(tmp_base[,vars1[i]], na.rm = TRUE)
+    M[i,5] <- mean(tmp_3[,vars2[i]], na.rm = TRUE)
+    M[i,6] <- sd(tmp_3[,vars2[i]], na.rm = TRUE)
+    if (nrow(tmp_12)>0) {
+      M[i,8] <- mean(tmp_12[,vars3[i]], na.rm = TRUE)
+      M[i,9] <- sd(tmp_12[,vars3[i]], na.rm = TRUE)
     }
   }
   return(M)
@@ -1325,24 +1329,24 @@ tab9pfun <- function(datas) {
 
 
 tab9fun <- function(ptab, datas) {
-  M <- matrix("", nrow=8, ncol=8)
-  M[c(2,3,4,5,6),c(1,5)] <- ptab[,c(1,8)]
+  M <- matrix("", nrow=8, ncol=12)
+  M[c(2,3,4,5,6),c(1,3,5,7,9,11)] <- ptab[,c(1,4,7,10,13,16)]
   digs <- c(1,1,1,1,2)
   for (i in 1:5){
     if (ptab[i,1] > 0) {
       M[(i+1), 2] <- paste(format(round(ptab[i,2], digs[i]), nsmall=digs[i]), "$\\pm$", format(round(ptab[i,3], digs[i]), nsmall=digs[i]), sep="")
-      M[(i+1), 3] <- paste(format(round(ptab[i,4], digs[i]), nsmall=digs[i]), "$\\pm$", format(round(ptab[i,5], digs[i]), nsmall=digs[i]), sep="")
-      M[(i+1), 4] <- paste(format(round(ptab[i,6], digs[i]), nsmall=digs[i]), "$\\pm$", format(round(ptab[i,7], digs[i]), nsmall=digs[i]), sep="")
+      M[(i+1), 4] <- paste(format(round(ptab[i,5], digs[i]), nsmall=digs[i]), "$\\pm$", format(round(ptab[i,6], digs[i]), nsmall=digs[i]), sep="")
+      M[(i+1), 6] <- paste(format(round(ptab[i,8], digs[i]), nsmall=digs[i]), "$\\pm$", format(round(ptab[i,9], digs[i]), nsmall=digs[i]), sep="")
     }
-    M[(i+1), 6] <- paste(format(round(ptab[i,9], digs[i]), nsmall=digs[i]), "$\\pm$", format(round(ptab[i,10], digs[i]), nsmall=digs[i]), sep="")
-    M[(i+1), 7] <- paste(format(round(ptab[i,11], digs[i]), nsmall=digs[i]), "$\\pm$", format(round(ptab[i,12], digs[i]), nsmall=digs[i]), sep="")
-    M[(i+1), 8] <- paste(format(round(ptab[i,13], digs[i]), nsmall=digs[i]), "$\\pm$", format(round(ptab[i,14], digs[i]), nsmall=digs[i]), sep="")
+    M[(i+1), 8] <- paste(format(round(ptab[i,11], digs[i]), nsmall=digs[i]), "$\\pm$", format(round(ptab[i,12], digs[i]), nsmall=digs[i]), sep="")
+    M[(i+1), 10] <- paste(format(round(ptab[i,14], digs[i]), nsmall=digs[i]), "$\\pm$", format(round(ptab[i,15], digs[i]), nsmall=digs[i]), sep="")
+    M[(i+1), 12] <- paste(format(round(ptab[i,17], digs[i]), nsmall=digs[i]), "$\\pm$", format(round(ptab[i,18], digs[i]), nsmall=digs[i]), sep="")
   }
   
-  M[7,1:4] <- catfun2(ds=datas[[1]], vars=c('return_to_work.3m','return_to_work.12m'))
-  M[7,5:8] <- catfun2(ds=datas[[2]], vars=c('return_to_work.3m','return_to_work.12m'))
-  M[8,1:4] <- catfun2(ds=datas[[1]], vars=c('pt_satisfaction_index.3m','pt_satisfaction_index.12m'))
-  M[8,5:8] <- catfun2(ds=datas[[2]], vars=c('pt_satisfaction_index.3m','pt_satisfaction_index.12m'))
+  M[7,c(3,4,5,6)] <- catfun2(ds=datas[[1]], vars=c('return_to_work.3m','return_to_work.12m'))
+  M[7,c(9,10,11,12)] <- catfun2(ds=datas[[2]], vars=c('return_to_work.3m','return_to_work.12m'))
+  M[8,c(3,4,5,6)] <- catfun2(ds=datas[[1]], vars=c('pt_satisfaction_index.3m','pt_satisfaction_index.12m'))
+  M[8,c(9,10,11,12)] <- catfun2(ds=datas[[2]], vars=c('pt_satisfaction_index.3m','pt_satisfaction_index.12m'))
   return(M)
 }
 
@@ -1394,16 +1398,24 @@ plotfun2 <- function(datas, pltnam, ptab) {
 
 plot12mfun1 <- function(x, yli, yma, yla, mai, yll) {
   plot(1:10, 1:10, xlim=c(1.5,8), ylim=yli, type="n", axes=FALSE, xlab="Time after Surgery", ylab=yla, main=mai)
-  axis(side=1, at=c(2,4,7), labels=c("Baseline", "3-month", "12-month"))
+  legend(x=9, y=0,legend=c('QOD',latexTranslate(pracs[k])), pch=c(20,8), col=c('red','blue'), bty='n', xpd=NA, ncol=1)
+  axis(side=1, at=c(2,5,8), labels=paste(c("Baseline", "3-month", "12-month"), "\n N=", c(x[1], x[4], x[7]), sep=''), col='white')
   axis(side=2, at=yma, las=2, labels=yll)
-  points(c(2,4), x[c(2,4)], pch=19)
-  arrows(2, x[2]-x[3], 2, x[2]+x[3], angle=90, code=3, length=0.05)
-  arrows(4, x[4]-x[5], 4, x[4]+x[5], angle=90, code=3, length=0.05)
-  segments(2, x[2], 4, x[4])
   
-  points(7, x[11], pch=19)
-  arrows(7, x[11]-x[12], 7, x[11]+x[12], angle=90, code=3, length=0.05)
-  segments(4, x[4], 7, x[11])
+  if (x[1]>4) {
+    arrows(2, x[2]-x[3], 2, x[2]+x[3], angle=90, code=3, length=0.05)
+    arrows(5, x[5]-x[6], 5, x[5]+x[6], angle=90, code=3, length=0.05)
+    segments(2, x[2], 5, x[5])
+    points(c(2,5), x[c(11,14)],  pch=c(20,20), col=c('red','red'), cex=3)
+    points(c(2,5), x[c(2,5)],  pch=c(8,8), col=c('blue','blue'), cex=1)
+  }
+  
+  if (x[7]>4) {
+    arrows(8, x[8]-x[9], 8, x[8]+x[9], angle=90, code=3, length=0.05)
+    segments(5, x[5], 8, x[8])
+    points(c(8), x[c(17)], pch=c(20), col=c('red'), cex=3)
+    points(c(8), x[c(8)], pch=c(8), col=c('blue'), cex=1)
+  }
 }
 
 plot12mfun1b <- function(dat, iv, xyli, xyma, xla, yla, idline, mai) {
@@ -1446,34 +1458,6 @@ plot12mfun2 <- function(datas, pltnam, ptab) {
 
 ## only for site with >20 12m followup ##
 
-
-if(length(pracs1) > 0L) {
-  load('patient_cervical_index.rda')
-  n <- nrow(d)
-  d$practice <- sub("^([^*]+)(\\*(.+))?_CP[0-9]{4}$", "\\1", d$pt_study_id)
-  d$sub_practice <- sub("^([^*]+)(\\*(.+))?_CP[0-9]{4}$", "\\3", d$pt_study_id)
-  d <- subset(d, practice %in% pracs1)
-  dfp <- aggregate(cbind(usefull3month, usefull12month, analysis3month, analysis12month) ~ practice, FUN=sum, data=d)
-  colnames(dfp) <- c('practice', 'x3m', 'x12m', 'y3m', 'y12m')
-  ##########Ben ekledim#################
-  dfp$QOD_3base<-sum(dfp$x3m,na.rm = FALSE)
-  dfp$QOD_12base<-sum(dfp$x12m,na.rm = FALSE)
-  dfp$QOD_3m<-sum(dfp$y3m,na.rm = FALSE)
-  dfp$QOD_12m<-sum(dfp$y12m,na.rm = FALSE)
-  dfp$qod_fu3m <- round(dfp$QOD_3m/dfp$QOD_3base,2)
-  dfp$qod_fu12m <-round(dfp$QOD_12m/dfp$QOD_12base,2)
-  ################
-  dfp$fu3m <-0
-  dfp$fu12m <-0
-  dfp$fu3m <- round(dfp$y3m/dfp$x3m,2)
-  dfp$fu12m <- round(dfp$y12m/dfp$x12m,2)
-  dfp$fu <- round(dfp$fu3m + dfp$fu12m,2)
-  dfp <- dfp[order(dfp$fu),]
-  nm <- nrow(dfp)
-  dfp$center <- nm:1
-  num.min <- min(dfp$x12m)
-  num.max <- max(dfp$x3m)
-}
 
 
 ## only for site with >20 12m followup ##

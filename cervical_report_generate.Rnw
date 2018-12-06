@@ -162,17 +162,32 @@ tab8 <- rbind(rep('',6), tab8b[-6,], rep('',6), tab8c, rep('',6),tab8d[-6,], rep
 rownames(tab8) <- c('\\underline{Posterior laminectomy only}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)', '\\underline{Posterior laminectomy and fusion}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~mJOA', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)', '\\underline{Posterior foraminotomy only}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)', '\\underline{ACDF only}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)', '\\underline{Corpectomy only}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)')
 
 
-tab9a <- tab9fun(ptab=cbind(tab9pfun(datas=data2c), tab9pfun(datas=data2)), datas=list(data2c, data2))
-tab9b <- tab9fun(ptab=cbind(tab9pfun(datas=subset(data2c, !is.na(newcat1))), tab9pfun(datas=subset(data2, !is.na(newcat1)))), datas=list(subset(data2c, !is.na(newcat1)), subset(data2, !is.na(newcat1))))
-tab9c <- tab9fun(ptab=cbind(tab9pfun(datas=subset(data2c, !is.na(newcat2))), tab9pfun(datas=subset(data2, !is.na(newcat2)))), datas=list(subset(data2c, !is.na(newcat2)), subset(data2, !is.na(newcat2))))
-tab9d <- tab9fun(ptab=cbind(tab9pfun(datas=subset(data2c, !is.na(newcat3))), tab9pfun(datas=subset(data2, !is.na(newcat3)))), datas=list(subset(data2c, !is.na(newcat3)), subset(data2, !is.na(newcat3))))
-tab9e <- tab9fun(ptab=cbind(tab9pfun(datas=subset(data2c, !is.na(newcat4))), tab9pfun(datas=subset(data2, !is.na(newcat4)))), datas=list(subset(data2c, !is.na(newcat4)), subset(data2, !is.na(newcat4))))
-tab9f <- tab9fun(ptab=cbind(tab9pfun(datas=subset(data2c, !is.na(newcat5))), tab9pfun(datas=subset(data2, !is.na(newcat5)))), datas=list(subset(data2c, !is.na(newcat5)), subset(data2, !is.na(newcat5))))
+
+    data2o_1 <- subset(data2o, !is.na(newcat1))
+    data2o_2 <- subset(data2o, !is.na(newcat2))
+    data2o_3 <- subset(data2o, !is.na(newcat3))
+    data2o_4 <- subset(data2o, !is.na(newcat4))
+    data2o_5 <- subset(data2o, !is.na(newcat5))
+
+
+    data2co_1 <- subset(data2co, !is.na(newcat1))
+    data2co_2 <- subset(data2co, !is.na(newcat2))
+    data2co_3 <- subset(data2co, !is.na(newcat3))
+    data2co_4 <- subset(data2co, !is.na(newcat4))
+    data2co_5 <- subset(data2co, !is.na(newcat5))
+
+    
+    tab9a <- tab9fun(ptab=cbind(tab9pfun(datas=data2co), tab9pfun(datas=data2o)), datas=list(data2co, data2o))
+    tab9b <- tab9fun(ptab=cbind(tab9pfun(datas=data2co_1), tab9pfun(datas=data2o_1)), datas=list(data2co_1, data2o_1))
+    tab9c <- tab9fun(ptab=cbind(tab9pfun(datas=data2co_2), tab9pfun(datas=data2o_2)), datas=list(data2co_2, data2o_2))
+    tab9d <- tab9fun(ptab=cbind(tab9pfun(datas=data2co_3), tab9pfun(datas=data2o_3)), datas=list(data2co_3, data2o_3))
+    tab9e <- tab9fun(ptab=cbind(tab9pfun(datas=data2co_4), tab9pfun(datas=data2o_4)), datas=list(data2co_4, data2o_4))
+    tab9f <- tab9fun(ptab=cbind(tab9pfun(datas=data2co_5), tab9pfun(datas=data2o_5)), datas=list(data2co_5, data2o_5))
 @
 
 
 <<echo=FALSE, results=hide>>=
-tab9 <- rbind(rep('',8), tab9b[-6,], rep('',8), tab9c, rep('',8),tab9d[-6,], rep('',8),tab9e[-6,], rep('',8),tab9f[-6,])
+tab9 <- rbind(rep('',12), tab9b[-6,], rep('',12), tab9c, rep('',12),tab9d[-6,], rep('',12),tab9e[-6,], rep('',12),tab9f[-6,])
 rownames(tab9) <- c('\\underline{Posterior laminectomy only}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)', '\\underline{Posterior laminectomy and fusion}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~mJOA', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)', '\\underline{Posterior forminotomy only}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)', '\\underline{ACDF only}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)', '\\underline{Corpectomy only}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)')
 
 plotname1 <- paste('figs/', pracs[k], "plot.pdf", sep="")
@@ -294,8 +309,8 @@ latex(tab8, title="", caption="Outcomes at Baseline and 3 Month", where="!h", si
 \clearpage
 \begin{landscape}
 <<echo=FALSE, results=tex>>=
-
-    latex(tab9, title="", caption="Outcomes at Baseline, 3 Month and 12 Month for Patients with 12-Month Follow-up", where="!h", size="footnotesize", col.just=c("r", "c", "c", "c", "r", "c", "c", "c"), colheads=rep(c("N", "Baseline", "3-Month", "12-Month"),2), longtable=TRUE, file="", cgroup=c(latexTranslate(pracs[k]), "QOD Total"), n.cgroup=c(4,4), insert.bottom =mlCap("${\\tiny a}$ b ${\\tiny c}$ represent the lower quantile a, the median b, and the upper quartile c.  \\\\ $x\\pm s$ represents $\\bar{X}\\pm 1$ Standard Deviation. \\\\ N is the number of non-missing values. \\\\ Numbers after percents are frequencies."), lines.page=100)
+    latex(tab9, title="", caption="Outcomes at Baseline, 3 Month and 12 Month for Patients with 12-month Follow-up", where="!h", size="footnotesize", col.just=c("r", "c","r", "c","r","c", "r", "c","r", "c","r", "c"), colheads=rep(c("N-B", "Baseline","N-3", "3-Month","N-12", "12-Month"),2), cgroup=c(latexTranslate(pracs[k]), "QOD Total"), file='', lines.page=100, longtable=TRUE, landscape=TRUE, insert.bottom =mlCap("${\\tiny a}$ b ${\\tiny c}$ represent the lower quantile a, the median b, and the upper quartile c.  \\\\ $x\\pm s$ represents $\\bar{X}\\pm 1$ Standard Deviation. \\\\  N-B is the number of non-missing values at baseline. \\\\ N-3 is the number of non-missing values at 3 month. \\\\
+N-12 is the number of non-missing values at 12 month.  \\\\ Numbers after percents are frequencies. \\\\ PLF: Posterolateral Lumbar Fusion \\\\ PLIF/TLIF: Transforaminal Lumbar Interbody Fusion/Posterior Lumbar Interbody Fusion \\\\ ALIF: Anterior Lumbar Interbody Fusion \\\\ XLIF/DLIF: Lateral Lumbar Interbody Fusion/Direct Lateral Interbody Fusion\\\\A patient could possibly fall into more than one category of Surgical Approach"))
 
 @
 \end{landscape}
