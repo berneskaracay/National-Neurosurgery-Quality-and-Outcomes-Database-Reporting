@@ -27,6 +27,7 @@ library(rms)
 library(MASS)
 library(survival)
 library(plyr)
+library("stringr", lib.loc="~/R/win-library/3.4")
 #################################################
 #### organize data set and prepare variables ####
 #################################################
@@ -70,3 +71,49 @@ data <- merge(data, dat3b, by=c('pt_study_id'), all=TRUE)
 
 ### extract practice/center name, patient id, surgeon id, hospital/surg_location ###
 n <- nrow(data)
+
+
+
+data$practice <- sub("^([^*]+)(\\*(.+))?_CP[0-9]{4}$", "\\1", data$pt_study_id)
+data$sub_practice <- sub("^([^*]+)(\\*(.+))?_CP[0-9]{4}$", "\\3", data$pt_study_id)
+data$pt_id <- sub(".*_", "", as.character(data$pt_study_id))
+data$surgeon_name <- data$surgeon
+data$surgeon_name <- str_replace_all(data$surgeon_name, "[[:punct:]]", " ")
+data$surgeon <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surgeon))
+data$surg_location <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surg_location))
+#liste=c("Semmes","Vanderbilt","Duke")
+#data <- subset(data, practice %in% liste)
+# merge the data with index #
+data_follow_up <- merge(data, d_follow_up[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month',"usefull3month","usefull12month")], by='pt_study_id', all.y=TRUE)
+
+
+
+data <- merge(data, d[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month')], by='pt_study_id', all.y=TRUE)
+
+
+data <- data[order(data$surgeon),]
+test<-c('pt_study_id', 'surgeon','surgeon_name')
+data_surgeon <-data[test]
+data_surgeon$num <- ave(data_surgeon$pt_study_id, data_surgeon$surgeon , FUN = seq_along)
+data_name <- subset(data_surgeon, num %in% 1)
+
+
+test<-c('surgeon','surgeon_name')
+data_name <-data_name[test]
+
+
+colnames(data_name)[colnames(data_name)=="surgeon_name"] <- "surgeon_new_id"
+
+data <- merge(data,data_name,by="surgeon")
+
+
+
+
+
+
+
+
+
+
+
+
