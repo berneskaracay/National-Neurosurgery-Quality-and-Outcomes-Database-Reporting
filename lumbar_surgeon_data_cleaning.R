@@ -6,7 +6,7 @@
 rm(list=ls())
 
 ### set working directory###
-setwd("C:\\Users\\karacb1\\Desktop\\qod-project-codes")
+setwd("C:\\Users\\karacb1\\Desktop\\QOD-reporting")
 
 
 
@@ -1463,7 +1463,7 @@ for (w in seq(length(pracs))) {
     nsg <- length(snam)
     for (k in seq(nsg)) {
       snam2 <- data1$surgeon_new_id[data1$surgeon==snam[k]]
-      Sweave("lumbar_surgeon_report_091318.rnw", output=paste(pracs[w], '_', snam[k], ".tex", sep="")) 
+      Sweave("lumbar_surgeon_report_generate.rnw", output=paste(pracs[w], '_', snam[k], ".tex", sep="")) 
     }
   }
 }
