@@ -56,7 +56,7 @@ pl<-ggplot(data=dfp_bar, aes(x=time_point, y=percent, fill=Site)) +
 
 
 
-pdf(paste('figs/cervical_fu_', practice, '.pdf', sep=''))
+pdf(paste('figs/cervical_fu_', file_name, '.pdf', sep=''))
 pl
 dev.off()
 
