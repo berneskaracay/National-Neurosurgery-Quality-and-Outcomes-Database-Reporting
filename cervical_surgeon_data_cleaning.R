@@ -1097,7 +1097,7 @@ tab9fun <- function(ptab, datas) {
 ### plot functions ###
 plotfun1 <- function(x, yli, yma, yla, mai, yll) {
   plot(1:10, 1:10, xlim=c(1.5,8), ylim=yli, type="n", axes=FALSE, xlab="Time after Surgery", ylab=yla, main=mai)
-  legend(x=9, y=0,legend=c(pracs[w]),latexTranslate(snam[k]), pch=c(20,8), col=c('red','blue'), bty='n', xpd=NA, ncol=1)
+  legend(x=9, y=0,legend=c(latexTranslate(pracs[w]),latexTranslate(snam[k])), pch=c(20,8), col=c('red','blue'), bty='n', xpd=NA, ncol=1)
   axis(side=1, at=c(2,5,8), labels=paste(c("Baseline", "3-month", "12-month"), "\n N=", c(x[1], x[4], x[7]), sep=''), col='white')
   axis(side=2, at=yma, las=2, labels=yll)
   
