@@ -45,8 +45,6 @@ d$analyzed_12month <- ifelse(d$analysis12month %in% TRUE | d$dead12month %in% TR
 # only include followed up at 3 month or 12 month #
 d <- subset(d,!scorefail_baseline)
 d_follow_up<-d
-
-
 d <- subset(d, analyzed_3month | analyzed_12month)
 
 ### read in patient data set ###
@@ -81,6 +79,7 @@ data$surgeon_name <- data$surgeon
 data$surgeon_name <- str_replace_all(data$surgeon_name, "[[:punct:]]", " ")
 data$surgeon <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surgeon))
 data$surg_location <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surg_location))
+data_follow_up1 <- merge(data, d_follow_up[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month',"usefull3month","usefull12month")], by='pt_study_id', all.y=TRUE)
 #liste=c("Semmes","Vanderbilt","Duke")
 #data <- subset(data, practice %in% liste)
 # merge the data with index #
@@ -672,7 +671,615 @@ data$insurance1___5 <- ifelse(data$insurance1 %in% 5, 1, 0)
 
 
 
+### generate table template ###
 
+tab2fun <- function(datas) {
+  M <- matrix("", nrow=45, ncol=2)
+  M[2,] <- catfun1(var1="pgender", var2="pgender", ilev="2", dfs=datas)
+  M[3,] <- catfun1(var1="pgender", var2="pgender", ilev="1", dfs=datas)
+  M[4,] <- confun2(var1="ptage2", dig=1, dfs=datas)
+  M[6,] <- catfun1(var1="prace___1", var2="prace___1", ilev="1", dfs=datas)
+  M[7,] <- catfun1(var1="prace___2", var2="prace___2", ilev="1", dfs=datas)
+  M[8,] <- catfun1(var1="prace___3", var2="prace___3", ilev="1", dfs=datas)
+  M[9,] <- catfun1(var1="prace___4", var2="prace___4", ilev="1", dfs=datas)
+  M[10,] <- catfun1(var1="prace___5", var2="prace___5", ilev="1", dfs=datas)
+  M[11,] <- catfun1(var1="prace___6", var2="prace___6", ilev="1", dfs=datas)
+  M[12,] <- catfun1(var1="ptethnicity", var2="ptethnicity", ilev="1", dfs=datas)
+  M[14,] <- catfun1(var1="pt_education_level___1", var2="pt_education_level___1", ilev="1", dfs=datas)
+  M[15,] <- catfun1(var1="pt_education_level___2", var2="pt_education_level___2", ilev="1", dfs=datas)
+  M[16,] <- catfun1(var1="pt_education_level___3", var2="pt_education_level___3", ilev="1", dfs=datas)
+  M[17,] <- catfun1(var1="pt_education_level___4", var2="pt_education_level___4", ilev="1", dfs=datas)
+  M[18,] <- catfun1(var1="pt_education_level___5", var2="pt_education_level___5", ilev="1", dfs=datas)
+  M[20,] <- catfun1(var1="insurance1___1", var2="insurance1___1", ilev="1", dfs=datas)
+  M[21,] <- catfun1(var1="insurance1___2", var2="insurance1___2", ilev="1", dfs=datas)
+  M[22,] <- catfun1(var1="insurance1___3", var2="insurance1___3", ilev="1", dfs=datas)
+  M[23,] <- catfun1(var1="insurance1___4", var2="insurance1___4", ilev="1", dfs=datas)
+  M[24,] <- catfun1(var1="insurance1___5", var2="insurance1___5", ilev="1", dfs=datas)
+  M[26,] <- catfun1(var1="workers_comp", var2="workers_comp", ilev="1", dfs=datas)
+  M[27,] <- catfun1(var1="liability_claim1", var2="liability_claim1", ilev="1", dfs=datas)
+  M[28,] <- catfun1(var1="employment", var2="employment", ilev="1", dfs=datas)
+  M[29,] <- catfun1(var1="full_part_time", var2="full_part_time", ilev="1", dfs=datas)
+  M[30,] <- catfun1(var1="full_part_time", var2="full_part_time", ilev="2", dfs=datas)
+  M[31,] <- catfun1(var1="employment", var2="employment", ilev="2", dfs=datas)
+  M[32,] <- catfun1(var1="disability_reason1", var2="disability_reason1", ilev="1", dfs=datas)
+  M[33,] <- catfun1(var1="disability_reason1", var2="disability_reason1", ilev="2", dfs=datas)
+  M[34,] <- catfun1(var1="employment", var2="employment", ilev="3", dfs=datas)
+  M[35,] <- catfun1(var1="unemployed", var2="unemployed", ilev="1", dfs=datas)
+  M[36,] <- catfun1(var1="disability_reason2", var2="disability_reason2", ilev="1", dfs=datas)
+  M[37,] <- catfun1(var1="disability_reason2", var2="disability_reason2", ilev="2", dfs=datas)
+  M[38,] <- catfun1(var1="unemployed", var2="unemployed", ilev="2", dfs=datas)
+  M[39,] <- catfun1(var1="unemployed", var2="unemployed", ilev="3", dfs=datas)
+  M[40,] <- catfun1(var1="unemployed", var2="unemployed", ilev="4", dfs=datas)
+  M[41,] <- catfun1(var1="employment", var2="employment", ilev="4", dfs=datas)
+  M[42,] <- catfun1(var1="plan_return_work", var2="plan_return_work", ilev="1", dfs=datas)
+  M[44,] <- catfun1(var1="activity_out_home", var2="activity_out_home", ilev="1", dfs=datas)
+  M[45,] <- catfun1(var1="activity_inside_home", var2="activity_inside_home", ilev="1", dfs=datas)
+  return(M)
+}
+
+hltab2 <- function(data, ipr) {
+  hl <- c(1,4,6,7,8,9,10,11,12,14,15,16,17,18,20,21,22,23,24,26,27,28,29, 31, 32, 34, 35, 36, 38:42, 44,45)
+  dv <- rep(0, times=37)
+  dv[1] <- sfun2(data=data, vr='pgender', ip=ipr)
+  dv[2] <- sfun1(data=data, vr='ptage2', ip=ipr)
+  dv[3] <- sfun2(data=data, vr='prace___1', ip=ipr)
+  dv[4] <- sfun2(data=data, vr='prace___2', ip=ipr)
+  dv[5] <- sfun2(data=data, vr='prace___3', ip=ipr)
+  dv[6] <- sfun2(data=data, vr='prace___4', ip=ipr)
+  dv[7] <- sfun2(data=data, vr='prace___5', ip=ipr)
+  dv[8] <- sfun2(data=data, vr='prace___6', ip=ipr)
+  dv[9] <- sfun2(data=data, vr='ptethnicity', ip=ipr)
+  dv[10] <- sfun2(data=data, vr='pt_education_level___1', ip=ipr)
+  dv[11] <- sfun2(data=data, vr='pt_education_level___2', ip=ipr)
+  dv[12] <- sfun2(data=data, vr='pt_education_level___3', ip=ipr)
+  dv[13] <- sfun2(data=data, vr='pt_education_level___4', ip=ipr)
+  dv[14] <- sfun2(data=data, vr='pt_education_level___5', ip=ipr)
+  dv[15] <- sfun2(data=data, vr='insurance1___1', ip=ipr)
+  dv[16] <- sfun2(data=data, vr='insurance1___2', ip=ipr)
+  dv[17] <- sfun2(data=data, vr='insurance1___3', ip=ipr)
+  dv[18] <- sfun2(data=data, vr='insurance1___4', ip=ipr)
+  dv[19] <- sfun2(data=data, vr='insurance1___5', ip=ipr)
+  dv[20] <- sfun3(data=data, vr='insurance1', ip=ipr)
+  dv[21] <- sfun2(data=data, vr='workers_comp', ip=ipr)
+  dv[22] <- sfun2(data=data, vr='liability_claim1', ip=ipr)
+  dv[23] <- sfun2(data=data, vr='employment', ip=ipr, lv=1)
+  dv[24] <- sfun2(data=data, vr='full_part_time', ip=ipr)
+  dv[25] <- sfun2(data=data, vr='employment', ip=ipr, lv=2)
+  dv[26] <- sfun2(data=data, vr='employment', ip=ipr, lv=2)
+  dv[27] <- sfun2(data=data, vr='disability_reason1', ip=ipr, lv=1)
+  dv[28] <- sfun2(data=data, vr='employment', ip=ipr, lv=3)
+  dv[29] <- sfun2(data=data, vr='unemployed', ip=ipr, lv=1)
+  dv[30] <- sfun2(data=data, vr='disability_reason2', ip=ipr, lv=1)
+  dv[31] <- sfun2(data=data, vr='unemployed', ip=ipr, lv=2)
+  dv[32] <- sfun2(data=data, vr='unemployed', ip=ipr, lv=3)
+  dv[33] <- sfun2(data=data, vr='unemployed', ip=ipr, lv=4)
+  dv[34] <- sfun2(data=data, vr='employment', ip=ipr, lv=4)
+  dv[35] <- sfun2(data=data, vr='plan_return_work', ip=ipr, lv=1)
+  dv[36] <- sfun2(data=data, vr='activity_out_home', ip=ipr, lv=1)
+  dv[37] <- sfun2(data=data, vr='activity_inside_home', ip=ipr, lv=1)
+  dv2 <- ifelse(abs(dv)>=0.4, TRUE, FALSE)
+  return(hl[dv2])
+}
+
+
+
+# Table of Medical History #
+tab3fun <- function(datas) {
+  M <- matrix("", nrow=38, ncol=2)
+  M[2,] <- catfun1(var1="diabetes", var2="diabetes", ilev=c("1"), dfs=datas)
+  M[3,] <- catfun1(var1="cad", var2="cad", ilev="1", dfs=datas)
+  M[4,] <- catfun1(var1="osteoporosis", var2="osteoporosis", ilev="1", dfs=datas)
+  M[5,] <- catfun1(var1="anxiety", var2="anxiety", ilev="1", dfs=datas)
+  M[6,] <- catfun1(var1="depression", var2="depression", ilev="1", dfs=datas)
+  M[8,] <- catfun1(var1="smoker___1", var2="smoker___1", ilev="1", dfs=datas)
+  M[9,] <- catfun1(var1="smoker___2", var2="smoker___2", ilev="1", dfs=datas)
+  M[10,] <- catfun1(var1="smoker___3", var2="smoker___3", ilev="1", dfs=datas)
+  M[11,] <- confun2(var1="bmi", dig=1, dfs=datas, dig2=1)
+  M[12,] <- catfun1(var1="revision", var2="revision", ilev="1", dfs=datas)
+  M[14,] <- catfun1(var1="indication_surgery___1", var2="indication_surgery___1", ilev="1", dfs=datas)
+  M[15,] <- catfun1(var1="indication_surgery___2", var2="indication_surgery___2", ilev="1", dfs=datas)
+  M[16,] <- catfun1(var1="indication_surgery___3", var2="indication_surgery___3", ilev="1", dfs=datas)
+  M[18,] <- catfun1(var1="underlying_pathology___1", var2="underlying_pathology___1", ilev="1", dfs=datas)
+  M[19,] <- catfun1(var1="underlying_pathology___2", var2="underlying_pathology___2", ilev="1", dfs=datas)
+  M[20,] <- catfun1(var1="underlying_pathology___3", var2="underlying_pathology___3", ilev="1", dfs=datas)
+  M[21,] <- catfun1(var1="underlying_pathology___4", var2="underlying_pathology___4", ilev="1", dfs=datas)
+  M[22,] <- catfun1(var1="underlying_pathology___5", var2="underlying_pathology___5", ilev="1", dfs=datas)
+  M[23,] <- catfun1(var1="underlying_pathology___6", var2="underlying_pathology___6", ilev="1", dfs=datas)
+  M[25,] <- catfun1(var1="symptom_duration2___1", var2="symptom_duration2___1", ilev="1", dfs=datas)
+  M[26,] <- catfun1(var1="symptom_duration2___2", var2="symptom_duration2___2", ilev="1", dfs=datas)
+  M[27,] <- catfun1(var1="symptom_duration2___3", var2="symptom_duration2___3", ilev="1", dfs=datas)
+  M[29,] <- catfun1(var1="asa_grade___1", var2="asa_grade___1", ilev="1", dfs=datas)
+  M[30,] <- catfun1(var1="asa_grade___2", var2="asa_grade___2", ilev="1", dfs=datas)
+  M[31,] <- catfun1(var1="asa_grade___3", var2="asa_grade___3", ilev="1", dfs=datas)
+  M[32,] <- catfun1(var1="asa_grade___4", var2="asa_grade___4", ilev="1", dfs=datas)
+  M[33,] <- catfun1(var1="arthrodesis", var2="arthrodesis", ilev="1", dfs=datas)
+  M[35,] <- catfun1(var1="surgical_approach___1", var2="surgical_approach___1", ilev="1", dfs=datas)
+  M[36,] <- catfun1(var1="surgical_approach___2", var2="surgical_approach___2", ilev="1", dfs=datas)
+  M[37,] <- catfun1(var1="surgical_approach___3", var2="surgical_approach___3", ilev="1", dfs=datas)
+  M[38,] <- confun1(var1="levels", var2="levels", dfs=datas, var3="levels")
+  return(M)
+}
+
+hltab3 <- function(data, ipr) {
+  hl <- c(2,3,4,5,6,8,9,10,11,12,14,15,16,18,19,20,21,22,23,25,26,27,29:32,33,35:37,38)
+  dv <- rep(0, times=31)
+  dv[1] <- sfun2(data=data, vr='diabetes', ip=ipr)
+  dv[2] <- sfun2(data=data, vr='cad', ip=ipr)
+  dv[3] <- sfun2(data=data, vr='osteoporosis', ip=ipr)
+  dv[4] <- sfun2(data=data, vr='anxiety', ip=ipr)
+  dv[5] <- sfun2(data=data, vr='depression', ip=ipr)
+  dv[6] <- sfun2(data=data, vr='smoker___1', ip=ipr)
+  dv[7] <- sfun2(data=data, vr='smoker___2', ip=ipr)
+  dv[8] <- sfun2(data=data, vr='smoker___3', ip=ipr)
+  dv[9] <- sfun1(data=data, vr='bmi', ip=ipr)
+  dv[10] <- sfun2(data=data, vr='revision', ip=ipr)
+  dv[11] <- sfun2(data=data, vr='indication_surgery___1', ip=ipr)
+  dv[12] <- sfun2(data=data, vr='indication_surgery___2', ip=ipr)
+  dv[13] <- sfun2(data=data, vr='indication_surgery___3', ip=ipr)
+  dv[14] <- sfun2(data=data, vr='underlying_pathology___1', ip=ipr)
+  dv[15] <- sfun2(data=data, vr='underlying_pathology___2', ip=ipr)
+  dv[16] <- sfun2(data=data, vr='underlying_pathology___3', ip=ipr)
+  dv[17] <- sfun2(data=data, vr='underlying_pathology___4', ip=ipr)
+  dv[18] <- sfun2(data=data, vr='underlying_pathology___5', ip=ipr)
+  dv[19] <- sfun2(data=data, vr='underlying_pathology___6', ip=ipr)
+  dv[20] <- sfun2(data=data, vr='dominant_symptom1___1', ip=ipr)
+  dv[21] <- sfun2(data=data, vr='dominant_symptom1___2', ip=ipr)
+  dv[22] <- sfun2(data=data, vr='dominant_symptom1___3', ip=ipr)
+  dv[23] <- sfun2(data=data, vr='asa_grade___1', ip=ipr)
+  dv[24] <- sfun2(data=data, vr='asa_grade___2', ip=ipr)
+  dv[25] <- sfun2(data=data, vr='asa_grade___3', ip=ipr)
+  dv[26] <- sfun2(data=data, vr='asa_grade___4', ip=ipr)
+  dv[27] <- sfun2(data=data, vr='arthrodesis_performed', ip=ipr)
+  dv[28] <- sfun2(data=data, vr='surgical_approach___1', ip=ipr)
+  dv[29] <- sfun2(data=data, vr='surgical_approach___2', ip=ipr)
+  dv[30] <- sfun2(data=data, vr='surgical_approach___3', ip=ipr)
+  dv[31] <- sfun1(data=data, vr='levels', ip=ipr)
+  dv3 <- ifelse(abs(dv)>=0.4, TRUE, FALSE)
+  return(hl[dv3])
+}
+
+
+
+# Table of surgical procedures #
+tab6fun <- function(datas) {
+  M <- matrix("", nrow=89, ncol=2)
+  M[2,] <- catfun1(var1="asa_grade", var2="asa_grade", ilev="1", dfs=datas)
+  M[3,] <- catfun1(var1="asa_grade", var2="asa_grade", ilev="2", dfs=datas)
+  M[4,] <- catfun1(var1="asa_grade", var2="asa_grade", ilev="3", dfs=datas)
+  M[5,] <- catfun1(var1="asa_grade", var2="asa_grade", ilev="4", dfs=datas)
+  M[6,] <- catfun1(var1="arthrodesis", var2="arthrodesis", ilev="1", dfs=datas)
+  
+  M[8,] <- catfun1(var1="surgical_approach", var2="surgical_approach", ilev="2", dfs=datas)
+  M[9,] <- catfun1(var1="surgical_approach", var2="surgical_approach", ilev="1", dfs=datas)
+  M[10,] <- catfun1(var1="surgical_approach", var2="surgical_approach", ilev="3", dfs=datas)
+  
+  M[11,] <- confun1(var1="levels", var2="levels", dfs=datas, var3="levels")
+  
+  M[14,] <- catfun1(var1="surgical_approach", var2="ind1", var3="ind4", ilev="2", dfs=datas)
+  M[15,] <- catfun1(var1="surgical_approach", var2="ind1", var3="ind4", ilev="1", dfs=datas)
+  M[16,] <- catfun1(var1="surgical_approach", var2="ind1", var3="ind4", ilev="3", dfs=datas)
+  M[17,] <- confun1(var1="levels", var2="ind1", var3="ind4", dfs=datas)
+  
+  M[19,] <- catfun1(var1="surgical_approach", var2="ind1", var3="ind8", ilev="2", dfs=datas)
+  M[20,] <- catfun1(var1="surgical_approach", var2="ind1", var3="ind8", ilev="1", dfs=datas)
+  M[21,] <- catfun1(var1="surgical_approach", var2="ind1", var3="ind8", ilev="3", dfs=datas)
+  M[22,] <- confun1(var1="levels", var2="ind1", var3="ind8", dfs=datas)
+  
+  M[24,] <- catfun1(var1="surgical_approach", var2="ind1", var3="ind7", ilev="2", dfs=datas)
+  M[25,] <- catfun1(var1="surgical_approach", var2="ind1", var3="ind7", ilev="1", dfs=datas)
+  M[26,] <- catfun1(var1="surgical_approach", var2="ind1", var3="ind7", ilev="3", dfs=datas)
+  M[27,] <- confun1(var1="levels", var2="ind1", var3="ind7", dfs=datas)
+  
+  M[29,] <- catfun1(var1="surgical_approach", var2="ind1", var3="ind9", ilev="2", dfs=datas)
+  M[30,] <- catfun1(var1="surgical_approach", var2="ind1", var3="ind9", ilev="1", dfs=datas)
+  M[31,] <- catfun1(var1="surgical_approach", var2="ind1", var3="ind9", ilev="3", dfs=datas)
+  M[32,] <- confun1(var1="levels", var2="ind1", var3="ind9", dfs=datas)
+  
+  M[34,] <- catfun1(var1="surgical_approach", var2="ind1", var3="ind10", ilev="2", dfs=datas)
+  M[35,] <- catfun1(var1="surgical_approach", var2="ind1", var3="ind10", ilev="1", dfs=datas)
+  M[36,] <- catfun1(var1="surgical_approach", var2="ind1", var3="ind10", ilev="3", dfs=datas)
+  M[37,] <- confun1(var1="levels", var2="ind1", var3="ind10", dfs=datas)
+  
+  M[40,] <- catfun1(var1="surgical_approach", var2="ind2", var3="ind4", ilev="2", dfs=datas)
+  M[41,] <- catfun1(var1="surgical_approach", var2="ind2", var3="ind4", ilev="1", dfs=datas)
+  M[42,] <- catfun1(var1="surgical_approach", var2="ind2", var3="ind4", ilev="3", dfs=datas)
+  M[43,] <- confun1(var1="levels", var2="ind2", var3="ind4", dfs=datas)
+  
+  M[45,] <- catfun1(var1="surgical_approach", var2="ind2", var3="ind8", ilev="2", dfs=datas)
+  M[46,] <- catfun1(var1="surgical_approach", var2="ind2", var3="ind8", ilev="1", dfs=datas)
+  M[47,] <- catfun1(var1="surgical_approach", var2="ind2", var3="ind8", ilev="3", dfs=datas)
+  M[48,] <- confun1(var1="levels", var2="ind2", var3="ind8", dfs=datas)
+  
+  M[50,] <- catfun1(var1="surgical_approach", var2="ind2", var3="ind7", ilev="2", dfs=datas)
+  M[51,] <- catfun1(var1="surgical_approach", var2="ind2", var3="ind7", ilev="1", dfs=datas)
+  M[52,] <- catfun1(var1="surgical_approach", var2="ind2", var3="ind7", ilev="3", dfs=datas)
+  M[53,] <- confun1(var1="levels", var2="ind2", var3="ind7", dfs=datas)
+  
+  M[55,] <- catfun1(var1="surgical_approach", var2="ind2", var3="ind9", ilev="2", dfs=datas)
+  M[56,] <- catfun1(var1="surgical_approach", var2="ind2", var3="ind9", ilev="1", dfs=datas)
+  M[57,] <- catfun1(var1="surgical_approach", var2="ind2", var3="ind9", ilev="3", dfs=datas)
+  M[58,] <- confun1(var1="levels", var2="ind2", var3="ind9", dfs=datas)
+  
+  M[60,] <- catfun1(var1="surgical_approach", var2="ind2", var3="ind10", ilev="2", dfs=datas)
+  M[61,] <- catfun1(var1="surgical_approach", var2="ind2", var3="ind10", ilev="1", dfs=datas)
+  M[62,] <- catfun1(var1="surgical_approach", var2="ind2", var3="ind10", ilev="3", dfs=datas)
+  M[63,] <- confun1(var1="levels", var2="ind2", var3="ind10", dfs=datas)
+  
+  
+  M[66,] <- catfun1(var1="surgical_approach", var2="ind3", var3="ind4", ilev="2", dfs=datas)
+  M[67,] <- catfun1(var1="surgical_approach", var2="ind3", var3="ind4", ilev="1", dfs=datas)
+  M[68,] <- catfun1(var1="surgical_approach", var2="ind3", var3="ind4", ilev="3", dfs=datas)
+  M[69,] <- confun1(var1="levels", var2="ind3", var3="ind4", dfs=datas)
+  
+  M[71,] <- catfun1(var1="surgical_approach", var2="ind3", var3="ind8", ilev="2", dfs=datas)
+  M[72,] <- catfun1(var1="surgical_approach", var2="ind3", var3="ind8", ilev="1", dfs=datas)
+  M[73,] <- catfun1(var1="surgical_approach", var2="ind3", var3="ind8", ilev="3", dfs=datas)
+  M[74,] <- confun1(var1="levels", var2="ind3", var3="ind8", dfs=datas)
+  
+  M[76,] <- catfun1(var1="surgical_approach", var2="ind3", var3="ind7", ilev="2", dfs=datas)
+  M[77,] <- catfun1(var1="surgical_approach", var2="ind3", var3="ind7", ilev="1", dfs=datas)
+  M[78,] <- catfun1(var1="surgical_approach", var2="ind3", var3="ind7", ilev="3", dfs=datas)
+  M[79,] <- confun1(var1="levels", var2="ind3", var3="ind7", dfs=datas)
+  
+  M[81,] <- catfun1(var1="surgical_approach", var2="ind3", var3="ind9", ilev="2", dfs=datas)
+  M[82,] <- catfun1(var1="surgical_approach", var2="ind3", var3="ind9", ilev="1", dfs=datas)
+  M[83,] <- catfun1(var1="surgical_approach", var2="ind3", var3="ind9", ilev="3", dfs=datas)
+  M[84,] <- confun1(var1="levels", var2="ind3", var3="ind9", dfs=datas)
+  
+  M[86,] <- catfun1(var1="surgical_approach", var2="ind3", var3="ind10", ilev="2", dfs=datas)
+  M[87,] <- catfun1(var1="surgical_approach", var2="ind3", var3="ind10", ilev="1", dfs=datas)
+  M[88,] <- catfun1(var1="surgical_approach", var2="ind3", var3="ind10", ilev="3", dfs=datas)
+  M[89,] <- confun1(var1="levels", var2="ind3", var3="ind10", dfs=datas)
+  return(M)
+}
+
+# Table of safety and quality #
+tab7fun <- function(datas, datasb) {
+  M <- matrix("", nrow=37, ncol=2)
+  M[2,] <- catfun1(var1="place_discharged_to", var2="place_discharged_to", ilev="6", df=datasb)
+  M[3,] <- catfun1(var1="mort30d", var2="mort30d", ilev="1", df=datasb)
+  M[4,] <- catfun1(var1="mort3m", var2="mort3m", ilev="1", df=datasb)
+  M[6,] <- catfun1(var1="pulmonary_embolism_30day", var2="pulmonary_embolism_30day", ilev="1", df=datas)
+  M[7,] <- catfun1(var1="cva_30days", var2="cva_30days", ilev="1", df=datas)
+  M[8,] <- catfun1(var1="mi_30day", var2="mi_30day", ilev="1", df=datas)
+  M[9,] <- catfun1(var1="surgical_site_infect_30day", var2="surgical_site_infect_30day", ilev="1", df=datas)
+  M[10,] <- catfun1(var1="hematoma", var2="hematoma", ilev="1", df=datas)
+  M[11,] <- catfun1(var1="new_neuro_deficit_30day", var2="new_neuro_deficit_30day", ilev="1", df=datas)
+  M[12,] <- catfun1(var1="majorade", var2="majorade", ilev="1", df=datas)
+  
+  M[14,] <- catfun1(var1="dvt_30day", var2="dvt_30day", ilev="1", df=datas)
+  M[15,] <- catfun1(var1="uti_30days", var2="uti_30days", ilev="1", df=datas)
+  M[16,] <- catfun1(var1="dysphagia_ng_tube", var2="dysphagia_ng_tube", ilev="1", df=datas)
+  M[17,] <- catfun1(var1="dysphagia_no_ng_tube", var2="dysphagia_no_ng_tube", ilev="1", df=datas)
+  M[18,] <- catfun1(var1="vocal_cord_paralysis", var2="vocal_cord_paralysis", ilev="1", df=datas)
+  M[19,] <- catfun1(var1="csf_leak", var2="csf_leak", ilev="1", df=datas)
+  M[20,] <- catfun1(var1="wound_dehiscence", var2="wound_dehiscence", ilev="1", df=datas)
+  M[21,] <- catfun1(var1="pneumonia", var2="pneumonia", ilev="1", df=datas)
+  M[22,] <- catfun1(var1="minorade", var2="minorade", ilev="1", df=datas)
+  
+  M[24,] <- catfun1(var1="pt_satisfaction_index.3m", var2="pt_satisfaction_index.3m", ilev="1", df=datas)
+  M[19+6,] <- catfun1(var1="pt_satisfaction_index.3m", var2="pt_satisfaction_index.3m", ilev="2", df=datas)
+  M[20+6,] <- catfun1(var1="pt_satisfaction_index.3m", var2="pt_satisfaction_index.3m", ilev="3", df=datas)
+  M[21+6,] <- catfun1(var1="pt_satisfaction_index.3m", var2="pt_satisfaction_index.3m", ilev="4", df=datas)
+  M[22+6,] <- catfun1(var1="pt_satisfaction_index2.3m", var2="pt_satisfaction_index2.3m", ilev="1", df=datas)
+  
+  M[24+6,] <- confun2(var1="estimated_blood_loss_cc3", dfs=datas, dig=0)
+  M[25+6,] <- confun2(var1="length_of_surgery", dfs=datas, dig=0)
+  M[26+6,] <- catfun1(var1="arthrodesis", var2="arthrodesis", ilev="1", df=datas)
+  M[27+6,] <- confun2(var1="los3", dfs=datas, dig=1)
+  M[28+6,] <- catfun1(var1="returned_to_or_with_30_day", var2="returned_to_or_with_30_day", ilev="1", df=datas)
+  M[35,] <- catfun1(var1="readmit30day", var2="readmit30day", ilev="1", df=datas)
+  M[36,] <- catfun1(var1="revision_surg_3mths", var2="revision_surg_3mths", ilev="1", df=datas)
+  M[37,] <- catfun1(var1="readmit3m", var2="readmit3m", ilev="1", df=datas)
+  return(M)
+}
+
+
+figure_construct <- function(datas) {
+  M_f <- matrix(NA,nrow=9, ncol=2)
+  M_f[1,] <- catfun1b(var1="pt_satisfaction_index.3m___1", var2="pt_satisfaction_index.3m___1", ilev="1", df=datas)
+  M_f[2,] <- catfun1b(var1="pt_satisfaction_index.3m___2", var2="pt_satisfaction_index.3m___2", ilev="1", df=datas)
+  M_f[3,] <- catfun1b(var1="pt_satisfaction_index.3m___3", var2="pt_satisfaction_index.3m___3", ilev="1", df=datas)
+  M_f[4,] <- catfun1b(var1="pt_satisfaction_index.3m___4", var2="pt_satisfaction_index.3m___4", ilev="1", df=datas)
+  M_f[5,] <- catfun1b(var1="pt_satisfaction_index2.3m", var2="pt_satisfaction_index2.3m", ilev="1", df=datas)
+  M_f[6,] <- M_f[1,] + M_f[2,]
+  M_f[7,] <- catfun1b(var1="readmit30day", var2="readmit30day", ilev="1", df=datas)
+  M_f[8,] <- catfun1b(var1="revision_surg_3mths2", var2="revision_surg_3mths2", ilev="1", df=datas)
+  M_f[9,] <- catfun1b(var1="readmit3m", var2="readmit3m", ilev="1", df=datas)
+  return(M_f)
+}
+
+
+
+
+# table of utilization #
+tab7bfun <- function(datas) { 
+  M <- matrix("", nrow=45, ncol=2)
+  M[2,] <- confun3(var1="estimated_blood_loss_cc3", var2="newcat1", dfs=datas, var3="estimated_blood_loss_cc3", dig=0)
+  M[3,] <- confun3(var1="length_of_surgery", var2="newcat1", dfs=datas, var3="length_of_surgery", dig=0)
+  M[4,] <- catfun1(var1="arthrodesis", var2="newcat1", ilev="1", df=datas)
+  M[5,] <- confun3(var1="los3", var2="newcat1", dfs=datas, var3="los3", dig=1)
+  M[6,] <- catfun1(var1="returned_to_or_with_30_day", var2="newcat1", ilev="1", df=datas)
+  M[7,] <- catfun1(var1="readmit30day", var2="newcat1", ilev="1", df=datas)
+  M[8,] <- catfun1(var1="revision_surg_3mths", var2="newcat1", ilev="1", df=datas)
+  M[9,] <- catfun1(var1="readmit3m", var2="newcat1", ilev="1", df=datas)
+  
+  M[11,] <- confun3(var1="estimated_blood_loss_cc3", var2="newcat2", dfs=datas, var3="estimated_blood_loss_cc3", dig=0)
+  M[12,] <- confun3(var1="length_of_surgery", var2="newcat2", dfs=datas, var3="length_of_surgery", dig=0)
+  M[13,] <- catfun1(var1="arthrodesis", var2="newcat2", ilev="1", df=datas)
+  M[14,] <- confun3(var1="los3", var2="newcat2", dfs=datas, var3="los3", dig=1)
+  M[15,] <- catfun1(var1="returned_to_or_with_30_day", var2="newcat2", ilev="1", df=datas)
+  M[16,] <- catfun1(var1="readmit30day", var2="newcat2", ilev="1", df=datas)
+  M[17,] <- catfun1(var1="revision_surg_3mths", var2="newcat2", ilev="1", df=datas)
+  M[18,] <- catfun1(var1="readmit3m", var2="newcat2", ilev="1", df=datas)
+  
+  M[20,] <- confun3(var1="estimated_blood_loss_cc3", var2="newcat3", dfs=datas, var3="estimated_blood_loss_cc3", dig=0)
+  M[21,] <- confun3(var1="length_of_surgery", var2="newcat3", dfs=datas, var3="length_of_surgery", dig=0)
+  M[22,] <- catfun1(var1="arthrodesis", var2="newcat3", ilev="1", df=datas)
+  M[23,] <- confun3(var1="los3", var2="newcat3", dfs=datas, var3="los3", dig=1)
+  M[24,] <- catfun1(var1="returned_to_or_with_30_day", var2="newcat3", ilev="1", df=datas)
+  M[25,] <- catfun1(var1="readmit30day", var2="newcat3", ilev="1", df=datas)
+  M[26,] <- catfun1(var1="revision_surg_3mths", var2="newcat3", ilev="1", df=datas)
+  M[27,] <- catfun1(var1="readmit3m", var2="newcat3", ilev="1", df=datas)
+  
+  M[29,] <- confun3(var1="estimated_blood_loss_cc3", var2="newcat4", dfs=datas, var3="estimated_blood_loss_cc3", dig=0)
+  M[30,] <- confun3(var1="length_of_surgery", var2="newcat4", dfs=datas, var3="length_of_surgery", dig=0)
+  M[31,] <- catfun1(var1="arthrodesis", var2="newcat4", ilev="1", df=datas)
+  M[32,] <- confun3(var1="los3", var2="newcat4", dfs=datas, var3="los3", dig=1)
+  M[33,] <- catfun1(var1="returned_to_or_with_30_day", var2="newcat4", ilev="1", df=datas)
+  M[34,] <- catfun1(var1="readmit30day", var2="newcat4", ilev="1", df=datas)
+  M[35,] <- catfun1(var1="revision_surg_3mths", var2="newcat4", ilev="1", df=datas)
+  M[36,] <- catfun1(var1="readmit3m", var2="newcat4", ilev="1", df=datas)
+  
+  M[38,] <- confun3(var1="estimated_blood_loss_cc3", var2="newcat5", dfs=datas, var3="estimated_blood_loss_cc3", dig=0)
+  M[39,] <- confun3(var1="length_of_surgery", var2="newcat5", dfs=datas, var3="length_of_surgery", dig=0)
+  M[40,] <- catfun1(var1="arthrodesis", var2="newcat5", ilev="1", df=datas)
+  M[41,] <- confun3(var1="los3", var2="newcat5", dfs=datas, var3="los3", dig=1)
+  M[42,] <- catfun1(var1="returned_to_or_with_30_day", var2="newcat5", ilev="1", df=datas)
+  M[43,] <- catfun1(var1="readmit30day", var2="newcat5", ilev="1", df=datas)
+  M[44,] <- catfun1(var1="revision_surg_3mths", var2="newcat5", ilev="1", df=datas)
+  M[45,] <- catfun1(var1="readmit3m", var2="newcat5", ilev="1", df=datas)
+  return(M)
+}
+
+
+
+
+tab9pfun <- function(datas) {
+  M <- matrix(NA, nrow=5, ncol=9)
+  vars1 <- c("neck_pain_vas", "arm_pain_vas1", "ndiscore", "eq5dscore", "joa")
+  vars2 <- paste(c("neck_pain_vas", "arm_pain_vas1", "ndiscore", "eq5dscore", "joa"), ".3m", sep="")
+  vars3 <- paste(c("neck_pain_vas", "arm_pain_vas1", "ndiscore", "eq5dscore", "joa"), ".12m", sep="")
+  for (i in 1:5) {
+    tmp_12 <- subset(datas, analyzed_12month)
+    tmp_3 <- subset(datas, analyzed_3month)
+    tmp_base<- datas
+    M[i,1] <- sum(!is.na(tmp_base[,vars1[i]]))
+    M[i,4] <- sum(!is.na(tmp_3[,vars2[i]]))
+    M[i,7] <- sum(!is.na(tmp_12[,vars3[i]]))
+    M[i,2] <- mean(tmp_base[,vars1[i]], na.rm = TRUE)
+    M[i,3] <- sd(tmp_base[,vars1[i]], na.rm = TRUE)
+    M[i,5] <- mean(tmp_3[,vars2[i]], na.rm = TRUE)
+    M[i,6] <- sd(tmp_3[,vars2[i]], na.rm = TRUE)
+    if (nrow(tmp_12)>0) {
+      M[i,8] <- mean(tmp_12[,vars3[i]], na.rm = TRUE)
+      M[i,9] <- sd(tmp_12[,vars3[i]], na.rm = TRUE)
+    }
+  }
+  return(M)
+}
+
+
+tab9fun <- function(ptab, datas) {
+  M <- matrix("", nrow=8, ncol=12)
+  M[c(2,3,4,5,6),c(1,3,5,7,9,11)] <- ptab[,c(1,4,7,10,13,16)]
+  digs <- c(1,1,1,1,2)
+  for (i in 1:5){
+    if (ptab[i,1] > 0) {
+      M[(i+1), 2] <- paste(format(round(ptab[i,2], digs[i]), nsmall=digs[i]), "$\\pm$", format(round(ptab[i,3], digs[i]), nsmall=digs[i]), sep="")
+      M[(i+1), 4] <- paste(format(round(ptab[i,5], digs[i]), nsmall=digs[i]), "$\\pm$", format(round(ptab[i,6], digs[i]), nsmall=digs[i]), sep="")
+      M[(i+1), 6] <- paste(format(round(ptab[i,8], digs[i]), nsmall=digs[i]), "$\\pm$", format(round(ptab[i,9], digs[i]), nsmall=digs[i]), sep="")
+    }
+    M[(i+1), 8] <- paste(format(round(ptab[i,11], digs[i]), nsmall=digs[i]), "$\\pm$", format(round(ptab[i,12], digs[i]), nsmall=digs[i]), sep="")
+    M[(i+1), 10] <- paste(format(round(ptab[i,14], digs[i]), nsmall=digs[i]), "$\\pm$", format(round(ptab[i,15], digs[i]), nsmall=digs[i]), sep="")
+    M[(i+1), 12] <- paste(format(round(ptab[i,17], digs[i]), nsmall=digs[i]), "$\\pm$", format(round(ptab[i,18], digs[i]), nsmall=digs[i]), sep="")
+  }
+  
+  M[7,c(3,4,5,6)] <- catfun2a(ds=datas[[1]], vars=c('return_to_work.3m','return_to_work.12m'))
+  M[7,c(9,10,11,12)] <- catfun2a(ds=datas[[2]], vars=c('return_to_work.3m','return_to_work.12m'))
+  M[8,c(3,4,5,6)] <- catfun2a(ds=datas[[1]], vars=c('pt_satisfaction_index.3m','pt_satisfaction_index.12m'))
+  M[8,c(9,10,11,12)] <- catfun2a(ds=datas[[2]], vars=c('pt_satisfaction_index.3m','pt_satisfaction_index.12m'))
+  return(M)
+}
+
+
+
+### plot functions ###
+plotfun1 <- function(x, yli, yma, yla, mai, yll) {
+  plot(1:10, 1:10, xlim=c(1.5,8), ylim=yli, type="n", axes=FALSE, xlab="Time after Surgery", ylab=yla, main=mai)
+  legend(x=9, y=0,legend=c(pracs[w]),latexTranslate(snam[k]), pch=c(20,8), col=c('red','blue'), bty='n', xpd=NA, ncol=1)
+  axis(side=1, at=c(2,5,8), labels=paste(c("Baseline", "3-month", "12-month"), "\n N=", c(x[1], x[4], x[7]), sep=''), col='white')
+  axis(side=2, at=yma, las=2, labels=yll)
+  
+  if (x[1]>4) {
+    arrows(2, x[2]-x[3], 2, x[2]+x[3], angle=90, code=3, length=0.05)
+    arrows(5, x[5]-x[6], 5, x[5]+x[6], angle=90, code=3, length=0.05)
+    segments(2, x[2], 5, x[5])
+    points(c(2,5), x[c(11,14)],  pch=c(20,20), col=c('red','red'), cex=3)
+    points(c(2,5), x[c(2,5)],  pch=c(8,8), col=c('blue','blue'), cex=1)
+  }
+  
+  if (x[7]>4) {
+    arrows(8, x[8]-x[9], 8, x[8]+x[9], angle=90, code=3, length=0.05)
+    segments(5, x[5], 8, x[8])
+    points(c(8), x[c(17)], pch=c(20), col=c('red'), cex=3)
+    points(c(8), x[c(8)], pch=c(8), col=c('blue'), cex=1)
+  }
+}
+
+plotfun1b <- function(dat, iv, xyli, xyma, xla, yla, idline, mai) {
+  vars1 <- c("neck_pain_vas", "arm_pain_vas1", "ndiscore", "eq5dscore", "joa")
+  vars2 <- paste(c("neck_pain_vas", "arm_pain_vas1", "ndiscore", "eq5dscore", "joa"), ".3m", sep="")
+  tmp <- dat[!is.na(dat[[vars1[iv]]]) & !is.na(dat[[vars2[iv]]]),]
+  x <- tmp[[vars1[[iv]]]]
+  y <- tmp[[vars2[[iv]]]]
+  plot(jitter(x,1), jitter(y,1), xlim=xyli, ylim=xyli, main=mai, axes=FALSE, xlab=xla, ylab=yla, type="p", pch=1, cex=1, col='grey40')
+  axis(side=1, at=xyma)
+  axis(side=2, at=xyma, las=2)
+  segments(idline[1], idline[2], idline[3], idline[4], lty=3) 
+}
+
+
+plotfun2 <- function(datas, pltnam, ptab) {
+  pdf(pltnam, width=8, height=12)
+  par(mfrow=c(3,2), mar=c(7,10,6,7))
+  plotfun1(x=ptab[1,], mai="Neck Pain", yli=c(0,10), yma=c(0,2,4,6,8,10), yla="Pain Score", yll=c("  \n 0\n No Pain", 2,4,6,8, "  \n 10\n Worst Pain"))
+  plotfun1(x=ptab[2,], mai="Arm Pain", yli=c(0,10), yma=c(0,2,4,6,8,10), yla="Pain Score", yll=c("  \n 0\n No Pain", 2,4,6,8, "  \n 10\n Worst Pain"))
+  plotfun1(x=ptab[3,], mai="Neck Disability Index", yli=c(0,100), yma=c(0,20,40,60,80,100), yla="NDI", yll=c("  \n 0\n No Impairment", 20,40,60,80, "  \n 100\n Functional Impairment"))
+  plotfun1(x=ptab[4,], mai="Euroqual Quality of Life", yli=c(-0.1, 1.0), yma=c(-0.1, 0, 0.2, 0.4, 0.6, 0.8, 1.0), yla="EQ-5D", yll=c("  \n -0.1\n Worst Health", 0,0.2,0.4,0.6,0.8, "  \n 1.0\n Best Health"))
+  plotfun1(x=ptab[5,], mai="mJOA", yli=c(0,17), yma=c(0,3,6,9,12,14,17), yla="mJOA", yll=c("  \n 0\n Severe", 3,6,9,12,14, "  \n 17\n Mild"))
+  dev.off()
+}
+
+
+plot12mfun1 <- function(x, yli, yma, yla, mai, yll) {
+  plot(1:10, 1:10, xlim=c(1.5,8), ylim=yli, type="n", axes=FALSE, xlab="Time after Surgery", ylab=yla, main=mai)
+  legend(x=9, y=0,legend=c(pracs[w]),latexTranslate(snam[k])), pch=c(20,8), col=c('red','blue'), bty='n', xpd=NA, ncol=1)
+  axis(side=1, at=c(2,5,8), labels=paste(c("Baseline", "3-month", "12-month"), "\n N=", c(x[1], x[4], x[7]), sep=''), col='white')
+  axis(side=2, at=yma, las=2, labels=yll)
+  
+  if (x[1]>4) {
+    arrows(2, x[2]-x[3], 2, x[2]+x[3], angle=90, code=3, length=0.05)
+    arrows(5, x[5]-x[6], 5, x[5]+x[6], angle=90, code=3, length=0.05)
+    segments(2, x[2], 5, x[5])
+    points(c(2,5), x[c(11,14)],  pch=c(20,20), col=c('red','red'), cex=3)
+    points(c(2,5), x[c(2,5)],  pch=c(8,8), col=c('blue','blue'), cex=1)
+  }
+  
+  if (x[7]>4) {
+    arrows(8, x[8]-x[9], 8, x[8]+x[9], angle=90, code=3, length=0.05)
+    segments(5, x[5], 8, x[8])
+    points(c(8), x[c(17)], pch=c(20), col=c('red'), cex=3)
+    points(c(8), x[c(8)], pch=c(8), col=c('blue'), cex=1)
+  }
+}
+
+plot12mfun1b <- function(dat, iv, xyli, xyma, xla, yla, idline, mai) {
+  vars1 <- c("neck_pain_vas", "arm_pain_vas1", "ndiscore", "eq5dscore", "joa")
+  vars2 <- paste(c("neck_pain_vas", "arm_pain_vas1", "ndiscore", "eq5dscore", "joa"), ".3m", sep="")
+  tmp <- dat[!is.na(dat[[vars1[iv]]]) & !is.na(dat[[vars2[iv]]]),]
+  x <- tmp[[vars1[[iv]]]]
+  y <- tmp[[vars2[[iv]]]]
+  plot(jitter(x,1), jitter(y,1), xlim=xyli, ylim=xyli, main=mai, axes=FALSE, xlab=xla, ylab=yla, type="p", pch=1, cex=1, col='grey40')
+  axis(side=1, at=xyma)
+  axis(side=2, at=xyma, las=2)
+  segments(idline[1], idline[2], idline[3], idline[4], lty=3) 
+}
+
+plot12mfun1c <- function(dat, iv, xyli, xyma, xla, yla, idline, mai) {
+  vars1 <- paste(c("neck_pain_vas", "arm_pain_vas1", "ndiscore", "eq5dscore", "joa"), ".3m", sep="")
+  vars2 <- paste(c("neck_pain_vas", "arm_pain_vas1", "ndiscore", "eq5dscore", "joa"), ".12m", sep="")
+  tmp <- dat[!is.na(dat[[vars1[iv]]]) & !is.na(dat[[vars2[iv]]]),]
+  x <- tmp[[vars1[[iv]]]]
+  y <- tmp[[vars2[[iv]]]]
+  plot(jitter(x,1), jitter(y,1), xlim=xyli, ylim=xyli, main=mai, axes=FALSE, xlab=xla, ylab=yla, type="p", pch=1, cex=1, col='grey40')
+  axis(side=1, at=xyma)
+  axis(side=2, at=xyma, las=2)
+  segments(idline[1], idline[2], idline[3], idline[4], lty=3) 
+}
+
+plot12mfun2 <- function(datas, pltnam, ptab) {
+  pdf(pltnam, width=6, height=17)
+  par(mfrow=c(4,1), mar=c(4,9.3,4,11))
+  plot12mfun1(x=ptab[1,], mai="Neck Pain", yli=c(0,10), yma=c(0,2,4,6,8,10), yla="Pain Score", yll=c("  \n 0\n No Pain", 2,4,6,8, "  \n 10\n Worst Pain"))
+  plot12mfun1(x=ptab[2,], mai="Arm Pain", yli=c(0,10), yma=c(0,2,4,6,8,10), yla="Pain Score", yll=c("  \n 0\n No Pain", 2,4,6,8, "  \n 10\n Worst Pain"))
+  plot12mfun1(x=ptab[3,], mai="Neck Disability Index", yli=c(0,100), yma=c(0,20,40,60,80,100), yla="NDI", yll=c("  \n 0\n No Impairment", 20,40,60,80, "  \n 100\n Functional Impairment"))
+  plot12mfun1(x=ptab[4,], mai="Euroqual Quality of Life", yli=c(-0.1, 1.0), yma=c(-0.1, 0, 0.2, 0.4, 0.6, 0.8, 1.0), yla="EQ-5D", yll=c("  \n -0.1\n Worst Health", 0,0.2,0.4,0.6,0.8, "  \n 1.0\n Best Health"))
+  plot12mfun1(x=ptab[5,], mai="mJOA", yli=c(0,17), yma=c(0,3,6,9,12,14,17), yla="mJOA", yll=c("  \n 0\n Severe", 3,6,9,12,14, "  \n 17\n Mild"))
+  dev.off()
+}
+
+
+#### generate the follow up plot #############
+
+## only for site with >20 12m followup ##
+
+
+
+follow_up <- function(site){
+  data_follow_up <- subset(data_follow_up1, practice==site)
+  if(length(pracs1) > 0L) {
+    n <- nrow(data_follow_up)
+    dfp <- aggregate(cbind(usefull3month, usefull12month, analysis3month, analysis12month) ~ surgeon, FUN=sum, data=data_follow_up)
+    colnames(dfp) <- c('surgeon', 'x3m', 'x12m', 'y3m', 'y12m')
+    ##########Ben ekledim#################
+    dfp$QOD_3base<-sum(dfp$x3m,na.rm = FALSE)
+    dfp$QOD_12base<-sum(dfp$x12m,na.rm = FALSE)
+    dfp$QOD_3m<-sum(dfp$y3m,na.rm = FALSE)
+    dfp$QOD_12m<-sum(dfp$y12m,na.rm = FALSE)
+    dfp$qod_fu3m <- round(dfp$QOD_3m/dfp$QOD_3base,2)
+    dfp$qod_fu12m <-round(dfp$QOD_12m/dfp$QOD_12base,2)
+    ################
+    dfp$fu3m <-0
+    dfp$fu12m <-0
+    dfp$fu3m <- round(dfp$y3m/dfp$x3m,2)
+    dfp$fu12m <- round(dfp$y12m/dfp$x12m,2)
+    dfp$fu <- round(dfp$fu3m + dfp$fu12m,2)
+    dfp <- dfp[order(dfp$fu),]
+    nm <- nrow(dfp)
+    dfp$center <- nm:1
+    num.min <- min(dfp$x12m)
+    num.max <- max(dfp$x3m)
+    return(dfp)
+  }
+}  
+
+
+
+
+
+##############################################
+#### run .rnw file to generate pdf report ####
+##############################################
+
+
+
+mlCap <- function(x) {
+  sprintf("\\begin{tabular}{l}%s \\end{tabular}", x)
+}
+pracs <- pracs1
+filepracs <- gsub('*', '+', pracs, fixed=TRUE)
+
+
+
+for (w in seq(length(pracs))) {
+  data1 <- subset(data, practice==pracs[w])
+  data2o <- subset(data1,analyzed_3month | analyzed_12month)
+  data2 <- subset(data1, analyzed_12month)
+  data3 <- subset(data1, analyzed_3month)
+  tab <- table(data1$surgeon)
+  if (sum(tab>19) > 0) {
+    snam <- names(tab)[tab>19]
+    nsg <- length(snam)
+    for (k in seq(nsg)) {
+      snam2 <- data1$surgeon_new_id[data1$surgeon==snam[k]]
+      Sweave("cervical_report_generate.rnw", output=paste(pracs[w], '_', snam[k], ".tex", sep="")) 
+    }
+  }
+}
+
+for (w in seq(length(pracs))) {
+  data1 <- subset(data, practice==pracs[w])
+  data2 <- subset(data1, analyzed_12month)
+  tab <- table(data1$surgeon)
+  if (sum(tab>19) > 0) {
+    snam <- names(tab)[tab>19]
+    nsg <- length(snam)
+    for (k in seq(nsg)) {
+      for (q in 1:3) {system(paste("pdflatex ", paste(pracs[w], '_', snam[k], ".tex", sep="")))}
+    }
+  }
+}
 
 
 
