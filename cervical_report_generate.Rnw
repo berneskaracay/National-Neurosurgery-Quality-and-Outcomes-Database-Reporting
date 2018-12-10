@@ -6,7 +6,7 @@
 \usepackage{pdflscape}
 \usepackage{colortbl}
 \providecommand{\shadeRow}{\rowcolor[rgb]{0.529,0.808,0.922}}
-
+\title{STATISTICS and OUTCOMES REPORT \\ CERVICAL}
 \date{}
 \begin{document}
 \begin{center}
@@ -198,24 +198,24 @@ The total number of patients at your site included in this report (called "follo
 <<echo=FALSE, results=tex>>=
 myrow <- rep('', nrow(tab2))
 myrow[hl2] <- 'shadeRow'
-latex(tab2, title="", caption="Baseline Characteristics for Patients with 3-Month Follow-up", where="!h", size="small", col.just=rep("c",2), colheads=c(latexTranslate(pracs[k]), "QOD Total"), file="", lines.page=48, insert.bottom =mlCap("* ${\\tiny a}$ b ${\\tiny c}$ represents the lower quantile a, the median b, and the upper quartile c. \\\\ *$x\\pm s$ represents mean$\\pm 1$ Standard Deviation. \\\\ Denominator lower than 3-month accrual is because of the missing values. \\\\ Highlighted are variables with a meaningful difference between Site and other centers."), rownamesTexCmd=myrow)
+latex(tab2, title="", caption="Baseline Characteristics for Patients with Follow-up", where="!h", size="small", col.just=rep("c",2), colheads=c(latexTranslate(pracs[k]), "QOD Total"), file="", lines.page=48, insert.bottom =mlCap("* ${\\tiny a}$ b ${\\tiny c}$ represents the lower quantile a, the median b, and the upper quartile c. \\\\ *$x\\pm s$ represents mean$\\pm 1$ Standard Deviation. \\\\ Denominator lower than 3-month accrual is because of the missing values. \\\\ Highlighted are variables with a meaningful difference between Site and other centers."), rownamesTexCmd=myrow)
 @
 
 \clearpage
 <<echo=FALSE, results=tex>>=
 myrow <- rep('', nrow(tab3))
 myrow[hl3] <- 'shadeRow'
-latex(tab3[-1,], title="", caption="Medical History for Patients with 3-Month Follow-up", where="!h", size="small", col.just=rep("c",2), colheads=c(latexTranslate(pracs[k]), "QOD Total"), file="", insert.bottom =mlCap("* ${\\tiny a}$ b ${\\tiny c}$ represents the lower quantile a, the median b, and the upper quartile c. \\\\ *$x\\pm s$ represents mean$\\pm 1$ Standard Deviation. \\\\ Denominator lower than 3-month accrual is because of the missing values. \\\\ Highlighted are variables with a meaningful difference between Site and other centers."), rownamesTexCmd=myrow[-1])
+latex(tab3[-1,], title="", caption="Medical History for Patients with Follow-up", where="!h", size="small", col.just=rep("c",2), colheads=c(latexTranslate(pracs[k]), "QOD Total"), file="", insert.bottom =mlCap("* ${\\tiny a}$ b ${\\tiny c}$ represents the lower quantile a, the median b, and the upper quartile c. \\\\ *$x\\pm s$ represents mean$\\pm 1$ Standard Deviation. \\\\ Denominator lower than 3-month accrual is because of the missing values. \\\\ Highlighted are variables with a meaningful difference between Site and other centers."), rownamesTexCmd=myrow[-1])
 
 @
 
 \clearpage
 <<echo=FALSE, results=tex>>=
-latex(tab6b, title="", caption="Surgical Procedures by Primary Indication for Patients with 3-Month Follow-up", where="!h", size="small", col.just=rep("c",2), colheads=c(latexTranslate(pracs[k]), "QOD Total"), longtable=TRUE, lines.page=200, file="", insert.bottom =mlCap("$x\\pm s$ represents mean$\\pm 1$ Standard Deviation for Number of Levels. \\\\ N is the number of non-missing values. \\\\  Denominator lower than 3-month accrual is because of the missing values."))
+latex(tab6b, title="", caption="Surgical Procedures by Primary Indication for Patients with Follow-up", where="!h", size="small", col.just=rep("c",2), colheads=c(latexTranslate(pracs[k]), "QOD Total"), longtable=TRUE, lines.page=200, file="", insert.bottom =mlCap("$x\\pm s$ represents mean$\\pm 1$ Standard Deviation for Number of Levels. \\\\ N is the number of non-missing values. \\\\  Denominator lower than 3-month accrual is because of the missing values."))
 @
 \clearpage
 <<echo=FALSE, results=tex>>=
-latex(tab7, title="", caption="Indicators of Safety and Quality of Care for Patients with 3-Month Follow-up", where="!h", size="small", col.just=rep("c",2), colheads=c(latexTranslate(pracs[k]), "QOD Total"), file="", lines.page=55, long=TRUE, insert.bottom =mlCap("* ${\\tiny a}$ b ${\\tiny c}$ represent the lower quantile a, the median b, and the upper quartile c. \\\\  * $x\\pm s$ represents mean$\\pm 1$ Standard Deviation. \\\\ N is the number of non-missing values. \\\\  Denominator lower than 3-month accrual is because of the missing values."))
+latex(tab7, title="", caption="Indicators of Safety and Quality of Care for Patients with Follow-up", where="!h", size="small", col.just=rep("c",2), colheads=c(latexTranslate(pracs[k]), "QOD Total"), file="", lines.page=55, long=TRUE, insert.bottom =mlCap("* ${\\tiny a}$ b ${\\tiny c}$ represent the lower quantile a, the median b, and the upper quartile c. \\\\  * $x\\pm s$ represents mean$\\pm 1$ Standard Deviation. \\\\ N is the number of non-missing values. \\\\  Denominator lower than 3-month accrual is because of the missing values."))
 @
 \clearpage
 
@@ -291,7 +291,7 @@ dev.off()
 
 
 <<echo=FALSE, results=tex>>=
-latex(tab7b, title="", caption="Utilization by Surgical Approach for Patients with 3-Month Follow-up", where="!h", size="small", col.just=rep("c",2), colheads=c(latexTranslate(pracs[k]), "QOD Total"), file="", lines.page=100, long=TRUE, insert.bottom =mlCap("* ${\\tiny a}$ b ${\\tiny c}$ represent the lower quantile a, the median b, and the upper quartile c. \\\\  * $x\\pm s$ represents mean$\\pm 1$ Standard Deviation. \\\\ N is the number of non-missing values. \\\\  Denominator lower than 3-month accrual is because of the missing values."))
+latex(tab7b, title="", caption="Utilization by Surgical Approach for Patients with Follow-up", where="!h", size="small", col.just=rep("c",2), colheads=c(latexTranslate(pracs[k]), "QOD Total"), file="", lines.page=100, long=TRUE, insert.bottom =mlCap("* ${\\tiny a}$ b ${\\tiny c}$ represent the lower quantile a, the median b, and the upper quartile c. \\\\  * $x\\pm s$ represents mean$\\pm 1$ Standard Deviation. \\\\ N is the number of non-missing values. \\\\  Denominator lower than 3-month accrual is because of the missing values."))
 @
 \clearpage
 

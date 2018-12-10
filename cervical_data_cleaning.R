@@ -75,8 +75,8 @@ data$sub_practice <- sub("^([^*]+)(\\*(.+))?_CP[0-9]{4}$", "\\3", data$pt_study_
 data$pt_id <- sub(".*_", "", as.character(data$pt_study_id))
 data$surgeon <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surgeon))
 data$surg_location <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surg_location))
-liste=c("Semmes","Vanderbilt","Duke")
-data <- subset(data, practice %in% liste)
+#liste=c("Semmes","Vanderbilt","Duke")
+#data <- subset(data, practice %in% liste)
 # merge the data with index #
 data_follow_up <- merge(data, d_follow_up[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month',"usefull3month","usefull12month")], by='pt_study_id', all.y=TRUE)
 
@@ -1260,7 +1260,7 @@ figure_construct <- function(datas) {
 
 # table of utilization #
 tab7bfun <- function(datas) { 
-  M <- matrix("", nrow=45, ncol=2)
+  M <- matrix("", nrow=44, ncol=2)
   M[2,] <- confun3(var1="estimated_blood_loss_cc3", var2="newcat1", dfs=datas, var3="estimated_blood_loss_cc3", dig=0)
   M[3,] <- confun3(var1="length_of_surgery", var2="newcat1", dfs=datas, var3="length_of_surgery", dig=0)
   M[4,] <- catfun1(var1="arthrodesis", var2="newcat1", ilev="1", df=datas)
@@ -1299,12 +1299,11 @@ tab7bfun <- function(datas) {
   
   M[38,] <- confun3(var1="estimated_blood_loss_cc3", var2="newcat5", dfs=datas, var3="estimated_blood_loss_cc3", dig=0)
   M[39,] <- confun3(var1="length_of_surgery", var2="newcat5", dfs=datas, var3="length_of_surgery", dig=0)
-  M[40,] <- catfun1(var1="arthrodesis", var2="newcat5", ilev="1", df=datas)
-  M[41,] <- confun3(var1="los3", var2="newcat5", dfs=datas, var3="los3", dig=1)
-  M[42,] <- catfun1(var1="returned_to_or_with_30_day", var2="newcat5", ilev="1", df=datas)
-  M[43,] <- catfun1(var1="readmit30day", var2="newcat5", ilev="1", df=datas)
-  M[44,] <- catfun1(var1="revision_surg_3mths", var2="newcat5", ilev="1", df=datas)
-  M[45,] <- catfun1(var1="readmit3m", var2="newcat5", ilev="1", df=datas)
+  M[40,] <- confun3(var1="los3", var2="newcat5", dfs=datas, var3="los3", dig=1)
+  M[41,] <- catfun1(var1="returned_to_or_with_30_day", var2="newcat5", ilev="1", df=datas)
+  M[42,] <- catfun1(var1="readmit30day", var2="newcat5", ilev="1", df=datas)
+  M[43,] <- catfun1(var1="revision_surg_3mths", var2="newcat5", ilev="1", df=datas)
+  M[44,] <- catfun1(var1="readmit3m", var2="newcat5", ilev="1", df=datas)
   return(M)
 }
 
