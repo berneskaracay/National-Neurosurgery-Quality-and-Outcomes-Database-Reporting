@@ -9,6 +9,7 @@
 \title{STATISTICS and OUTCOMES REPORT \\ CERVICAL}
 \date{}
 \begin{document}
+\maketitle
 \begin{center}
 \Large {\Sexpr{startdate$sdate[startdate$practice==pracs[k]]}} $\sim$ {\Sexpr{startdate$edate[startdate$practice == pracs[k]]}}
 \end{center}
@@ -296,7 +297,7 @@ latex(tab7b, title="", caption="Utilization by Surgical Approach for Patients wi
 \clearpage
 
 <<echo=FALSE, results=tex>>=
-    latex(tab9a, title="", caption="Outcomes at Baseline, 3 Month and 12 Month for Patients with 12-month Follow-up", where="!h", size="footnotesize", col.just=c("r", "c","r", "c","r","c", "r", "c","r", "c","r", "c"), colheads=rep(c("N-B", "Baseline","N-3", "3-Month","N-12", "12-Month"),2), cgroup=c(latexTranslate(pracs[k]), "QOD Total"), file='', lines.page=25, longtable=TRUE, landscape=TRUE, insert.bottom =mlCap("${\\tiny a}$ b ${\\tiny c}$ represent the lower quantile a, the median b, and the upper quartile c.  \\\\ $x\\pm s$ represents $\\bar{X}\\pm 1$ Standard Deviation. \\\\  N-B is the number of non-missing values at baseline. \\\\ N-3 is the number of non-missing values at 3 month. \\\\
+    latex(tab9a, title="", caption="Outcomes at Baseline, 3 Month and 12 Month for Patients with Follow-up", where="!h", size="footnotesize", col.just=c("r", "c","r", "c","r","c", "r", "c","r", "c","r", "c"), colheads=rep(c("N-B", "Baseline","N-3", "3-Month","N-12", "12-Month"),2), cgroup=c(latexTranslate(pracs[k]), "QOD Total"), file='', lines.page=25, longtable=TRUE, landscape=TRUE, insert.bottom =mlCap("${\\tiny a}$ b ${\\tiny c}$ represent the lower quantile a, the median b, and the upper quartile c.  \\\\ $x\\pm s$ represents $\\bar{X}\\pm 1$ Standard Deviation. \\\\  N-B is the number of non-missing values at baseline. \\\\ N-3 is the number of non-missing values at 3 month. \\\\
 N-12 is the number of non-missing values at 12 month."))
 
 @
@@ -314,7 +315,7 @@ N-12 is the number of non-missing values at 12 month."))
 \clearpage
 
 <<echo=FALSE, results=tex>>=
-    latex(tab9, title="", caption="Outcomes at Baseline, 3 Month and 12 Month for Patients with 12-month Follow-up", where="!h", size="footnotesize", col.just=c("r", "c","r", "c","r","c", "r", "c","r", "c","r", "c"), colheads=rep(c("N-B", "Baseline","N-3", "3-Month","N-12", "12-Month"),2), cgroup=c(latexTranslate(pracs[k]), "QOD Total"), file='', lines.page=25, longtable=TRUE, landscape=TRUE, insert.bottom =mlCap("${\\tiny a}$ b ${\\tiny c}$ represent the lower quantile a, the median b, and the upper quartile c.  \\\\ $x\\pm s$ represents $\\bar{X}\\pm 1$ Standard Deviation. \\\\  N-B is the number of non-missing values at baseline. \\\\ N-3 is the number of non-missing values at 3 month. \\\\
+    latex(tab9, title="", caption="Outcomes at Baseline, 3 Month and 12 Month for Patients with Follow-up", where="!h", size="footnotesize", col.just=c("r", "c","r", "c","r","c", "r", "c","r", "c","r", "c"), colheads=rep(c("N-B", "Baseline","N-3", "3-Month","N-12", "12-Month"),2), cgroup=c(latexTranslate(pracs[k]), "QOD Total"), file='', lines.page=25, longtable=TRUE, landscape=TRUE, insert.bottom =mlCap("${\\tiny a}$ b ${\\tiny c}$ represent the lower quantile a, the median b, and the upper quartile c.  \\\\ $x\\pm s$ represents $\\bar{X}\\pm 1$ Standard Deviation. \\\\  N-B is the number of non-missing values at baseline. \\\\ N-3 is the number of non-missing values at 3 month. \\\\
 N-12 is the number of non-missing values at 12 month.  \\\\ Numbers after percents are frequencies.\\\\A patient could possibly fall into more than one category of Surgical Approach"))
 
 @
