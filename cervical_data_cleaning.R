@@ -1267,7 +1267,7 @@ tab7fun <- function(datas, datasb) {
   M[27+6,] <- confun2(var1="los3", dfs=datas, dig=1)
   M[28+6,] <- catfun1(var1="returned_to_or_with_30_day", var2="returned_to_or_with_30_day", ilev="1", df=datas)
   M[35,] <- catfun1(var1="readmit30day", var2="readmit30day", ilev="1", df=datas)
-  M[36,] <- catfun1(var1="revision_surg_3mths", var2="revision_surg_3mths", ilev="1", df=datas)
+  M[36,] <- catfun1(var1="revision_surg_3mths.3m", var2="revision_surg_3mths.3m", ilev="1", df=datas)
   M[37,] <- catfun1(var1="readmit3m", var2="readmit3m", ilev="1", df=datas)
   return(M)
 }
@@ -1282,7 +1282,7 @@ figure_construct <- function(datas) {
   M_f[5,] <- catfun1b(var1="pt_satisfaction_index2.3m", var2="pt_satisfaction_index2.3m", ilev="1", df=datas)
   M_f[6,] <- M_f[1,] + M_f[2,]
   M_f[7,] <- catfun1b(var1="readmit30day", var2="readmit30day", ilev="1", df=datas)
-  M_f[8,] <- catfun1b(var1="revision_surg_3mths2", var2="revision_surg_3mths2", ilev="1", df=datas)
+  M_f[8,] <- catfun1b(var1="revision_surg_3mths.3m", var2="revision_surg_3mths.3m", ilev="1", df=datas)
   M_f[9,] <- catfun1b(var1="readmit3m", var2="readmit3m", ilev="1", df=datas)
   return(M_f)
 }
@@ -1299,7 +1299,7 @@ tab7bfun <- function(datas) {
   M[5,] <- confun3(var1="los3", var2="newcat1", dfs=datas, var3="los3", dig=1)
   M[6,] <- catfun1(var1="returned_to_or_with_30_day", var2="newcat1", ilev="1", df=datas)
   M[7,] <- catfun1(var1="readmit30day", var2="newcat1", ilev="1", df=datas)
-  M[8,] <- catfun1(var1="revision_surg_3mths", var2="newcat1", ilev="1", df=datas)
+  M[8,] <- catfun1(var1="revision_surg_3mths.3m", var2="newcat1", ilev="1", df=datas)
   M[9,] <- catfun1(var1="readmit3m", var2="newcat1", ilev="1", df=datas)
   
   M[11,] <- confun3(var1="estimated_blood_loss_cc3", var2="newcat2", dfs=datas, var3="estimated_blood_loss_cc3", dig=0)
@@ -1308,7 +1308,7 @@ tab7bfun <- function(datas) {
   M[14,] <- confun3(var1="los3", var2="newcat2", dfs=datas, var3="los3", dig=1)
   M[15,] <- catfun1(var1="returned_to_or_with_30_day", var2="newcat2", ilev="1", df=datas)
   M[16,] <- catfun1(var1="readmit30day", var2="newcat2", ilev="1", df=datas)
-  M[17,] <- catfun1(var1="revision_surg_3mths", var2="newcat2", ilev="1", df=datas)
+  M[17,] <- catfun1(var1="revision_surg_3mths.3m", var2="newcat2", ilev="1", df=datas)
   M[18,] <- catfun1(var1="readmit3m", var2="newcat2", ilev="1", df=datas)
   
   M[20,] <- confun3(var1="estimated_blood_loss_cc3", var2="newcat3", dfs=datas, var3="estimated_blood_loss_cc3", dig=0)
@@ -1317,7 +1317,7 @@ tab7bfun <- function(datas) {
   M[23,] <- confun3(var1="los3", var2="newcat3", dfs=datas, var3="los3", dig=1)
   M[24,] <- catfun1(var1="returned_to_or_with_30_day", var2="newcat3", ilev="1", df=datas)
   M[25,] <- catfun1(var1="readmit30day", var2="newcat3", ilev="1", df=datas)
-  M[26,] <- catfun1(var1="revision_surg_3mths", var2="newcat3", ilev="1", df=datas)
+  M[26,] <- catfun1(var1="revision_surg_3mths.3m", var2="newcat3", ilev="1", df=datas)
   M[27,] <- catfun1(var1="readmit3m", var2="newcat3", ilev="1", df=datas)
   
   M[29,] <- confun3(var1="estimated_blood_loss_cc3", var2="newcat4", dfs=datas, var3="estimated_blood_loss_cc3", dig=0)
@@ -1326,7 +1326,7 @@ tab7bfun <- function(datas) {
   M[32,] <- confun3(var1="los3", var2="newcat4", dfs=datas, var3="los3", dig=1)
   M[33,] <- catfun1(var1="returned_to_or_with_30_day", var2="newcat4", ilev="1", df=datas)
   M[34,] <- catfun1(var1="readmit30day", var2="newcat4", ilev="1", df=datas)
-  M[35,] <- catfun1(var1="revision_surg_3mths", var2="newcat4", ilev="1", df=datas)
+  M[35,] <- catfun1(var1="revision_surg_3mths.3m", var2="newcat4", ilev="1", df=datas)
   M[36,] <- catfun1(var1="readmit3m", var2="newcat4", ilev="1", df=datas)
   
   M[38,] <- confun3(var1="estimated_blood_loss_cc3", var2="newcat5", dfs=datas, var3="estimated_blood_loss_cc3", dig=0)
@@ -1335,7 +1335,7 @@ tab7bfun <- function(datas) {
   M[41,] <- confun3(var1="los3", var2="newcat5", dfs=datas, var3="los3", dig=1)
   M[42,] <- catfun1(var1="returned_to_or_with_30_day", var2="newcat5", ilev="1", df=datas)
   M[43,] <- catfun1(var1="readmit30day", var2="newcat5", ilev="1", df=datas)
-  M[44,] <- catfun1(var1="revision_surg_3mths", var2="newcat5", ilev="1", df=datas)
+  M[44,] <- catfun1(var1="revision_surg_3mths.3m", var2="newcat5", ilev="1", df=datas)
   M[45,] <- catfun1(var1="readmit3m", var2="newcat5", ilev="1", df=datas)
   return(M)
 }
