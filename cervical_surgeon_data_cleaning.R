@@ -80,7 +80,7 @@ data$surgeon_name <- str_replace_all(data$surgeon_name, "[[:punct:]]", " ")
 data$surgeon <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surgeon))
 data$surg_location <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surg_location))
 data_follow_up1 <- merge(data, d_follow_up[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month',"usefull3month","usefull12month")], by='pt_study_id', all.y=TRUE)
-#liste=c("Semmes","Vanderbilt","Duke")
+#liste=c("Albany")
 #data <- subset(data, practice %in% liste)
 # merge the data with index #
 data_follow_up <- merge(data, d_follow_up[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month',"usefull3month","usefull12month")], by='pt_study_id', all.y=TRUE)
@@ -231,7 +231,7 @@ data$readmit30day[!is.na(data$days.readmit) & data$days.readmit<31] <- 1
 ## FIX ME -- HACKY QUICK FIX
 data$readmit30day[is.na(data$readmit30day)] <- 0
 data$readmit30day <- factor(data$readmit30day, levels=0:1)
-data$readmit3m <- ifelse(data$readmit_3months%in%c(1) | data$readmit_3mth_surg.3m%in%c(1) | data$readmit_3mth_surg.12m%in%c(1), 1, 0)
+data$readmit3m <- ifelse(data$readmit_3months %in% 1 | data$readmit_3mth_surg.3m %in% 1 | data$readmit_3mth_surg.12m %in% 1, 1, 0)
 data$readmit3m <- factor(data$readmit3m, levels=c("1", "0"))
 
 data$return_to_work.3m[!data$plan_return_work.3m %in% 1] <- NA
@@ -1015,7 +1015,7 @@ figure_construct <- function(datas) {
   M_f[5,] <- catfun1b(var1="pt_satisfaction_index2.3m", var2="pt_satisfaction_index2.3m", ilev="1", df=datas)
   M_f[6,] <- round(M_f[1,]) + round(M_f[2,])
   M_f[7,] <- catfun1b(var1="readmit30day", var2="readmit30day", ilev="1", df=datas)
-  M_f[8,] <- catfun1b(var1="revision_surg_3mths2", var2="revision_surg_3mths2", ilev="1", df=datas)
+  M_f[8,] <- catfun1b(var1="revision_surg_3mths.3m", var2="revision_surg_3mths.3m", ilev="1", df=datas)
   M_f[9,] <- catfun1b(var1="readmit3m", var2="readmit3m", ilev="1", df=datas)
   return(M_f)
 }
@@ -1173,39 +1173,6 @@ plotfun2 <- function(datas, pltnam, ptab) {
 }
 
 
-plot12mfun1 <- function(x, yli, yma, yla, mai, yll) {
-  plot(1:10, 1:10, xlim=c(1.5,8), ylim=yli, type="n", axes=FALSE, xlab="Time after Surgery", ylab=yla, main=mai)
-  legend(x=9, y=0,legend=c(pracs[w]),latexTranslate(snam[k])), pch=c(20,8), col=c('red','blue'), bty='n', xpd=NA, ncol=1)
-  axis(side=1, at=c(2,5,8), labels=paste(c("Baseline", "3-month", "12-month"), "\n N=", c(x[1], x[4], x[7]), sep=''), col='white')
-  axis(side=2, at=yma, las=2, labels=yll)
-  
-  if (x[1]>4) {
-    arrows(2, x[2]-x[3], 2, x[2]+x[3], angle=90, code=3, length=0.05)
-    arrows(5, x[5]-x[6], 5, x[5]+x[6], angle=90, code=3, length=0.05)
-    segments(2, x[2], 5, x[5])
-    points(c(2,5), x[c(11,14)],  pch=c(20,20), col=c('red','red'), cex=3)
-    points(c(2,5), x[c(2,5)],  pch=c(8,8), col=c('blue','blue'), cex=1)
-  }
-  
-  if (x[7]>4) {
-    arrows(8, x[8]-x[9], 8, x[8]+x[9], angle=90, code=3, length=0.05)
-    segments(5, x[5], 8, x[8])
-    points(c(8), x[c(17)], pch=c(20), col=c('red'), cex=3)
-    points(c(8), x[c(8)], pch=c(8), col=c('blue'), cex=1)
-  }
-}
-
-plot12mfun1b <- function(dat, iv, xyli, xyma, xla, yla, idline, mai) {
-  vars1 <- c("neck_pain_vas", "arm_pain_vas1", "ndiscore", "eq5dscore", "joa")
-  vars2 <- paste(c("neck_pain_vas", "arm_pain_vas1", "ndiscore", "eq5dscore", "joa"), ".3m", sep="")
-  tmp <- dat[!is.na(dat[[vars1[iv]]]) & !is.na(dat[[vars2[iv]]]),]
-  x <- tmp[[vars1[[iv]]]]
-  y <- tmp[[vars2[[iv]]]]
-  plot(jitter(x,1), jitter(y,1), xlim=xyli, ylim=xyli, main=mai, axes=FALSE, xlab=xla, ylab=yla, type="p", pch=1, cex=1, col='grey40')
-  axis(side=1, at=xyma)
-  axis(side=2, at=xyma, las=2)
-  segments(idline[1], idline[2], idline[3], idline[4], lty=3) 
-}
 
 plot12mfun1c <- function(dat, iv, xyli, xyma, xla, yla, idline, mai) {
   vars1 <- paste(c("neck_pain_vas", "arm_pain_vas1", "ndiscore", "eq5dscore", "joa"), ".3m", sep="")

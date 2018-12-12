@@ -894,31 +894,51 @@ data$pt_education_level___4 <- ifelse(data$pt_education_level %in% 4, 1, 0)
 data$pt_education_level___5 <- ifelse(data$pt_education_level %in% 5, 1, 0)
 data$pt_education_level___6 <- ifelse(data$pt_education_level %in% NA, 1, 0)
 
-
+data$pt_education_level___1[is.na(data$pt_education_level)]<-NA
+data$pt_education_level___2[is.na(data$pt_education_level)]<-NA
+data$pt_education_level___3[is.na(data$pt_education_level)]<-NA
+data$pt_education_level___4[is.na(data$pt_education_level)]<-NA
+data$pt_education_level___5[is.na(data$pt_education_level)]<-NA
+data$pt_education_level___6[is.na(data$pt_education_level)]<-NA
 
 data$smoker___1 <- ifelse(data$smoker %in% 1, 1, 0)
 data$smoker___2 <- ifelse(data$smoker %in% 2, 1, 0)
 data$smoker___3 <- ifelse(data$smoker %in% 3, 1, 0)
 
-
+data$smoker___1[is.na(data$smoker)]<-NA
+data$smoker___2[is.na(data$smoker)]<-NA
+data$smoker___3[is.na(data$smoker)]<-NA
 
 data$asa_grade___1 <- ifelse(data$asa_grade %in% 1, 1, 0)
 data$asa_grade___2 <- ifelse(data$asa_grade %in% 2, 1, 0)
 data$asa_grade___3 <- ifelse(data$asa_grade %in% 3, 1, 0)
 data$asa_grade___4 <- ifelse(data$asa_grade %in% 4, 1, 0)
 
+
+data$asa_grade___1[is.na(data$asa_grade)]<-NA
+data$asa_grade___2[is.na(data$asa_grade)]<-NA
+data$asa_grade___3[is.na(data$asa_grade)]<-NA
+data$asa_grade___4[is.na(data$asa_grade)]<-NA
+
 data$symptom_duration2___1 <- ifelse(data$symptom_duration2 %in% 1, 1, 0)
 data$symptom_duration2___2 <- ifelse(data$symptom_duration2 %in% 2, 1, 0)
 data$symptom_duration2___3 <- ifelse(data$symptom_duration2 %in% 3, 1, 0)
 
-
-
-
+data$symptom_duration2___1[is.na(data$symptom_duration2)]<-NA
+data$symptom_duration2___2[is.na(data$symptom_duration2)]<-NA
+data$symptom_duration2___3[is.na(data$symptom_duration2)]<-NA
 
 data$surgical_approach___1 <- ifelse(data$surgical_approach %in% 1, 1, 0)
 data$surgical_approach___2 <- ifelse(data$surgical_approach %in% 2, 1, 0)
 data$surgical_approach___3 <- ifelse(data$surgical_approach %in% 3, 1, 0)
 data$surgical_approach___4 <- ifelse(data$surgical_approach %in% 4, 1, 0)
+
+
+
+data$surgical_approach___1[is.na(data$surgical_approach)]<-NA
+data$surgical_approach___2[is.na(data$surgical_approach)]<-NA
+data$surgical_approach___3[is.na(data$surgical_approach)]<-NA
+data$surgical_approach___4[is.na(data$surgical_approach)]<-NA
 
 data$pt_satisfaction_index.3m___1 <- ifelse(data$pt_satisfaction_index.3m %in% 1, 1, 0)
 data$pt_satisfaction_index.3m___2 <- ifelse(data$pt_satisfaction_index.3m %in% 2, 1, 0)
@@ -926,8 +946,15 @@ data$pt_satisfaction_index.3m___3 <- ifelse(data$pt_satisfaction_index.3m %in% 3
 data$pt_satisfaction_index.3m___4 <- ifelse(data$pt_satisfaction_index.3m %in% 4, 1, 0)
 
 
-data$place_discharged_to___6 <- ifelse(data$place_discharged_to %in% 6, 1, 0)
+data$pt_satisfaction_index.3m___1[is.na(data$pt_satisfaction_index.3m)]<-NA
+data$pt_satisfaction_index.3m___2[is.na(data$pt_satisfaction_index.3m)]<-NA
+data$pt_satisfaction_index.3m___3[is.na(data$pt_satisfaction_index.3m)]<-NA
+data$pt_satisfaction_index.3m___4[is.na(data$pt_satisfaction_index.3m)]<-NA
 
+
+
+data$place_discharged_to___6 <- ifelse(data$place_discharged_to %in% 6, 1, 0)
+data$place_discharged_to___6[is.na(data$place_discharged_to)]<-NA
 ######New Employment Variable##########################################################
 
 data$insurance1___1 <- ifelse(data$insurance1 %in% 1, 1, 0)
@@ -935,6 +962,13 @@ data$insurance1___2 <- ifelse(data$insurance1 %in% 2, 1, 0)
 data$insurance1___3 <- ifelse(data$insurance1 %in% 3, 1, 0)
 data$insurance1___4 <- ifelse(data$insurance1 %in% 4, 1, 0)
 data$insurance1___5 <- ifelse(data$insurance1 %in% 5, 1, 0)
+
+
+data$insurance1___1[is.na(data$insurance1)]<-NA
+data$insurance1___2[is.na(data$insurance1)]<-NA
+data$insurance1___3[is.na(data$insurance1)]<-NA
+data$insurance1___4[is.na(data$insurance1)]<-NA
+data$insurance1___5[is.na(data$insurance1)]<-NA
 
 
 ### generate table template ###
