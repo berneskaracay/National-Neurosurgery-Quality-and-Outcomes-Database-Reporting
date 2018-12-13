@@ -244,7 +244,7 @@ pl<-ggplot(data=dfp_satisfaction, aes(x=satisfaction, y=percent, fill=Site)) +
   scale_fill_brewer(palette="Paired")+scale_x_discrete(limits=c("1-Met", "2-Not As Much \n As Hoped","3-Would Not \n Undergo", "4-Same or Worse","Satisfied \n (1+2)"))+
   theme(panel.grid.major = element_line(color = "grey"),text = element_text(size=12),axis.text.x=element_text(angle=30,hjust=1,vjust=1,size=10))
 
-pdf(paste('figs/cervical_fu2_', practice, '.pdf', sep=''))
+pdf(paste('figs/cervical_fu2_', file_name, '.pdf', sep=''))
 pl
 dev.off()
   
@@ -263,7 +263,7 @@ pl<-ggplot(data=dfp_readmission, aes(x=readmit, y=percent, fill=Site)) +
   scale_fill_brewer(palette="Paired")+scale_x_discrete(limits=c("30-day Hospital \n Readmission", "3-month Hospital \n Readmission", "3-month Revision \n Surgery"))+
   theme(panel.grid.major = element_line(color = "grey"),text = element_text(size=12),axis.text.x=element_text(angle=30,hjust=1,vjust=1))
 
-pdf(paste('figs/cervical_fu3_', practice, '.pdf', sep=''))
+pdf(paste('figs/cervical_fu3_', file_name, '.pdf', sep=''))
 pl
 dev.off()
 @
