@@ -186,7 +186,7 @@ rownames(tab9a) <- c('\\underline{Overall}', '~~~Rating of Pain', '~~~~~~Neck Pa
 tab9 <- rbind(rep('',12), tab9b[-6,], rep('',12), tab9c, rep('',12),tab9d[-6,], rep('',12),tab9e[-6,], rep('',12),tab9f[-6,])
 rownames(tab9) <- c('\\underline{Posterior laminectomy only}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)', '\\underline{Posterior laminectomy and fusion}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~mJOA', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)', '\\underline{Posterior forminotomy only}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)', '\\underline{ACDF only}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)', '\\underline{Corpectomy only}', '~~~Rating of Pain', '~~~~~~Neck Pain', '~~~~~~Arm Pain', '~~~NDI($\\%$)', '~~~EQ-5D', '~~~Return to Work', '~~~Patient Satisfaction (Expectation Met)')
 
-plotname1 <- paste('figs/', pracs[w], "plot.pdf", sep="")
+plotname1 <- paste('figs/', file_name, "plot.pdf", sep="")
 plotfun2(datas=data1c, pltnam=plotname1, ptab=cbind(tab9pfun(datas=data1c),tab9pfun(datas=data1)))
 @
 \clearpage
@@ -279,14 +279,14 @@ dev.off()
   cat("\\clearpage",
     "\\begin{figure}[!htbp]",
     "\\begin{center}",
-    "\\includegraphics[scale=1]{", paste('figs/cervical_fu2_', pracs[w],'.pdf', sep=''), "}",
+    "\\includegraphics[scale=1]{", paste('figs/cervical_fu2_', file_name,'.pdf', sep=''), "}",
     "\\caption[Satisfaction]{Satisfaction from surgery.}",
     "\\end{center}",
     "\\end{figure}", sep='')
 
   cat("\\begin{figure}[!htbp]",
     "\\begin{center}",
-    "\\includegraphics[scale=1]{", paste('figs/cervical_fu3_', pracs[w],'.pdf', sep=''), "}",
+    "\\includegraphics[scale=1]{", paste('figs/cervical_fu3_', file_name,'.pdf', sep=''), "}",
     "\\caption[Readmission]{Readmission.}",
     "\\end{center}",
     "\\end{figure}", sep='')
