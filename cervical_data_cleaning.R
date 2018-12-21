@@ -75,6 +75,9 @@ data$sub_practice <- sub("^([^*]+)(\\*(.+))?_CP[0-9]{4}$", "\\3", data$pt_study_
 data$pt_id <- sub(".*_", "", as.character(data$pt_study_id))
 data$surgeon <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surgeon))
 data$surg_location <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surg_location))
+data <- subset(data, practice != "MMPNSS")
+data$practice<-data$redcap_data_access_group
+data <- subset(data, practice != "MMPNSS")
 #liste=c("Semmes","Vanderbilt","Duke")
 #data <- subset(data, practice %in% liste)
 # merge the data with index #
