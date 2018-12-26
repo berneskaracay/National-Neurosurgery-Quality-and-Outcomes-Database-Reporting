@@ -51,6 +51,7 @@ vid <- which(names(data) %in% c('patient_baseline_interview_complete', 'patient_
 names(dat2)[(vid[2]+1):vid[4]] <- paste(names(dat1)[(vid[2]+1):vid[4]], ".3m", sep="")
 names(dat3)[(vid[2]+1):vid[4]] <- paste(names(dat1)[(vid[2]+1):vid[4]], ".12m", sep="")
 
+
 # merge the data sets #
 dat1b <- dat1[c(1:vid[1], (vid[3]+1):vid[5])]
 dat2b <- dat2[c(1,(vid[1]+1):vid[4])]
@@ -819,7 +820,7 @@ catfun1 <- function(var1, var2, ilev, dfs, var3="pt_study_id") {
 }
 
 # for categorical variables for figures#
-catfun1b <- function(var1, var2, ilev, dfs, var3="pt_study_id") {
+catfun1b <- function(var1, var2, ilev, dfs=datas, var3="pt_study_id") {
   nlist <- length(dfs)
   dats <- vector("list", nlist)
   for (i in 1:nlist) {

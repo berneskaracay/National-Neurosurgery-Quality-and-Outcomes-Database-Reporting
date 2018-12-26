@@ -70,14 +70,27 @@ data <- merge(data, dat3b, by=c('pt_study_id'), all=TRUE)
 
 ### extract practice/center name, patient id, surgeon id, hospital/surg_location ###
 n <- nrow(data)
+data<-data[,1:15]
 data$practice <- sub("^([^*]+)(\\*(.+))?_CP[0-9]{4}$", "\\1", data$pt_study_id)
 data$sub_practice <- sub("^([^*]+)(\\*(.+))?_CP[0-9]{4}$", "\\3", data$pt_study_id)
 data$pt_id <- sub(".*_", "", as.character(data$pt_study_id))
 data$surgeon <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surgeon))
 data$surg_location <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surg_location))
 data <- subset(data, practice != "MMPNSS")
-data$practice<-data$redcap_data_access_group
-data <- subset(data, practice != "MMPNSS")
+data$practice<-data$dag_label
+
+##### subsite part#############################
+
+
+data<-subset(data,redcap_data_access_group %in% "ihc")
+
+
+data$location <- as.character(factor(data$location, levels=c(1,2,3,4,5,6,7,8), labels=c("+DRMC","+IMED","+LRH","+MKD","+UVH","+KMH","+MHB","+SOC")))
+data$location[is.na(data$location)] <- ""
+#data$practice[is.na(data$practice)]<-data$location
+data$practice1<-paste(data$practice,data$location, sep='')
+#data$practice<-data$practice1
+#data <- subset(data, practice %nin%c("IHC","CHS"))
 #liste=c("Semmes","Vanderbilt","Duke")
 #data <- subset(data, practice %in% liste)
 # merge the data with index #
@@ -86,6 +99,10 @@ data_follow_up <- merge(data, d_follow_up[,c('pt_study_id', 'analyzed_3month', '
 
 
 data <- merge(data, d[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month')], by='pt_study_id', all.y=TRUE)
+
+data34 <- subset(data, practice == "IHC")
+write.table(data34, file="mydata1.csv",sep=",",row.names=F)
+
 
 data$surgery_date <- as.Date(data$date_surgery_performed)
 data$surgery_date[is.na(data$surgery_date)] <- as.Date(data$surgerydte1[is.na(data$surgery_date)])
