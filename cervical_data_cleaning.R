@@ -70,7 +70,6 @@ data <- merge(data, dat3b, by=c('pt_study_id'), all=TRUE)
 
 ### extract practice/center name, patient id, surgeon id, hospital/surg_location ###
 n <- nrow(data)
-data<-data[,1:15]
 data$practice <- sub("^([^*]+)(\\*(.+))?_CP[0-9]{4}$", "\\1", data$pt_study_id)
 data$sub_practice <- sub("^([^*]+)(\\*(.+))?_CP[0-9]{4}$", "\\3", data$pt_study_id)
 data$pt_id <- sub(".*_", "", as.character(data$pt_study_id))
@@ -78,19 +77,7 @@ data$surgeon <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surgeon))
 data$surg_location <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surg_location))
 data <- subset(data, practice != "MMPNSS")
 data$practice<-data$dag_label
-
-##### subsite part#############################
-
-
-data<-subset(data,redcap_data_access_group %in% "ihc")
-
-
-data$location <- as.character(factor(data$location, levels=c(1,2,3,4,5,6,7,8), labels=c("+DRMC","+IMED","+LRH","+MKD","+UVH","+KMH","+MHB","+SOC")))
-data$location[is.na(data$location)] <- ""
-#data$practice[is.na(data$practice)]<-data$location
-data$practice1<-paste(data$practice,data$location, sep='')
-#data$practice<-data$practice1
-#data <- subset(data, practice %nin%c("IHC","CHS"))
+data <- subset(data, practice != "MMPNSS")
 #liste=c("Semmes","Vanderbilt","Duke")
 #data <- subset(data, practice %in% liste)
 # merge the data with index #
@@ -99,10 +86,6 @@ data_follow_up <- merge(data, d_follow_up[,c('pt_study_id', 'analyzed_3month', '
 
 
 data <- merge(data, d[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month')], by='pt_study_id', all.y=TRUE)
-
-data34 <- subset(data, practice == "IHC")
-write.table(data34, file="mydata1.csv",sep=",",row.names=F)
-
 
 data$surgery_date <- as.Date(data$date_surgery_performed)
 data$surgery_date[is.na(data$surgery_date)] <- as.Date(data$surgerydte1[is.na(data$surgery_date)])
@@ -286,7 +269,7 @@ data$eq5dscore.3m <- eq$score[match(data$com.3m, eq$com)]
 data$eq5dscore.12m <- eq$score[match(data$com.12m, eq$com)]
 
 data$revision <- ifelse(data$primary_revision %in% 2, 1, 0)
-
+data$revision[is.na(data$primary_revision)]<-NA
 
 # joa #
 data$joa <- data$mjoa_score_baseline
@@ -335,314 +318,314 @@ data$rtw.3m[is.na(data$day)] <- NA
 #### model fitting to get plots and tables of expected values ####
 ##################################################################
 
-    ds <- data
-    ds$race <- ifelse(ds$prace___5==1, 'white', 'other')
-    ds$race[ds$prace___3==1] <- 'black'
-    ds$race <- factor(ds$race, levels=c('white', 'black', 'other'), labels=c('1','2','3'))
-    ds$predominat_symptom_durg <- factor(ds$predominat_symptom_durg, levels=c('1','2','3'))
-    ds$underlying_pathology <- NA
-    ds$underlying_pathology[ds$underlying_pathology___1 %in% 1] <- 1
-    ds$underlying_pathology[ds$underlying_pathology___2 %in% 1] <- 2
-    ds$underlying_pathology[ds$underlying_pathology___3 %in% 1] <- 3
-    ds$underlying_pathology[ds$underlying_pathology___4 %in% 1] <- 4
-    ds$underlying_pathology[ds$underlying_pathology___5 %in% 1] <- 5
-    ds$underlying_pathology[ds$underlying_pathology___6 %in% 1] <- 6
-    ds$underlying_pathology <- factor(ds$underlying_pathology, levels=c('1','2','3','4','5','6'))
-    ds$occupation <- factor(ds$pre_illness_work2, levels=1:4)
-    ds$work <- ds$pre_illness_work2
-    ds$work[ds$employment %in% c(3,4)] <- 7
-    ds$work[ds$unemployed %in% 1] <- 5
-    ds$work[ds$unemployed %in% 2] <- 6
-    ds$work <- factor(ds$work, levels=c(1,2,3,4,5,6,7))
-    ds$pt_satisfaction_index.3m <- as.numeric(ds$pt_satisfaction_index.3m)
-    ds$pt_satisfaction_index.12m <- as.numeric(ds$pt_satisfaction_index.12m)
-    ds <- subset(ds, select=c(pgender, ptage2, race, ptethnicity,pt_education_level, workers_comp, liability_claim1, any_major_surgery_in_the_p, diabetes, cad, osteoporosis, anxiety, depression, smoker, bmi, predominat_symptom_durg, underlying_pathology, symptom_duration2, asa_grade, arthrodesis, surgical_approach, occupation, work, ndiscore, eq5dscore, neck_pain_vas, arm_pain_vas1, joa, ndiscore.3m, ndiscore.12m, eq5dscore.3m, eq5dscore.12m, neck_pain_vas.3m, neck_pain_vas.12m, arm_pain_vas1.3m, arm_pain_vas1.12m, pt_satisfaction_index.3m, pt_satisfaction_index.12m, los3, estimated_blood_loss_cc3, joa.3m, joa.12m, rtw.3m, day, practice, pt_study_id, analysis3month, select12m))
-    rtwdata <- subset(ds, !is.na(rtw.3m))
+ds <- data
+ds$race <- ifelse(ds$prace___5==1, 'white', 'other')
+ds$race[ds$prace___3==1] <- 'black'
+ds$race <- factor(ds$race, levels=c('white', 'black', 'other'), labels=c('1','2','3'))
+ds$predominat_symptom_durg <- factor(ds$predominat_symptom_durg, levels=c('1','2','3'))
+ds$underlying_pathology <- NA
+ds$underlying_pathology[ds$underlying_pathology___1 %in% 1] <- 1
+ds$underlying_pathology[ds$underlying_pathology___2 %in% 1] <- 2
+ds$underlying_pathology[ds$underlying_pathology___3 %in% 1] <- 3
+ds$underlying_pathology[ds$underlying_pathology___4 %in% 1] <- 4
+ds$underlying_pathology[ds$underlying_pathology___5 %in% 1] <- 5
+ds$underlying_pathology[ds$underlying_pathology___6 %in% 1] <- 6
+ds$underlying_pathology <- factor(ds$underlying_pathology, levels=c('1','2','3','4','5','6'))
+ds$occupation <- factor(ds$pre_illness_work2, levels=1:4)
+ds$work <- ds$pre_illness_work2
+ds$work[ds$employment %in% c(3,4)] <- 7
+ds$work[ds$unemployed %in% 1] <- 5
+ds$work[ds$unemployed %in% 2] <- 6
+ds$work <- factor(ds$work, levels=c(1,2,3,4,5,6,7))
+ds$pt_satisfaction_index.3m <- as.numeric(ds$pt_satisfaction_index.3m)
+ds$pt_satisfaction_index.12m <- as.numeric(ds$pt_satisfaction_index.12m)
+ds <- subset(ds, select=c(pgender, ptage2, race, ptethnicity,pt_education_level, workers_comp, liability_claim1, any_major_surgery_in_the_p, diabetes, cad, osteoporosis, anxiety, depression, smoker, bmi, predominat_symptom_durg, underlying_pathology, symptom_duration2, asa_grade, arthrodesis, surgical_approach, occupation, work, ndiscore, eq5dscore, neck_pain_vas, arm_pain_vas1, joa, ndiscore.3m, ndiscore.12m, eq5dscore.3m, eq5dscore.12m, neck_pain_vas.3m, neck_pain_vas.12m, arm_pain_vas1.3m, arm_pain_vas1.12m, pt_satisfaction_index.3m, pt_satisfaction_index.12m, los3, estimated_blood_loss_cc3, joa.3m, joa.12m, rtw.3m, day, practice, pt_study_id, analysis3month, select12m))
+rtwdata <- subset(ds, !is.na(rtw.3m))
 
-    ## single impute missing covariates ##
-    tmp <- transcan(~ pgender + ptage2 + race + ptethnicity + pt_education_level + workers_comp + liability_claim1 + any_major_surgery_in_the_p + diabetes + cad + osteoporosis + anxiety + depression + smoker + bmi + predominat_symptom_durg + underlying_pathology + symptom_duration2 + asa_grade + arthrodesis + surgical_approach + work + ndiscore + eq5dscore + neck_pain_vas + arm_pain_vas1 + joa, data=ds, imputed=TRUE, transformed=TRUE, pl=FALSE, pr=FALSE)
-    imp <- impute(tmp, data=ds, list.out=TRUE)
-    ## get complete data set ##
-    for (i in names(tmp$imputed)) {
-        x <- ds[[i]]
-        if (sum(is.na(x))>0) {
-            if (is.numeric(x)) {
-                ds[[i]][is.na(x)] <- tmp$imputed[[i]]
-            } else {
-                ds[[i]][is.na(x)] <- levels(ds[[i]])[tmp$imputed[[i]]]
-            }
-        }
+## single impute missing covariates ##
+tmp <- transcan(~ pgender + ptage2 + race + ptethnicity + pt_education_level + workers_comp + liability_claim1 + any_major_surgery_in_the_p + diabetes + cad + osteoporosis + anxiety + depression + smoker + bmi + predominat_symptom_durg + underlying_pathology + symptom_duration2 + asa_grade + arthrodesis + surgical_approach + work + ndiscore + eq5dscore + neck_pain_vas + arm_pain_vas1 + joa, data=ds, imputed=TRUE, transformed=TRUE, pl=FALSE, pr=FALSE)
+imp <- impute(tmp, data=ds, list.out=TRUE)
+## get complete data set ##
+for (i in names(tmp$imputed)) {
+  x <- ds[[i]]
+  if (sum(is.na(x))>0) {
+    if (is.numeric(x)) {
+      ds[[i]][is.na(x)] <- tmp$imputed[[i]]
+    } else {
+      ds[[i]][is.na(x)] <- levels(ds[[i]])[tmp$imputed[[i]]]
     }
+  }
+}
 
-    ## single impute missing covariates for rtw data ##
-    tmp <- transcan(~ pgender + ptage2 + race + ptethnicity + pt_education_level + workers_comp + liability_claim1 + any_major_surgery_in_the_p + diabetes + cad + osteoporosis + anxiety + depression + smoker + bmi + predominat_symptom_durg + underlying_pathology + symptom_duration2 + asa_grade + arthrodesis + surgical_approach + occupation + ndiscore + eq5dscore + neck_pain_vas + arm_pain_vas1 + joa, data=rtwdata, imputed=TRUE, transformed=TRUE, pl=FALSE, pr=FALSE)
-    imp <- impute(tmp, data=rtwdata, list.out=TRUE)
-    ## get complete data set ##
-    for (i in names(tmp$imputed)) {
-        x <- rtwdata[[i]]
-        if (sum(is.na(x))>0) {
-            if (is.numeric(x)) {
-                rtwdata[[i]][is.na(x)] <- tmp$imputed[[i]]
-            } else {
-                rtwdata[[i]][is.na(x)] <- levels(rtwdata[[i]])[tmp$imputed[[i]]]
-            }
-        }
+## single impute missing covariates for rtw data ##
+tmp <- transcan(~ pgender + ptage2 + race + ptethnicity + pt_education_level + workers_comp + liability_claim1 + any_major_surgery_in_the_p + diabetes + cad + osteoporosis + anxiety + depression + smoker + bmi + predominat_symptom_durg + underlying_pathology + symptom_duration2 + asa_grade + arthrodesis + surgical_approach + occupation + ndiscore + eq5dscore + neck_pain_vas + arm_pain_vas1 + joa, data=rtwdata, imputed=TRUE, transformed=TRUE, pl=FALSE, pr=FALSE)
+imp <- impute(tmp, data=rtwdata, list.out=TRUE)
+## get complete data set ##
+for (i in names(tmp$imputed)) {
+  x <- rtwdata[[i]]
+  if (sum(is.na(x))>0) {
+    if (is.numeric(x)) {
+      rtwdata[[i]][is.na(x)] <- tmp$imputed[[i]]
+    } else {
+      rtwdata[[i]][is.na(x)] <- levels(rtwdata[[i]])[tmp$imputed[[i]]]
     }
+  }
+}
 
 
-                                        # to get bootstrap CI #
-    btfun <- function(x, B=2000) {
-        set.seed(123)
-        n <- length(x)
-        if (n > 0) {
-            m <- mean(x, na.rm=TRUE)
-            v <- numeric(B)
-            for (i in seq(B)) {
-                v[i] <- mean(x[sample(1:n, size=n, replace=TRUE)], na.rm=TRUE)
-            }
-            ci <- quantile(v, probs=c(0.025,0.975))
-            return(c(n,m,ci))
-        }
-        return(c(0,NA,NA,NA))
+# to get bootstrap CI #
+btfun <- function(x, B=2000) {
+  set.seed(123)
+  n <- length(x)
+  if (n > 0) {
+    m <- mean(x, na.rm=TRUE)
+    v <- numeric(B)
+    for (i in seq(B)) {
+      v[i] <- mean(x[sample(1:n, size=n, replace=TRUE)], na.rm=TRUE)
     }
+    ci <- quantile(v, probs=c(0.025,0.975))
+    return(c(n,m,ci))
+  }
+  return(c(0,NA,NA,NA))
+}
 
-                                        # fit models and get observed and expected mean for each site #
-    modfun <- function(dt, fmla, resp1, resp2, prs=data.frame(prac=pracs1)) {
-        dt1 <- dt[dt$analysis3month & !is.na(dt[[resp1]]),]
-        tmp <- aggregate(dt1[[resp1]], by=list(dt1$practice), FUN=btfun)
-        obs1 <- data.frame(prac=tmp[[1]], n=tmp[[2]][,1], m=tmp[[2]][,2], lower=tmp[[2]][,3], upper=tmp[[2]][,4])
-        dd <<- datadist('dt1')
-        options(datadist='dd')
-        fmla1 <- as.formula(paste(resp1, '~', fmla))
-        fit1 <- orm(fmla1, data=dt1, x=TRUE, y=TRUE)
-        pred1 <- predict(fit1, type='mean')
-        tmp <- aggregate(pred1, by=list(dt1$practice), FUN=mean, na.rm=TRUE)
-        obs1$pred <- tmp[[2]]
-        obs1 <- merge(obs1, prs, by='prac', all.y=TRUE)
-        
-        if (resp2 != '') {
-            dt2 <- dt[dt$select12m & !is.na(dt[[resp2]]), ]
-            tmp <- aggregate(dt2[[resp2]], by=list(dt2$practice), FUN=btfun)
-            obs2 <- data.frame(prac=tmp[[1]], n2=tmp[[2]][,1], m2=tmp[[2]][,2], lower2=tmp[[2]][,3], upper2=tmp[[2]][,4])
-            dd <<- datadist('dt2')
-            options(datadist='dd')
-            fmla2 <- as.formula(paste(resp2, '~', fmla))
-            fit2 <- orm(fmla2, data=dt2, x=TRUE, y=TRUE)
-            pred2 <- predict(fit2, type='mean')
-            tmp <- aggregate(pred2, by=list(dt2$practice), FUN=mean, na.rm=TRUE)
-            obs2$pred2 <- tmp[[2]]
-            obs1 <- merge(obs1, obs2, by='prac', all.x=TRUE)
-        } else {
-            obs1 <- cbind(obs1, n2=NA, m2=NA, lower2=NA, upper2=NA, pred2=NA)
-        }
-        return(obs1)
-    }
+# fit models and get observed and expected mean for each site #
+modfun <- function(dt, fmla, resp1, resp2, prs=data.frame(prac=pracs1)) {
+  dt1 <- dt[dt$analysis3month & !is.na(dt[[resp1]]),]
+  tmp <- aggregate(dt1[[resp1]], by=list(dt1$practice), FUN=btfun)
+  obs1 <- data.frame(prac=tmp[[1]], n=tmp[[2]][,1], m=tmp[[2]][,2], lower=tmp[[2]][,3], upper=tmp[[2]][,4])
+  dd <<- datadist('dt1')
+  options(datadist='dd')
+  fmla1 <- as.formula(paste(resp1, '~', fmla))
+  fit1 <- orm(fmla1, data=dt1, x=TRUE, y=TRUE)
+  pred1 <- predict(fit1, type='mean')
+  tmp <- aggregate(pred1, by=list(dt1$practice), FUN=mean, na.rm=TRUE)
+  obs1$pred <- tmp[[2]]
+  obs1 <- merge(obs1, prs, by='prac', all.y=TRUE)
+  
+  if (resp2 != '') {
+    dt2 <- dt[dt$select12m & !is.na(dt[[resp2]]), ]
+    tmp <- aggregate(dt2[[resp2]], by=list(dt2$practice), FUN=btfun)
+    obs2 <- data.frame(prac=tmp[[1]], n2=tmp[[2]][,1], m2=tmp[[2]][,2], lower2=tmp[[2]][,3], upper2=tmp[[2]][,4])
+    dd <<- datadist('dt2')
+    options(datadist='dd')
+    fmla2 <- as.formula(paste(resp2, '~', fmla))
+    fit2 <- orm(fmla2, data=dt2, x=TRUE, y=TRUE)
+    pred2 <- predict(fit2, type='mean')
+    tmp <- aggregate(pred2, by=list(dt2$practice), FUN=mean, na.rm=TRUE)
+    obs2$pred2 <- tmp[[2]]
+    obs1 <- merge(obs1, obs2, by='prac', all.x=TRUE)
+  } else {
+    obs1 <- cbind(obs1, n2=NA, m2=NA, lower2=NA, upper2=NA, pred2=NA)
+  }
+  return(obs1)
+}
 
-    
-    
 
-    
 
-    fmla0 <- "pgender + ptage2 + race + ptethnicity + pt_education_level + workers_comp + liability_claim1 + any_major_surgery_in_the_p + diabetes + cad + osteoporosis + anxiety + depression + smoker + rcs(bmi,4) + predominat_symptom_durg + underlying_pathology + symptom_duration2 + asa_grade + arthrodesis + surgical_approach + work + rcs(ndiscore,3) + rcs(eq5dscore,3) + rcs(neck_pain_vas,3) + rcs(arm_pain_vas1,3)"
-    fmla1 <- "pgender + ptage2 + race + ptethnicity + pt_education_level + workers_comp + liability_claim1 + any_major_surgery_in_the_p + diabetes + cad + osteoporosis + anxiety + depression + smoker + rcs(bmi,4) + predominat_symptom_durg + underlying_pathology + symptom_duration2 + asa_grade + arthrodesis + surgical_approach + work + rcs(ndiscore,3) + rcs(eq5dscore,3) + rcs(neck_pain_vas,3) + rcs(arm_pain_vas1,3) + rcs(joa,3)"
 
-                                   # the following models may take a few minutes to run #
-    ndi <- modfun(dt=ds, fmla=fmla0, resp1="ndiscore.3m", resp2="ndiscore.12m", prs=data.frame(prac=pracs1))
-    eq5d <- modfun(dt=ds, fmla=fmla0, resp1="eq5dscore.3m", resp2="eq5dscore.12m", prs=data.frame(prac=pracs1))
-    neck <- modfun(dt=ds, fmla=fmla0, resp1="neck_pain_vas.3m", resp2="neck_pain_vas.12m", prs=data.frame(prac=pracs1))
-    arm <- modfun(dt=ds, fmla=fmla0, resp1="arm_pain_vas1.3m", resp2="arm_pain_vas1.12m", prs=data.frame(prac=pracs1))
-    satisfy <- modfun(dt=ds, fmla=fmla0, resp1="pt_satisfaction_index.3m", resp2="pt_satisfaction_index.12m", prs=data.frame(prac=pracs1))
-    los <- modfun(dt=ds, fmla=fmla0, resp1="los3", resp2="", prs=data.frame(prac=pracs1))
-    blood <- modfun(dt=ds, fmla=fmla0, resp1="estimated_blood_loss_cc3", resp2="", prs=data.frame(prac=pracs1))
-    joa <- modfun(dt=ds, fmla=fmla1, resp1="joa.3m", resp2="joa.12m", prs=data.frame(prac=pracs1))
 
-                                        # organize output results #
-    np <- length(pracs1)
-    modrst <- vector('list', np)
-    for (i in 1:np) {
-        mat <- matrix(NA, nrow=8, ncol=10, dimnames=list(c('neck', 'arm', 'odi', 'eq5d', 'joa', 'satisfy', 'blood', 'los'), c('n', 'm', 'lower', 'upper', 'pred', 'n2', 'm2', 'lower2', 'upper2', 'pred2')))
-        mat[1,] <- as.numeric(neck[i,2:11])
-        mat[2,] <- as.numeric(arm[i,2:11])
-        mat[3,] <- as.numeric(ndi[i,2:11])
-        mat[4,] <- as.numeric(eq5d[i,2:11])
-        mat[5,] <- as.numeric(joa[i,2:11])
-        mat[6,] <- as.numeric(satisfy[i,2:11])
-        mat[7,] <- as.numeric(blood[i,2:11])
-        mat[8,] <- as.numeric(los[i,2:11])
-        modrst[[i]] <- data.frame(mat)
-    }
-    names(modrst) <- names(table(ds$practice))
 
-                                        # model of return to work #
-    fit <- coxph(Surv(day, rtw.3m) ~ pgender + ptage2 + race + ptethnicity + pt_education_level + workers_comp + liability_claim1 + any_major_surgery_in_the_p + diabetes + cad + osteoporosis + anxiety + depression + smoker + rcs(bmi,4) + predominat_symptom_durg + underlying_pathology + symptom_duration2 + asa_grade + arthrodesis + surgical_approach + occupation + rcs(ndiscore,3) + rcs(eq5dscore,3) + rcs(neck_pain_vas,3) + rcs(arm_pain_vas1,3), data=rtwdata)
-    pred <- survfit(fit, newdata=rtwdata, se.fit=FALSE)
-    tmp <- apply(pred$surv, MARGIN=1, FUN=function(x) {
-        zxcv <- aggregate(x, by=list(rtwdata$practice), FUN=mean)
-        return(zxcv[[2]])
-    })
-    survs <- data.frame(cbind(t(tmp), pred$time))
-    colnames(survs) <- c(names(table(rtwdata$practice)), 'time')
+fmla0 <- "pgender + ptage2 + race + ptethnicity + pt_education_level + workers_comp + liability_claim1 + any_major_surgery_in_the_p + diabetes + cad + osteoporosis + anxiety + depression + smoker + rcs(bmi,4) + predominat_symptom_durg + underlying_pathology + symptom_duration2 + asa_grade + arthrodesis + surgical_approach + work + rcs(ndiscore,3) + rcs(eq5dscore,3) + rcs(neck_pain_vas,3) + rcs(arm_pain_vas1,3)"
+fmla1 <- "pgender + ptage2 + race + ptethnicity + pt_education_level + workers_comp + liability_claim1 + any_major_surgery_in_the_p + diabetes + cad + osteoporosis + anxiety + depression + smoker + rcs(bmi,4) + predominat_symptom_durg + underlying_pathology + symptom_duration2 + asa_grade + arthrodesis + surgical_approach + work + rcs(ndiscore,3) + rcs(eq5dscore,3) + rcs(neck_pain_vas,3) + rcs(arm_pain_vas1,3) + rcs(joa,3)"
 
-                                        # generate plot of predicted values #
-    rerange <- function(x, ranges=c(10,10,100,1,3,10,600)) {
-        y <- matrix(NA, nrow=nrow(x), ncol=ncol(x))
-        n <- nrow(x)
-        for (k in 1:n) {
-            y[k,] <- as.numeric(x[k,]*100/ranges[k])
-        }
-        return(y)
-    }
+# the following models may take a few minutes to run #
+ndi <- modfun(dt=ds, fmla=fmla0, resp1="ndiscore.3m", resp2="ndiscore.12m", prs=data.frame(prac=pracs1))
+eq5d <- modfun(dt=ds, fmla=fmla0, resp1="eq5dscore.3m", resp2="eq5dscore.12m", prs=data.frame(prac=pracs1))
+neck <- modfun(dt=ds, fmla=fmla0, resp1="neck_pain_vas.3m", resp2="neck_pain_vas.12m", prs=data.frame(prac=pracs1))
+arm <- modfun(dt=ds, fmla=fmla0, resp1="arm_pain_vas1.3m", resp2="arm_pain_vas1.12m", prs=data.frame(prac=pracs1))
+satisfy <- modfun(dt=ds, fmla=fmla0, resp1="pt_satisfaction_index.3m", resp2="pt_satisfaction_index.12m", prs=data.frame(prac=pracs1))
+los <- modfun(dt=ds, fmla=fmla0, resp1="los3", resp2="", prs=data.frame(prac=pracs1))
+blood <- modfun(dt=ds, fmla=fmla0, resp1="estimated_blood_loss_cc3", resp2="", prs=data.frame(prac=pracs1))
+joa <- modfun(dt=ds, fmla=fmla1, resp1="joa.3m", resp2="joa.12m", prs=data.frame(prac=pracs1))
+
+# organize output results #
+np <- length(pracs1)
+modrst <- vector('list', np)
+for (i in 1:np) {
+  mat <- matrix(NA, nrow=8, ncol=10, dimnames=list(c('neck', 'arm', 'odi', 'eq5d', 'joa', 'satisfy', 'blood', 'los'), c('n', 'm', 'lower', 'upper', 'pred', 'n2', 'm2', 'lower2', 'upper2', 'pred2')))
+  mat[1,] <- as.numeric(neck[i,2:11])
+  mat[2,] <- as.numeric(arm[i,2:11])
+  mat[3,] <- as.numeric(ndi[i,2:11])
+  mat[4,] <- as.numeric(eq5d[i,2:11])
+  mat[5,] <- as.numeric(joa[i,2:11])
+  mat[6,] <- as.numeric(satisfy[i,2:11])
+  mat[7,] <- as.numeric(blood[i,2:11])
+  mat[8,] <- as.numeric(los[i,2:11])
+  modrst[[i]] <- data.frame(mat)
+}
+names(modrst) <- names(table(ds$practice))
+
+# model of return to work #
+fit <- coxph(Surv(day, rtw.3m) ~ pgender + ptage2 + race + ptethnicity + pt_education_level + workers_comp + liability_claim1 + any_major_surgery_in_the_p + diabetes + cad + osteoporosis + anxiety + depression + smoker + rcs(bmi,4) + predominat_symptom_durg + underlying_pathology + symptom_duration2 + asa_grade + arthrodesis + surgical_approach + occupation + rcs(ndiscore,3) + rcs(eq5dscore,3) + rcs(neck_pain_vas,3) + rcs(arm_pain_vas1,3), data=rtwdata)
+pred <- survfit(fit, newdata=rtwdata, se.fit=FALSE)
+tmp <- apply(pred$surv, MARGIN=1, FUN=function(x) {
+  zxcv <- aggregate(x, by=list(rtwdata$practice), FUN=mean)
+  return(zxcv[[2]])
+})
+survs <- data.frame(cbind(t(tmp), pred$time))
+colnames(survs) <- c(names(table(rtwdata$practice)), 'time')
+
+# generate plot of predicted values #
+rerange <- function(x, ranges=c(10,10,100,1,3,10,600)) {
+  y <- matrix(NA, nrow=nrow(x), ncol=ncol(x))
+  n <- nrow(x)
+  for (k in 1:n) {
+    y[k,] <- as.numeric(x[k,]*100/ranges[k])
+  }
+  return(y)
+}
 #####################################################################   
-    
-    for (j in 1:np) {
-      tprac <- pracs1[j]
-      sp <- 10
-      pnam <- paste('figs/',tprac, '_model.pdf', sep='')
-      pdf(pnam, width=16, height=6)
-      par(mar=c(2,10,4,0), xpd=NA, mfrow=c(1,1))
-      plot(0:210, seq(from=0.5, to=7.5, length=211), xlim=c(-2,220), ylim=c(0.8,9.5), xlab='', ylab='', main='', axes=FALSE, type='n')
-      for (i in 8:3) {
-        segments(0, i, 100, i, lty=2, col='grey60')
-        segments(100+sp, i, 200+sp, i, lty=2, col='grey60')
+
+for (j in 1:np) {
+  tprac <- pracs1[j]
+  sp <- 10
+  pnam <- paste('figs/',tprac, '_model.pdf', sep='')
+  pdf(pnam, width=16, height=6)
+  par(mar=c(2,10,4,0), xpd=NA, mfrow=c(1,1))
+  plot(0:210, seq(from=0.5, to=7.5, length=211), xlim=c(-2,220), ylim=c(0.8,9.5), xlab='', ylab='', main='', axes=FALSE, type='n')
+  for (i in 8:3) {
+    segments(0, i, 100, i, lty=2, col='grey60')
+    segments(100+sp, i, 200+sp, i, lty=2, col='grey60')
+  }
+  for (i in 2:1) {
+    segments(0, i, 100, i, lty=2, col='grey60')
+  }
+  trst <- modrst[[tprac]]
+  trst3 <- trst2 <- trst
+  trst2['satisfy', c(2:5,7:10)] <- trst['satisfy', c(2:5,7:10)] - 1
+  trst3[,c(2:5,7:10)] <- rerange(x=trst2[,c(2:5,7:10)], ranges=c(10,10,100,1,17,3,700,10))
+  trst4 <- format(round(trst,2), nsmall=2)
+  trst4[c(3,7),] <- format(round(trst[c(3,7),],1), nsmall=1)
+  for (i in 1:8) {
+    if(!is.nan(trst3[i,'pred'])){
+      if (trst3[i,'pred'] > trst3[i,'upper'] | trst3[i,'pred'] < trst3[i,"lower"]){
+        points(as.numeric(trst3[i,c('m', 'pred')]), c(9-i, 9-i), pch=c(16,17), col=c('blue', 'red'))
+        points(as.numeric(trst3[i,c('lower', 'upper')]), c(9-i, 9-i), pch=c('(', ')'), col=c('blue', 'blue'))
+        text(trst3[i,'m'], 9-i, trst4[i,'m'], pos=3, col='blue', cex=0.8)
+        text(trst3[i,'pred'], 9-i, trst4[i,'pred'], pos=1, col='red', cex=0.8)
+        text(0, 9-i, c(0,0,0,0,0,1,0,0)[i], pos=1)
+        text(100, 9-i, c(10,10,100,1,17,4,700,10)[i], pos=1)
       }
-      for (i in 2:1) {
-        segments(0, i, 100, i, lty=2, col='grey60')
+      else{
+        points(as.numeric(trst3[i,c('m', 'pred')]), c(9-i, 9-i), pch=c(16,18), col=c('blue', 'forestgreen'))
+        points(as.numeric(trst3[i,c('lower', 'upper')]), c(9-i, 9-i), pch=c('(', ')'), col=c('blue', 'blue'))
+        text(trst3[i,'m'], 9-i, trst4[i,'m'], pos=3, col='blue', cex=0.8)
+        text(trst3[i,'pred'], 9-i, trst4[i,'pred'], pos=1, col='forestgreen', cex=0.8)
+        text(0, 9-i, c(0,0,0,0,0,1,0,0)[i], pos=1)
+        text(100, 9-i, c(10,10,100,1,17,4,700,10)[i], pos=1)
       }
-      trst <- modrst[[tprac]]
-      trst3 <- trst2 <- trst
-      trst2['satisfy', c(2:5,7:10)] <- trst['satisfy', c(2:5,7:10)] - 1
-      trst3[,c(2:5,7:10)] <- rerange(x=trst2[,c(2:5,7:10)], ranges=c(10,10,100,1,17,3,700,10))
-      trst4 <- format(round(trst,2), nsmall=2)
-      trst4[c(3,7),] <- format(round(trst[c(3,7),],1), nsmall=1)
-      for (i in 1:8) {
-        if(!is.nan(trst3[i,'pred'])){
-          if (trst3[i,'pred'] > trst3[i,'upper'] | trst3[i,'pred'] < trst3[i,"lower"]){
-            points(as.numeric(trst3[i,c('m', 'pred')]), c(9-i, 9-i), pch=c(16,17), col=c('blue', 'red'))
-            points(as.numeric(trst3[i,c('lower', 'upper')]), c(9-i, 9-i), pch=c('(', ')'), col=c('blue', 'blue'))
-            text(trst3[i,'m'], 9-i, trst4[i,'m'], pos=3, col='blue', cex=0.8)
-            text(trst3[i,'pred'], 9-i, trst4[i,'pred'], pos=1, col='red', cex=0.8)
-            text(0, 9-i, c(0,0,0,0,0,1,0,0)[i], pos=1)
-            text(100, 9-i, c(10,10,100,1,17,4,700,10)[i], pos=1)
-          }
-          else{
-            points(as.numeric(trst3[i,c('m', 'pred')]), c(9-i, 9-i), pch=c(16,18), col=c('blue', 'forestgreen'))
-            points(as.numeric(trst3[i,c('lower', 'upper')]), c(9-i, 9-i), pch=c('(', ')'), col=c('blue', 'blue'))
-            text(trst3[i,'m'], 9-i, trst4[i,'m'], pos=3, col='blue', cex=0.8)
-            text(trst3[i,'pred'], 9-i, trst4[i,'pred'], pos=1, col='forestgreen', cex=0.8)
-            text(0, 9-i, c(0,0,0,0,0,1,0,0)[i], pos=1)
-            text(100, 9-i, c(10,10,100,1,17,4,700,10)[i], pos=1)
-          }
+    }
+    else{
+      points(as.numeric(trst3[i,c('m', 'pred')]), c(9-i, 9-i), pch=c(16,17), col=c('blue', 'red'))
+      points(as.numeric(trst3[i,c('lower', 'upper')]), c(9-i, 9-i), pch=c('(', ')'), col=c('blue', 'blue'))
+      text(trst3[i,'m'], 9-i, trst4[i,'m'], pos=3, col='blue', cex=0.8)
+      text(trst3[i,'pred'], 9-i, trst4[i,'pred'], pos=1, col='red', cex=0.8)
+      text(0, 9-i, c(0,0,0,0,0,1,0,0)[i], pos=1)
+      text(100, 9-i, c(10,10,100,1,17,4,700,10)[i], pos=1)
+    }
+  }
+  
+  if (tprac %in% pracs2) {
+    for (i in 1:6) {
+      if(!is.nan(trst3[i,'pred2'])){
+        if (trst3[i,'pred2'] > trst3[i,'upper2'] | trst3[i,'pred2'] < trst3[i,"lower2"]){
+          points(as.numeric(trst3[i,c('m2', 'pred2')]) + 100 + sp, c(9-i, 9-i), pch=c(16,17), col=c('blue', 'red'))
+          points(as.numeric(trst3[i,c('lower2', 'upper2')]) + 100 + sp, c(9-i, 9-i), pch=c('(', ')'), col=c('blue', 'blue'))
+          text(trst3[i,'m2'] + 100 + sp, 9-i, trst4[i,'m2'], pos=3, col='blue', cex=0.8)
+          text(trst3[i,'pred2'] + 100 + sp, 9-i, trst4[i,'pred2'], pos=1, col='red', cex=0.8)
+          text(100+sp, 9-i, c(0,0,0,0,0,1,0,0)[i], pos=1)
+          text(200+sp, 9-i, c(10,10,100,1,17,4,700,10)[i], pos=1)
         }
         else{
-          points(as.numeric(trst3[i,c('m', 'pred')]), c(9-i, 9-i), pch=c(16,17), col=c('blue', 'red'))
-          points(as.numeric(trst3[i,c('lower', 'upper')]), c(9-i, 9-i), pch=c('(', ')'), col=c('blue', 'blue'))
-          text(trst3[i,'m'], 9-i, trst4[i,'m'], pos=3, col='blue', cex=0.8)
-          text(trst3[i,'pred'], 9-i, trst4[i,'pred'], pos=1, col='red', cex=0.8)
-          text(0, 9-i, c(0,0,0,0,0,1,0,0)[i], pos=1)
-          text(100, 9-i, c(10,10,100,1,17,4,700,10)[i], pos=1)
+          points(as.numeric(trst3[i,c('m2', 'pred2')]) + 100 + sp, c(9-i, 9-i), pch=c(16,18), col=c('blue', 'forestgreen'))
+          points(as.numeric(trst3[i,c('lower2', 'upper2')]) + 100 + sp, c(9-i, 9-i), pch=c('(', ')'), col=c('blue', 'blue'))
+          text(trst3[i,'m2'] + 100 + sp, 9-i, trst4[i,'m2'], pos=3, col='blue', cex=0.8)
+          text(trst3[i,'pred2'] + 100 + sp, 9-i, trst4[i,'pred2'], pos=1, col='forestgreen', cex=0.8)
+          text(100+sp, 9-i, c(0,0,0,0,0,1,0,0)[i], pos=1)
+          text(200+sp, 9-i, c(10,10,100,1,17,4,700,10)[i], pos=1)
         }
       }
-      
-      if (tprac %in% pracs2) {
-        for (i in 1:6) {
-          if(!is.nan(trst3[i,'pred2'])){
-            if (trst3[i,'pred2'] > trst3[i,'upper2'] | trst3[i,'pred2'] < trst3[i,"lower2"]){
-              points(as.numeric(trst3[i,c('m2', 'pred2')]) + 100 + sp, c(9-i, 9-i), pch=c(16,17), col=c('blue', 'red'))
-              points(as.numeric(trst3[i,c('lower2', 'upper2')]) + 100 + sp, c(9-i, 9-i), pch=c('(', ')'), col=c('blue', 'blue'))
-              text(trst3[i,'m2'] + 100 + sp, 9-i, trst4[i,'m2'], pos=3, col='blue', cex=0.8)
-              text(trst3[i,'pred2'] + 100 + sp, 9-i, trst4[i,'pred2'], pos=1, col='red', cex=0.8)
-              text(100+sp, 9-i, c(0,0,0,0,0,1,0,0)[i], pos=1)
-              text(200+sp, 9-i, c(10,10,100,1,17,4,700,10)[i], pos=1)
-            }
-            else{
-              points(as.numeric(trst3[i,c('m2', 'pred2')]) + 100 + sp, c(9-i, 9-i), pch=c(16,18), col=c('blue', 'forestgreen'))
-              points(as.numeric(trst3[i,c('lower2', 'upper2')]) + 100 + sp, c(9-i, 9-i), pch=c('(', ')'), col=c('blue', 'blue'))
-              text(trst3[i,'m2'] + 100 + sp, 9-i, trst4[i,'m2'], pos=3, col='blue', cex=0.8)
-              text(trst3[i,'pred2'] + 100 + sp, 9-i, trst4[i,'pred2'], pos=1, col='forestgreen', cex=0.8)
-              text(100+sp, 9-i, c(0,0,0,0,0,1,0,0)[i], pos=1)
-              text(200+sp, 9-i, c(10,10,100,1,17,4,700,10)[i], pos=1)
-            }
-          }
-          else{
-            points(as.numeric(trst3[i,c('m2', 'pred2')]) + 100 + sp, c(9-i, 9-i), pch=c(16,17), col=c('blue', 'red'))
-            points(as.numeric(trst3[i,c('lower2', 'upper2')]) + 100 + sp, c(9-i, 9-i), pch=c('(', ')'), col=c('blue', 'blue'))
-            text(trst3[i,'m2'] + 100 + sp, 9-i, trst4[i,'m2'], pos=3, col='blue', cex=0.8)
-            text(trst3[i,'pred2'] + 100 + sp, 9-i, trst4[i,'pred2'], pos=1, col='red', cex=0.8)
-            text(100+sp, 9-i, c(0,0,0,0,0,1,0,0)[i], pos=1)
-            text(200+sp, 9-i, c(10,10,100,1,17,4,700,10)[i], pos=1)
-          }
-        }
-      }
-      
-      axis(side=2, at=8:1, labels=c('Neck Pain', 'Arm Pain', 'NDI', 'EQ5D', 'mJOA', 'Patient Satisfaction', 'Blood Loss \n (ml)', 'Length of Hospital Stay \n (day)'), las=2, col='white', font=2, line=-2)
-      legend(x=130, y=2,  legend=c('QOD risk adjusted estimate (significantly different from site)','QOD risk adjusted estimate (no significant difference with site)',latexTranslate(tprac)), pch=c(17,18,16), col=c('red','forestgreen', 'blue'), bty='n', xpd=NA, ncol=1)
-      text(50, 8, '')
-      title(main=paste(tprac, ': Self Benchmark Patient Reported Outcomes and Utilization', sep=''))
-      text(50, 8.3, '3-Month Post-Surgery', pos=3)
-      text(150+sp, 8.3, '12-Month Post-Surgery', pos=3)
-      dev.off()
-      
-      # survival plot #
-      nsample <- sum(rtwdata$practice==tprac)
-      if (nsample>0) {
-        pnam <- paste('figs/cervical_' ,tprac, '_model2.pdf', sep='')
-        pdf(pnam, width=6, height=6)
-        par(mar=c(5,4,4,2), mfrow=c(1,1))
-        dt <- subset(rtwdata, practice==tprac)
-        tmp <- summary(survfit(Surv(day, rtw.3m) ~ 1, data=dt))
-        tmp2 <- tmp
-        tmp2$time <- tmp$time[!is.na(tmp$lower) & !is.na(tmp$upper)]
-        tmp2$surv <- tmp$surv[!is.na(tmp$lower) & !is.na(tmp$upper)]
-        tmp2$lower <- tmp$lower[!is.na(tmp$lower) & !is.na(tmp$upper)]
-        tmp2$upper <- tmp$upper[!is.na(tmp$lower) & !is.na(tmp$upper)]
-        plot(tmp$time, 1-tmp$surv, type='n', xlim=c(0,200), ylim=c(0,1), xlab='Days Post-Surgery', ylab='Proportion of Return to Work')
-        polygon(c(tmp2$time, rev(tmp2$time)), c(1-tmp2$lower, rev(1-tmp2$upper)), col='grey80', border=NA)
-        lines(tmp$time, 1-tmp$surv, type='s')
-        lines(survs$time, 1-survs[[tprac]], type='s', col='blue')
-        title(main=paste(tprac, ': Self Benchmark Return to Work \n (N=', nsample, ')', sep=''), line=4.3)
-        legend('bottomright', bty='n', lty=1:1, col=c('black', 'blue'), legend=c(latexTranslate(tprac), 'QOD risk adjusted'))
-        dev.off()
-      } else {
-        print(tprac)
+      else{
+        points(as.numeric(trst3[i,c('m2', 'pred2')]) + 100 + sp, c(9-i, 9-i), pch=c(16,17), col=c('blue', 'red'))
+        points(as.numeric(trst3[i,c('lower2', 'upper2')]) + 100 + sp, c(9-i, 9-i), pch=c('(', ')'), col=c('blue', 'blue'))
+        text(trst3[i,'m2'] + 100 + sp, 9-i, trst4[i,'m2'], pos=3, col='blue', cex=0.8)
+        text(trst3[i,'pred2'] + 100 + sp, 9-i, trst4[i,'pred2'], pos=1, col='red', cex=0.8)
+        text(100+sp, 9-i, c(0,0,0,0,0,1,0,0)[i], pos=1)
+        text(200+sp, 9-i, c(10,10,100,1,17,4,700,10)[i], pos=1)
       }
     }
+  }
+  
+  axis(side=2, at=8:1, labels=c('Neck Pain', 'Arm Pain', 'NDI', 'EQ5D', 'mJOA', 'Patient Satisfaction', 'Blood Loss \n (ml)', 'Length of Hospital Stay \n (day)'), las=2, col='white', font=2, line=-2)
+  legend(x=130, y=2,  legend=c('QOD risk adjusted estimate (significantly different from site)','QOD risk adjusted estimate (no significant difference with site)',latexTranslate(tprac)), pch=c(17,18,16), col=c('red','forestgreen', 'blue'), bty='n', xpd=NA, ncol=1)
+  text(50, 8, '')
+  title(main=paste(tprac, ': Self Benchmark Patient Reported Outcomes and Utilization', sep=''))
+  text(50, 8.3, '3-Month Post-Surgery', pos=3)
+  text(150+sp, 8.3, '12-Month Post-Surgery', pos=3)
+  dev.off()
+  
+  # survival plot #
+  nsample <- sum(rtwdata$practice==tprac)
+  if (nsample>0) {
+    pnam <- paste('figs/cervical_' ,tprac, '_model2.pdf', sep='')
+    pdf(pnam, width=6, height=6)
+    par(mar=c(5,4,4,2), mfrow=c(1,1))
+    dt <- subset(rtwdata, practice==tprac)
+    tmp <- summary(survfit(Surv(day, rtw.3m) ~ 1, data=dt))
+    tmp2 <- tmp
+    tmp2$time <- tmp$time[!is.na(tmp$lower) & !is.na(tmp$upper)]
+    tmp2$surv <- tmp$surv[!is.na(tmp$lower) & !is.na(tmp$upper)]
+    tmp2$lower <- tmp$lower[!is.na(tmp$lower) & !is.na(tmp$upper)]
+    tmp2$upper <- tmp$upper[!is.na(tmp$lower) & !is.na(tmp$upper)]
+    plot(tmp$time, 1-tmp$surv, type='n', xlim=c(0,200), ylim=c(0,1), xlab='Days Post-Surgery', ylab='Proportion of Return to Work')
+    polygon(c(tmp2$time, rev(tmp2$time)), c(1-tmp2$lower, rev(1-tmp2$upper)), col='grey80', border=NA)
+    lines(tmp$time, 1-tmp$surv, type='s')
+    lines(survs$time, 1-survs[[tprac]], type='s', col='blue')
+    title(main=paste(tprac, ': Self Benchmark Return to Work \n (N=', nsample, ')', sep=''), line=4.3)
+    legend('bottomright', bty='n', lty=1:1, col=c('black', 'blue'), legend=c(latexTranslate(tprac), 'QOD risk adjusted'))
+    dev.off()
+  } else {
+    print(tprac)
+  }
+}
 
-    #####################################################################
-    
-    modrst2 <- vector('list', 0)
-    for (i in 1:np) {
-        tprac <- pracs1[i]
-        if (tprac %nin% pracs2) {
-            mat <- matrix('', nrow=8, ncol=8)
-            tmp1 <- as.matrix(modrst[[tprac]])
-            tmp2 <- as.matrix(format(round(tmp1,2), nsmall=2))
-            tmp2[c(3,7),] <- as.matrix(format(round(tmp1[c(3,7),],1), nsmall=1))
-            mat[1:8,c(2,4)] <- tmp2[1:8,c(2,5)]
-            mat[1:8,3] <- paste('(', tmp2[1:8,3], ', ', tmp2[1:8,4], ')', sep='')
-            mat[1:8,1] <- tmp1[1:8,1]
-            mat2 <- matrix('', nrow=8, ncol=6)
-            mat2[,c(1,3)] <- mat[,c(1,4)]
-            mat2[,2] <- paste(mat[,2], mat[,3], sep='~~~~')
-            modrst2[[tprac]] <- mat2
-        } else {
-            mat <- matrix('', nrow=8, ncol=8)
-            tmp1 <- as.matrix(modrst[[tprac]])
-            tmp2 <- as.matrix(format(round(tmp1,2), nsmall=2))
-            tmp2[c(3,7),] <- as.matrix(format(round(tmp1[c(3,7),],1), nsmall=1))
-            mat[1:8,c(2,4)] <- tmp2[1:8,c(2,5)]
-            mat[1:8,3] <- paste('(', tmp2[1:8,3], ', ', tmp2[1:8,4], ')', sep='')
-            mat[1:8,1] <- tmp1[1:8,1]
-            mat[1:6,5] <- tmp1[1:6,6]
-            mat[1:6,7] <- paste('(', tmp2[1:6,8], ', ', tmp2[1:6,9], ')', sep='')
-            mat[1:6,c(6,8)] <- tmp2[1:6,c(7,10)]
-            mat2 <- matrix('', nrow=8, ncol=6)
-            mat2[,c(1,3, 4, 6)] <- mat[,c(1,4, 5, 8)]
-            mat2[,2] <- paste(mat[,2], mat[,3], sep='~~~~')
-            mat2[,5] <- paste(mat[,6], mat[,7], sep='~~~~')
-            modrst2[[tprac]] <- mat2
-        }
-    }
-    save(modrst2, file='cervical_modrst2.RData')
+#####################################################################
+
+modrst2 <- vector('list', 0)
+for (i in 1:np) {
+  tprac <- pracs1[i]
+  if (tprac %nin% pracs2) {
+    mat <- matrix('', nrow=8, ncol=8)
+    tmp1 <- as.matrix(modrst[[tprac]])
+    tmp2 <- as.matrix(format(round(tmp1,2), nsmall=2))
+    tmp2[c(3,7),] <- as.matrix(format(round(tmp1[c(3,7),],1), nsmall=1))
+    mat[1:8,c(2,4)] <- tmp2[1:8,c(2,5)]
+    mat[1:8,3] <- paste('(', tmp2[1:8,3], ', ', tmp2[1:8,4], ')', sep='')
+    mat[1:8,1] <- tmp1[1:8,1]
+    mat2 <- matrix('', nrow=8, ncol=6)
+    mat2[,c(1,3)] <- mat[,c(1,4)]
+    mat2[,2] <- paste(mat[,2], mat[,3], sep='~~~~')
+    modrst2[[tprac]] <- mat2
+  } else {
+    mat <- matrix('', nrow=8, ncol=8)
+    tmp1 <- as.matrix(modrst[[tprac]])
+    tmp2 <- as.matrix(format(round(tmp1,2), nsmall=2))
+    tmp2[c(3,7),] <- as.matrix(format(round(tmp1[c(3,7),],1), nsmall=1))
+    mat[1:8,c(2,4)] <- tmp2[1:8,c(2,5)]
+    mat[1:8,3] <- paste('(', tmp2[1:8,3], ', ', tmp2[1:8,4], ')', sep='')
+    mat[1:8,1] <- tmp1[1:8,1]
+    mat[1:6,5] <- tmp1[1:6,6]
+    mat[1:6,7] <- paste('(', tmp2[1:6,8], ', ', tmp2[1:6,9], ')', sep='')
+    mat[1:6,c(6,8)] <- tmp2[1:6,c(7,10)]
+    mat2 <- matrix('', nrow=8, ncol=6)
+    mat2[,c(1,3, 4, 6)] <- mat[,c(1,4, 5, 8)]
+    mat2[,2] <- paste(mat[,2], mat[,3], sep='~~~~')
+    mat2[,5] <- paste(mat[,6], mat[,7], sep='~~~~')
+    modrst2[[tprac]] <- mat2
+  }
+}
+save(modrst2, file='cervical_modrst2.RData')
 
 
 #################################
@@ -1250,7 +1233,7 @@ tab6fun <- function(datas) {
   M[89,] <- confun1(var1="levels", var2="ind3", var3="ind10", dfs=datas)
   return(M)
 }
-  
+
 # Table of safety and quality #
 tab7fun <- function(datas, datasb) {
   M <- matrix("", nrow=37, ncol=2)
@@ -1361,7 +1344,7 @@ tab7bfun <- function(datas) {
 }
 
 
-  
+
 
 tab9pfun <- function(datas) {
   M <- matrix(NA, nrow=5, ncol=9)
@@ -1579,13 +1562,12 @@ pracs <- pracs1
 filepracs <- gsub('*', '+', pracs, fixed=TRUE)
 
 for (k in seq_along(pracs)) {
-    Sweave("cervical_report_generate.Rnw", output=paste0(filepracs[k], ".tex"))
+  Sweave("cervical_report_generate.Rnw", output=paste0(filepracs[k], ".tex"))
 }
 
 for (k in seq_along(pracs)) {
-    for (q in 1:3) {
-        if (system(paste0("pdflatex -halt-on-error ", filepracs[k], ".tex")) != 0L)
-            stop("Unable to compile latex document ", filepracs[k], ".tex")
-    }
+  for (q in 1:3) {
+    if (system(paste0("pdflatex -halt-on-error ", filepracs[k], ".tex")) != 0L)
+      stop("Unable to compile latex document ", filepracs[k], ".tex")
+  }
 }
-

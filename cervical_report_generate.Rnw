@@ -124,7 +124,7 @@ hl2 <- hltab2(data=data1, ipr=pracs[k])
 
 <<echo=FALSE, results=hide>>=
 tab3 <- tab3fun(datas=datas)
-rownames(tab3) <- c("Comorbidity", "~~~Diabetes", "~~~Coronary Artery Disease", "~~~Osteoporosis", "~~~Anxiety", "~~~Depression", "Smoking", "~~~Current Every Day", "~~~Current Some Day", "~~~Not a Current Smoker", "Body Mass Index","Revision", "Primary Indication for Surgery", "~~~Radiculopathy","~~~Myelopathy","~~~Neck Pain from Instability", "Underlying Pathology", "~~~Disc Herniation", "~~~Foraminal Stenosis", "~~~Central Stenosis", "~~~Cervical Instability", "~~~Pseudoarthrosis", "~~~Adjacent Segment Disease", "Duration", "~~~Less Than 3 Months", "~~~Greater Than 3 Months","~~~More then 12 months","ASA Grade", "~~~1", "~~~2", "~~~3", "~~~4", "Arthrodesis Performed", "Surgical Approach", "~~~Anterior","~~~Posterior", "~~~Two-stage", 'Surgical Levels')
+rownames(tab3) <- c("Comorbidity", "~~~Diabetes", "~~~Coronary Artery Disease", "~~~Osteoporosis", "~~~Anxiety", "~~~Depression", "Smoking", "~~~Current Every Day", "~~~Current Some Day", "~~~Not a Current Smoker", "Body Mass Index","Revision", "Primary Indication for Surgery", "~~~Radiculopathy","~~~Myelopathy","~~~Neck Pain from Instability", "Underlying Pathology", "~~~Disc Herniation", "~~~Foraminal Stenosis", "~~~Central Stenosis", "~~~Cervical Instability", "~~~Pseudoarthrosis", "~~~Adjacent Segment Disease", "Duration", "~~~Less Than 3 Months", "~~~Greater Than 3 Months","~~~More then 12 months","ASA Grade", "~~~1", "~~~2", "~~~3", "~~~4", "Arthrodesis Performed", "Surgical Approach","~~~Posterior", "~~~Anterior", "~~~Two-stage", 'Surgical Levels')
 hl3 <- hltab3(data=data1, ipr=pracs[k])
 @
 

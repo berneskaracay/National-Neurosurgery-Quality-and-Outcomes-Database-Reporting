@@ -73,7 +73,7 @@ n <- nrow(data)
 
 
 data$practice <- sub("^([^*]+)(\\*(.+))?_CP[0-9]{4}$", "\\1", data$pt_study_id)
-data$practice<-data$redcap_data_access_group
+data$practice<-data$dag_label
 data$sub_practice <- sub("^([^*]+)(\\*(.+))?_CP[0-9]{4}$", "\\3", data$pt_study_id)
 data$pt_id <- sub(".*_", "", as.character(data$pt_study_id))
 data$surgeon_name <- data$surgeon
@@ -81,7 +81,7 @@ data$surgeon_name <- str_replace_all(data$surgeon_name, "[[:punct:]]", " ")
 data$surgeon <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surgeon))
 data$surg_location <- sub('^.*\\(([0-9]+)\\)$', '\\1', as.character(data$surg_location))
 data_follow_up1 <- merge(data, d_follow_up[,c('pt_study_id', 'analyzed_3month', 'analyzed_12month', 'analysis3month', 'analysis12month',"usefull3month","usefull12month")], by='pt_study_id', all.y=TRUE)
-
+data$practice<-data$dag_label
 
 
 
@@ -294,7 +294,7 @@ data$eq5dscore.3m <- eq$score[match(data$com.3m, eq$com)]
 data$eq5dscore.12m <- eq$score[match(data$com.12m, eq$com)]
 
 data$revision <- ifelse(data$primary_revision %in% 2, 1, 0)
-
+data$revision[is.na(data$primary_revision)]<-NA
 
 # joa #
 data$joa <- data$mjoa_score_baseline
